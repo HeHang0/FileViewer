@@ -1,0 +1,19 @@
+﻿<Window x:Class="FileViewer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"  
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FileViewer"
+        mc:Ignorable="d" Name="MyMainWindow" Icon="logo.ico" 
+        MinHeight="200" MinWidth="200"
+        Title="{Binding FileInfo.Title}" WindowStartupLocation="CenterScreen">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding Path=ViewerEventer.OnLoaded}" CommandParameter="{Binding ElementName=MyMainWindow}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid>
+        <Image Source="{Binding Path=FileInfo.ThumbnailImage}" Stretch="Fill"/>
+    </Grid>
+</Window>
