@@ -1,37 +1,57 @@
-﻿using FileViewer.FileHelper;
-using Microsoft.WindowsAPICodePack.Shell;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.WindowsAPICodePack.Shell;
+using Prism.Commands;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace FileViewer.ViewModel
 {
     public class FileAccess : INotifyPropertyChanged
     {
-        public delegate void SizeChangeEventHandler(double height, double width);
-        public event SizeChangeEventHandler SizeChange;
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
         public string Title { get; private set; }
 
-        public FileExtension FType { get; private set; }
+        public string FilePath { get; private set; }
 
-        public BitmapSource ThumbnailImage { get; private set; }
+        public ImageSource IconImage { get; private set; }
 
-        public void InitFile(object sender, string filePath)
+        public Brush BackgroundColor { get; private set; } = Brushes.White;
+
+        public void InitFile(string filePath)
         {
+            if (FilePath == filePath) return;
+            if (!Directory.Exists(filePath) && !File.Exists(filePath)) return;
             Title = Path.GetFileName(filePath);
-            FType = FileType.GetFileType(filePath);
+            FilePath = filePath;
             ShellObject shellFile = ShellObject.FromParsingName(filePath);
-            ThumbnailImage = shellFile.Thumbnail.ExtraLargeBitmapSource;
-            SizeChange?.Invoke(ThumbnailImage.Height, ThumbnailImage.Width);
+            IconImage = shellFile.Thumbnail.SmallBitmapSource;
+            //SizeChange?.Invoke(ThumbnailImage.Height, ThumbnailImage.Width);
         }
+        public bool Loading { get; private set; }
+
+        private void LoadingChange(bool loading)
+        {
+            Loading = loading;
+        }
+
+        private void ColorChange(Color color)
+        {
+            BackgroundColor = new SolidColorBrush(color);
+        }
+
+        public FileAccess()
+        {
+            GlobalNotify.LoadingChange += LoadingChange;
+            GlobalNotify.ColorChange += ColorChange;
+        }
+
+        public ICommand OpenFile => new DelegateCommand(() => 
+        {
+            if(File.Exists(FilePath) || Directory.Exists(FilePath))
+            System.Diagnostics.Process.Start(FilePath);
+        });
     }
 }

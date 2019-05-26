@@ -1,8 +1,11 @@
 ﻿using FileViewer.ViewModel;
 using System;
 using System.Drawing;
+using System.IO;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Media;
+using Application = System.Windows.Application;
 
 namespace FileViewer
 {
@@ -16,50 +19,105 @@ namespace FileViewer
         {
             myViewer = new Viewer();
             myViewer.ViewerEventer.ReceiveFile += BalloonTips;
-            myViewer.ViewerEventer.Loaded += MyViewer_Loaded;
-            myViewer.FileInfo.SizeChange += SizeChange;
+            myViewer.ViewerEventer.ReceiveFile += myViewer.FileInfo.InitFile;
+            GlobalNotify.SizeChange += SizeChange;
+            GlobalNotify.FullScreen += FullScreen;
             InitializeComponent();
             DataContext = myViewer;
         }
 
+        private void FullScreen(bool isFullScreen)
+        {
+            if (isFullScreen)
+            {
+                WindowStyle = System.Windows.WindowStyle.None;
+                WindowState = WindowState.Maximized;
+            }
+            else
+            {
+                WindowStyle = System.Windows.WindowStyle.SingleBorderWindow;
+                WindowState = WindowState.Normal;
+            }
+        }
+
         private void SizeChange(double height, double width)
         {
-            Height = height;
-            Width = width;
+            height += SystemParameters.CaptionHeight+10;
+            var workArea = SystemParameters.WorkArea;
+            if(height > workArea.Height)
+            {
+                Height = workArea.Height;
+            }
+            else
+            {
+                Height = height;
+            }
+            if (width > workArea.Width)
+            {
+                Width = workArea.Width;
+            }
+            else
+            {
+                Width = width;
+            }
+            //Left = workArea.Left + (workArea.Width / 2 - Width / 2);
+            //Top = workArea.Top + (workArea.Height / 2 - Height / 2);
         }
 
-        private void MyViewer_Loaded(object sender, EventArgs e)
+        private void MyMainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             InitNotyfy();
-            Hide();
+            //Hide();
+            myViewer.ViewerEventer.OnLoaded.Execute(null);
         }
 
-        System.Windows.Forms.NotifyIcon notifyIcon;
+        NotifyIcon notifyIcon;
         private void InitNotyfy()
         {
-            notifyIcon = new System.Windows.Forms.NotifyIcon();
+            notifyIcon = new NotifyIcon();
             notifyIcon.Text = Title;//最小化到托盘时，鼠标点击时显示的文本
-            notifyIcon.Icon = FromImageSource(Icon);//程序图标
+            notifyIcon.Icon = Properties.Resources.logo ;//程序图标
             notifyIcon.Visible = true;
-            BalloonTips(null, "Viewer");
+            MenuItem closeItem = new MenuItem("退出");
+            closeItem.Click += ExitApp;
+            MenuItem openItem = new MenuItem("显示");
+            openItem.Click += Show;
+            MenuItem[] menu = new MenuItem[] { openItem, closeItem };
+            notifyIcon.ContextMenu = new ContextMenu(menu);
         }
 
-        private static Icon FromImageSource(ImageSource icon)
+        private void ExitApp(object sender, EventArgs e)
         {
-            if (icon == null)
+            notifyIcon.Dispose();
+            Application.Current.Shutdown();
+        }
+
+        private void Show(object sender, EventArgs e)
+        {
+            Show();
+        }
+
+        private void BalloonTips(string msg)
+        {
+            msg = Path.GetFileName(msg);
+            if (msg.Length > 16)
             {
-                return null;
+                msg = msg.Substring(0, 13) + "...";
             }
-            Uri iconUri = new Uri(icon.ToString());
-            return new Icon(Application.GetResourceStream(iconUri).Stream);
-        }
-
-        private void BalloonTips(object sender, string msg)
-        {
-            //notifyIcon.BalloonTipText = msg; //设置托盘提示显示的文本
-            //notifyIcon.ShowBalloonTip(500);
+            notifyIcon.Text = msg;
             Show();
             Activate();
+            if(WindowState == WindowState.Minimized)
+            {
+                WindowState = WindowState.Normal;
+            }
+        }
+
+        private void MyMainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Hide();
+            e.Cancel = true;
+            GlobalNotify.OnWindowClose();
         }
     }
 }
