@@ -1,58 +1,79 @@
-﻿using FileViewer.Monitor;
+﻿using FileViewer.Globle;
+using FileViewer.Monitor;
 using Prism.Commands;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 
 namespace FileViewer.ViewModel
 {
-    public class Eventer
+    public class Eventer : BaseBackgroundWork
     {
+
         public ICommand OnLoaded => new DelegateCommand<System.Windows.Window>((win) => {
-            Loaded?.Invoke(null, null);
             InitHotKey(win);
         });
+        public ICommand OpenFile => new DelegateCommand(() => {
+            
+        });
 
-        public delegate void ReceiveFileEventHandler(object sender, string msg);
+        public delegate void ReceiveFileEventHandler(string msg);
         public event ReceiveFileEventHandler ReceiveFile;
         void OnReceiveFile(string msg)
         {
-            ReceiveFile?.Invoke(this, msg);
+            ReceiveFile?.Invoke(msg);
         }
 
-        public event EventHandler Loaded;
-
-
+        KeyboardHook _keyboardHook;
         private void InitHotKey(System.Windows.Window win)
         {
-            HwndSource hWndSource;
-            WindowInteropHelper wih = new WindowInteropHelper(win);
-            hWndSource = HwndSource.FromHwnd(wih.Handle);
-            //添加处理程序 
-            hWndSource.AddHook(MainWindowProc);
-            HotKey.RegisterHotKey(wih.Handle, HotKey.GlobalAddAtom("Space"), HotKey.KeyModifiers.None, (int)System.Windows.Forms.Keys.Space);
+            _keyboardHook = new KeyboardHook();
+            _keyboardHook.InstallHook(OnKeyPress);
         }
 
-        private IntPtr MainWindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        private void OnKeyPress(KeyboardHook.HookStruct hookStruct, out bool handle)
         {
-            switch (msg)
+            handle = false; //预设不拦截任何键
+            if (GlobalNotify.IsLoading()) return;
+            Keys key = (Keys)hookStruct.vkCode;
+            if (key == Keys.Space)
             {
-                case HotKey.WM_HOTKEY:
-                    {
-                        handled = true;
-                        var (ok, filePath) = ExplorerFile.GetCurrentFilePath();
-                        if (ok)
-                        {
-                            OnReceiveFile(filePath);
-                        }
-                        break;
-                    }
+                InitBackGroundWork();
+                bgWorker.RunWorkerAsync();
             }
-            return IntPtr.Zero;
+        }
+
+        protected override void BgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (!e.Cancelled && e.Result != null)
+            {
+                string filePath = (string)e.Result;
+                OnReceiveFile(filePath);
+            }
+        }
+
+        protected override void BgWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            var (ok, filePath) = ExplorerFile.GetCurrentFilePath();
+            if (ok && !(sender as BackgroundWorker).CancellationPending)
+            {
+                e.Result = filePath;
+            }
+            else
+            {
+                e.Cancel = true;
+            }
+        }
+
+        protected override void BgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
         }
     }
 }

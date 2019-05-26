@@ -6,7 +6,6 @@
         {
             ViewerEventer = new Eventer();
             FileInfo = new FileAccess();
-            ViewerEventer.ReceiveFile += FileInfo.InitFile;
         }
 
         public FileAccess FileInfo { get; } 
