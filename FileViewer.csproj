@@ -17,6 +17,7 @@
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -29,7 +30,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -171,9 +171,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FileAnalyze\Viewer.xaml.cs">
-      <DependentUpon>Viewer.xaml</DependentUpon>
+    <Compile Include="AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FileControl\Common\CommonControl.xaml.cs">
+      <DependentUpon>CommonControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FileControl\Common\CommonModel.cs" />
+    <Compile Include="FileControl\Hello\HelloControl.xaml.cs">
+      <DependentUpon>HelloControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FileControl\Hello\HelloModel.cs" />
+    <Compile Include="FileControl\IFileModel.cs" />
     <Compile Include="FileControl\Office\Excel\ExcelControl.xaml.cs">
       <DependentUpon>ExcelControl.xaml</DependentUpon>
     </Compile>
@@ -191,7 +200,6 @@
       <DependentUpon>ImageControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="FileControl\Image\ImageModel.cs" />
-    <Compile Include="FileControl\IFileChanged.cs" />
     <Compile Include="FileControl\Loading.xaml.cs">
       <DependentUpon>Loading.xaml</DependentUpon>
     </Compile>
@@ -218,8 +226,8 @@
     <Compile Include="FileControl\Office\Word\WordModel.cs" />
     <Compile Include="FileHelper\FileType.cs" />
     <Compile Include="FileHelper\ShellItems.cs" />
-    <Compile Include="FileHelper\WindowsThumbnailProvider.cs" />
     <Compile Include="Globle\BaseBackgroundWork.cs" />
+    <Compile Include="Globle\Utils.cs" />
     <Compile Include="Monitor\HotKey.cs" />
     <Compile Include="Monitor\KeyboardHook.cs" />
     <Compile Include="ViewModel\Eventer.cs" />
@@ -229,7 +237,15 @@
     <Compile Include="WindowStyle\WindowUniversal.xaml.cs">
       <DependentUpon>WindowUniversal.xaml</DependentUpon>
     </Compile>
-    <Page Include="FileAnalyze\Viewer.xaml">
+    <Page Include="AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FileControl\Common\CommonControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FileControl\Hello\HelloControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -343,9 +359,6 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="logo.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -355,6 +368,10 @@
     <Content Include="libmupdf.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\HelloBack.jpg" />
+    <None Include="Resources\preview.png" />
+    <Resource Include="logo.ico" />
+    <None Include="Resources\logo.ico" />
     <None Include="Resources\cloundmusic.ico" />
     <None Include="Resources\toolbarButton-zoomOut.png" />
     <None Include="Resources\toolbarButton-zoomIn.png" />

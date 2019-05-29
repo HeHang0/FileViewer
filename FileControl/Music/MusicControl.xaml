@@ -22,53 +22,55 @@
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
-        <Ellipse Margin="187,178,187,146" RenderTransformOrigin="0.5,0.5">
-            <Ellipse.Fill>
-                <ImageBrush>
-                    <ImageBrush.ImageSource>
-                        <DrawingImage>
-                            <DrawingImage.Drawing>
-                                <ImageDrawing ImageSource="{Binding ThumbnailImage}" Rect="100,100,100,100"></ImageDrawing>
-                            </DrawingImage.Drawing>
-                        </DrawingImage>
-                    </ImageBrush.ImageSource>
-                </ImageBrush>
-            </Ellipse.Fill>
-            <Ellipse.RenderTransform>
-                <RotateTransform x:Name="trans" Angle="0"/>
-            </Ellipse.RenderTransform>
-            <Ellipse.Triggers>
-                <EventTrigger RoutedEvent="Loaded">
-                    <BeginStoryboard >
-                        <Storyboard>
-                            <DoubleAnimation From="0" To="360" RepeatBehavior="Forever" Duration="0:0:3"
+    <Viewbox>
+        <Grid Height="450" Width="500">
+            <Ellipse Margin="187,178,187,146" RenderTransformOrigin="0.5,0.5">
+                <Ellipse.Fill>
+                    <ImageBrush>
+                        <ImageBrush.ImageSource>
+                            <DrawingImage>
+                                <DrawingImage.Drawing>
+                                    <ImageDrawing ImageSource="{Binding ThumbnailImage}" Rect="100,100,100,100"></ImageDrawing>
+                                </DrawingImage.Drawing>
+                            </DrawingImage>
+                        </ImageBrush.ImageSource>
+                    </ImageBrush>
+                </Ellipse.Fill>
+                <Ellipse.RenderTransform>
+                    <RotateTransform x:Name="trans" Angle="0"/>
+                </Ellipse.RenderTransform>
+                <Ellipse.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard >
+                            <Storyboard>
+                                <DoubleAnimation From="0" To="360" RepeatBehavior="Forever" Duration="0:0:3"
                                              Storyboard.TargetName="trans"
                                              Storyboard.TargetProperty="Angle"/>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-            </Ellipse.Triggers>
-        </Ellipse>
-        <Image Source="{Binding BackgroundImg}">
-        </Image>
-        <Button Style="{StaticResource GlassButton}" Background="White" ToolTip="播放"  Margin="10,0,0,5" Width="30" Height="30"
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Ellipse.Triggers>
+            </Ellipse>
+            <Image Source="{Binding BackgroundImg}">
+            </Image>
+            <Button Style="{StaticResource GlassButton}" Background="White" ToolTip="播放"  Margin="10,0,0,5" Width="30" Height="30"
                 Visibility="{Binding IsPause, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" 
                 Command="{Binding PlayCommand}" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-            <Label Content="▷" VerticalAlignment="Bottom" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="30" Height="30"></Label>
-        </Button>
-        <Button Style="{StaticResource GlassButton}" Background="White" ToolTip="暂停"  Margin="10,0,0,5"
+                <Label Content="▷" VerticalAlignment="Bottom" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="30" Height="30"></Label>
+            </Button>
+            <Button Style="{StaticResource GlassButton}" Background="White" ToolTip="暂停"  Margin="10,0,0,5"
                 Visibility="{Binding IsPlaying, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" 
                 Command="{Binding PauseCommand}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="30" Height="30">
-            <Label Content="| |" VerticalAlignment="Bottom" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="30" Height="30"></Label>
-        </Button>
-        <!--<Button Style="{StaticResource CircularButton}" Background="White" Content="▢" ToolTip="停止" Command="{Binding StopCommand}" Margin="0,0,10,34" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="30" />-->
-        <!--<Label Content="{Binding CurrentTime, Mode=OneWay, StringFormat={}{0:mm\\:ss}}" Foreground="White" Margin="10,0,0,5" Height="18" VerticalAlignment="Bottom" Padding="3" HorizontalAlignment="Left" Width="55"/>-->
-        <Slider Style="{StaticResource Slider_CustomStyle}" Cursor="Hand" Value="{Binding MusicPosition, Mode=TwoWay}" IsMoveToPointEnabled="True" Margin="55,0,173,10" Height="18" VerticalAlignment="Bottom"  />
-        <!--<Label Content="{Binding TotalTime, Mode=OneWay, StringFormat={}{0:mm\\:ss}}" Foreground="White" Margin="0,0,110,5" Height="18" VerticalAlignment="Bottom" Padding="3" HorizontalAlignment="Right" Width="55"/>-->
-        <Label Content="{Binding CurrentTime, Mode=OneWay, StringFormat={}{0:mm\\:ss}}" Foreground="White" Margin="0,0,110,10" Height="18" VerticalAlignment="Bottom" Padding="3" HorizontalAlignment="Right" Width="55"/>
+                <Label Content="| |" VerticalAlignment="Bottom" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="30" Height="30"></Label>
+            </Button>
+            <!--<Button Style="{StaticResource CircularButton}" Background="White" Content="▢" ToolTip="停止" Command="{Binding StopCommand}" Margin="0,0,10,34" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="30" />-->
+            <!--<Label Content="{Binding CurrentTime, Mode=OneWay, StringFormat={}{0:mm\\:ss}}" Foreground="White" Margin="10,0,0,5" Height="18" VerticalAlignment="Bottom" Padding="3" HorizontalAlignment="Left" Width="55"/>-->
+            <Slider Style="{StaticResource Slider_CustomStyle}" Cursor="Hand" Value="{Binding MusicPosition, Mode=TwoWay}" IsMoveToPointEnabled="True" Margin="55,0,173,10" Height="18" VerticalAlignment="Bottom"  />
+            <!--<Label Content="{Binding TotalTime, Mode=OneWay, StringFormat={}{0:mm\\:ss}}" Foreground="White" Margin="0,0,110,5" Height="18" VerticalAlignment="Bottom" Padding="3" HorizontalAlignment="Right" Width="55"/>-->
+            <Label Content="{Binding CurrentTime, Mode=OneWay, StringFormat={}{0:mm\\:ss}}" Foreground="White" Margin="0,0,110,10" Height="18" VerticalAlignment="Bottom" Padding="3" HorizontalAlignment="Right" Width="55"/>
 
-        <Slider Style="{StaticResource Slider_CustomStyle_HoverThumb}" Cursor="Hand" IsMoveToPointEnabled="True" Value="{Binding Vol, Mode=TwoWay}" Margin="0,0,10,10" HorizontalAlignment="Right" Width="83" Height="18" VerticalAlignment="Bottom"/>
+            <Slider Style="{StaticResource Slider_CustomStyle_HoverThumb}" Cursor="Hand" IsMoveToPointEnabled="True" Value="{Binding Vol, Mode=TwoWay}" Margin="0,0,10,10" HorizontalAlignment="Right" Width="83" Height="18" VerticalAlignment="Bottom"/>
 
-    </Grid>
+        </Grid>
+    </Viewbox>
 </fc:FileControl>

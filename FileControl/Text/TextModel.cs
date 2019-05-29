@@ -12,10 +12,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace FileViewer.FileControl.Text
 {
-    public class TextModel : BaseBackgroundWork, INotifyPropertyChanged, IFileChanged
+    public class TextModel : BaseBackgroundWork, IFileModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -43,6 +44,9 @@ namespace FileViewer.FileControl.Text
         public IHighlightingDefinition SyntaxHighlighting { get; private set; }
 
 
+
+        private double height = SystemParameters.WorkArea.Height / 2;
+        private double width = SystemParameters.WorkArea.Width / 2;
         public void OnFileChanged((string FilePath, FileExtension Ext) file)
         {
             if (file.Ext == FileExtension.JSON || file.Ext == FileExtension.VUE)
@@ -55,6 +59,8 @@ namespace FileViewer.FileControl.Text
             }
             InitBackGroundWork();
             bgWorker.RunWorkerAsync(file.FilePath);
+            GlobalNotify.OnSizeChange(height, width);
+            OnColorChanged(Colors.White);
         }
 
         protected override void BgWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -66,13 +72,13 @@ namespace FileViewer.FileControl.Text
                     StringBuilder sb = new StringBuilder();
                     string str = "";
                     int i = 0;
-                    for (; i < 2000; i++)
+                    for (; i < 1000; i++)
                     {
                         str = st.ReadLine();
                         if (str == null) break;
                         sb.AppendLine(str);
                     }
-                    if(i == 2000)
+                    if(i == 1000)
                     {
                         sb.AppendLine("...");
                     }
@@ -88,14 +94,15 @@ namespace FileViewer.FileControl.Text
         protected override void BgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
         }
-
-        private double height = SystemParameters.WorkArea.Height / 2;
-        private double width = SystemParameters.WorkArea.Width / 2;
         protected override void BgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             setText((string)e.Result);
             GlobalNotify.OnLoadingChange(false);
-            GlobalNotify.OnSizeChange(height, width);
+        }
+
+        public void OnColorChanged(Color color)
+        {
+            GlobalNotify.OnColorChange(color);
         }
     }
 }

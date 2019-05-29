@@ -17,22 +17,6 @@ namespace FileViewer.FileHelper
                 {
                     return ext;
                 }
-                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-                {
-                    using (BinaryReader br = new BinaryReader(fs))
-                    {
-                        try
-                        {
-                            var b1 = br.ReadByte().ToString();
-                            var b2 = br.ReadByte().ToString();
-                            int.TryParse(b1 + b2, out int typeInt);
-                            return (FileExtension)typeInt;
-                        }
-                        catch (Exception)
-                        {
-                        }
-                    }
-                }
             }
             else if (Directory.Exists(filePath))
             {
@@ -44,11 +28,7 @@ namespace FileViewer.FileHelper
         public static (FileViewType Type, FileExtension Ext) GetFileViewType(string filePath)
         {
             var ext = GetFileType(filePath);
-            if(ext == FileExtension.None)
-            {
-                ext = CheckNoneType(filePath);
-            }
-            var type = FileViewType.Image;
+            var type = FileViewType.None;
             switch (ext)
             {
                 case FileExtension.JPG:
@@ -57,7 +37,6 @@ namespace FileViewer.FileHelper
                 case FileExtension.GIF:
                 case FileExtension.ICO:
                 case FileExtension.SVG:
-                case FileExtension.None:
                     type = FileViewType.Image;
                     break;
                 case FileExtension.TXT:
@@ -78,15 +57,7 @@ namespace FileViewer.FileHelper
                     type = FileViewType.Code;
                     break;
                 case FileExtension.XML:
-                    if (filePath.EndsWith(".svg"))
-                    {
-                        ext = FileExtension.SVG;
-                        type = FileViewType.Image;
-                    }
-                    else
-                    {
-                        type = FileViewType.Code;
-                    }
+                    type = FileViewType.Code;
                     break;
                 case FileExtension.MP3:
                 case FileExtension.WMA:
@@ -116,26 +87,17 @@ namespace FileViewer.FileHelper
                 case FileExtension.PPTX:
                     type = FileViewType.PowerPoint;
                     break;
+                case FileExtension.Folder:
+                    type = FileViewType.Folder;
+                    break;
             }
             return (type, ext);
-        }
-
-        private static FileExtension CheckNoneType(string filePath)
-        {
-            if (Enum.TryParse(Path.GetExtension(filePath).ToUpper(), out FileExtension ext))
-            {
-                return ext;
-            }
-            else
-            {
-                return FileExtension.None;
-            }
         }
     }
 
     public enum FileViewType
     {
-        Image, Code, Txt, Music, Video, Word, Excel, PowerPoint, Pdf, None
+        Image, Code, Txt, Music, Video, Word, Excel, PowerPoint, Pdf, Folder, None
     }
 
     public enum FileExtension

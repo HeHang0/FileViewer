@@ -13,7 +13,7 @@ using System.Windows.Threading;
 
 namespace FileViewer.FileControl.Music
 {
-    public class MusicModel : INotifyPropertyChanged, IFileChanged, IDisposable
+    public class MusicModel : IFileModel, IDisposable
     {
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string propertyName)
@@ -41,6 +41,12 @@ namespace FileViewer.FileControl.Music
             GlobalNotify.OnLoadingChange(false);
             GlobalNotify.OnSizeChange(450, 500);
             SetThumbnailImage();
+            OnColorChanged(Colors.White);
+        }
+
+        public void OnColorChanged(System.Windows.Media.Color color)
+        {
+            GlobalNotify.OnColorChange(color);
         }
 
         private void SetThumbnailImage()

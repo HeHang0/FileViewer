@@ -13,7 +13,7 @@ using System.Windows.Media;
 
 namespace FileViewer.FileControl.Image
 {
-    public class ImageModel : BaseBackgroundWork, INotifyPropertyChanged, IFileChanged
+    public class ImageModel : BaseBackgroundWork, IFileModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public ImageSource ThumbnailImage { get; private set; }
@@ -39,6 +39,12 @@ namespace FileViewer.FileControl.Image
             {
                 ShowThumbnail(GetDefaultThumbnail(file.FilePath));
             }
+            OnColorChanged(Colors.White);
+        }
+
+        public void OnColorChanged(System.Windows.Media.Color color)
+        {
+            GlobalNotify.OnColorChange(color);
         }
 
         public bool IsGif { get; private set; }
