@@ -20,6 +20,8 @@ namespace FileViewer.ViewModel
 
         public Brush BackgroundColor { get; private set; } = Brushes.White;
 
+        public Brush TitleBarForeground { get; private set; } = Brushes.Black;
+
         public void InitFile(string filePath)
         {
             if (FilePath == filePath) return;
@@ -37,9 +39,10 @@ namespace FileViewer.ViewModel
             Loading = loading;
         }
 
-        private void ColorChange(Color color)
+        private void ColorChange(Color color, bool white)
         {
             BackgroundColor = new SolidColorBrush(color);
+            TitleBarForeground = white ? Brushes.Black : Brushes.White;
         }
 
         public FileAccess()

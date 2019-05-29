@@ -23,14 +23,19 @@ namespace FileViewer.WindowStyle
             "OpenCommond", typeof(ICommand), typeof(UniversalWindowStyle),
             new PropertyMetadata(null, OnOpenCommondChanged));
 
-        public static ICommand GetOpenCommond(DependencyObject element)
-        {
-            var a = (ICommand)element.GetValue(OpenCommondProperty);
-            return a;
-        }
+        public static ICommand GetOpenCommond(DependencyObject element) => (ICommand)element.GetValue(OpenCommondProperty);
 
         public static void SetOpenCommond(DependencyObject element, ICommand value)
             => element.SetValue(OpenCommondProperty, value);
+
+        public static readonly DependencyProperty ForegroundProperty = DependencyProperty.RegisterAttached(
+            "Foreground", typeof(Brush), typeof(UniversalWindowStyle),
+            new PropertyMetadata(Brushes.Black));
+
+        public static Brush GetForeground(DependencyObject element) => (Brush)element.GetValue(ForegroundProperty);
+
+        public static void SetForeground(DependencyObject element, Brush value)
+            => element.SetValue(ForegroundProperty, value);
 
         public static readonly DependencyProperty TitleBarButtonStateProperty = DependencyProperty.RegisterAttached(
             "TitleBarButtonState", typeof(WindowState?), typeof(UniversalWindowStyle),
@@ -114,9 +119,9 @@ namespace FileViewer.WindowStyle
         public Color ForegroundColor { get; set; } = Colors.Black;
         public Color InactiveForegroundColor { get; set; } = Color.FromRgb(0x99, 0x99, 0x99);
         public Color ButtonHoverForeground { get; set; } = Colors.Black;
-        public Color ButtonHoverBackground { get; set; } = Color.FromRgb(0xE6, 0xE6, 0xE6);
+        public Color ButtonHoverBackground { get; set; } = Color.FromArgb(0x80, 0x82, 0x82, 0x82);
         public Color ButtonPressedForeground { get; set; } = Colors.Black;
-        public Color ButtonPressedBackground { get; set; } = Color.FromRgb(0xCC, 0xCC, 0xCC);
+        public Color ButtonPressedBackground { get; set; } = Color.FromArgb(0xB2, 0x82, 0x82, 0x82);
         public ICommand Open => new DelegateCommand(() => { });
     }
 }

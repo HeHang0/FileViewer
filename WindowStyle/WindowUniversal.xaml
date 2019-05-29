@@ -134,30 +134,30 @@
                                 </FrameworkElement.Resources>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                     <Image Source="{TemplateBinding Icon}" Margin="2" Height="20" Width="20" Stretch="Uniform" HorizontalAlignment="Left"/>
+                                    <TextBlock x:Name="TitleTextBlock" FontSize="12" Text="{TemplateBinding Title}"
+                                           Margin="0" VerticalAlignment="Center" TextAlignment="Center" Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}" />
                                 </StackPanel>
-                                <TextBlock x:Name="TitleTextBlock" FontSize="12" Text="{TemplateBinding Title}"
-                                           Margin="0" VerticalAlignment="Center" TextAlignment="Center" Foreground="{StaticResource Brush.TitleBar.Foreground}" />
                                 <StackPanel x:Name="TitleBarButtonPanel" Orientation="Horizontal"
                                             Margin="0 -5 0 0" HorizontalAlignment="Right">
-                                    <Button ToolTip="打开文件" FontSize="12" Command="{TemplateBinding themes:UniversalWindowStyle.OpenCommond}">
+                                    <Button ToolTip="打开文件" FontSize="12" Command="{TemplateBinding themes:UniversalWindowStyle.OpenCommond}" 
+                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}">
                                         打开
-                                        <!--<StreamGeometry>M 3,8 L 3,9 L 13,9 L 13,8 Z</StreamGeometry>-->
                                     </Button>
-                                    <Button x:Name="MinimizeButton" FontSize="15" themes:UniversalWindowStyle.TitleBarButtonState="Minimized">
+                                    <Button x:Name="MinimizeButton" FontSize="15" themes:UniversalWindowStyle.TitleBarButtonState="Minimized" 
+                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}">
                                         ─
-                                        <!--<StreamGeometry>M 3,8 L 3,9 L 13,9 L 13,8 Z</StreamGeometry>-->
                                     </Button>
-                                    <Button x:Name="RestoreButton" FontSize="15" themes:UniversalWindowStyle.TitleBarButtonState="Normal">
+                                    <Button x:Name="RestoreButton" FontSize="15" themes:UniversalWindowStyle.TitleBarButtonState="Normal" 
+                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}">
                                         ◱
-                                        <!--<StreamGeometry>M 3,3 L 3,4 L 13,4 L 13,3 Z M 3,12 L 3,13 L 13,13 L 13,12 Z M 3,4 L 3,12 L 4,12 L 4,4 Z M 12,4 L 12,12 L 13,12 L 13,4 Z</StreamGeometry>-->
                                     </Button>
-                                    <Button x:Name="MaximizeButton" FontSize="15" themes:UniversalWindowStyle.TitleBarButtonState="Maximized">
+                                    <Button x:Name="MaximizeButton" FontSize="15" themes:UniversalWindowStyle.TitleBarButtonState="Maximized" 
+                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}">
                                         ◻
-                                        <!--<StreamGeometry>M 3,3 L 3,4 L 13,4 L 13,3 Z M 3,12 L 3,13 L 13,13 L 13,12 Z M 3,4 L 3,12 L 4,12 L 4,4 Z M 12,4 L 12,12 L 13,12 L 13,4 Z</StreamGeometry>-->
                                     </Button>
-                                    <Button x:Name="CloseButton" FontSize="15" Style="{StaticResource Style.Button.Close}" themes:UniversalWindowStyle.IsTitleBarCloseButton="True">
+                                    <Button x:Name="CloseButton" FontSize="15" Style="{StaticResource Style.Button.Close}" themes:UniversalWindowStyle.IsTitleBarCloseButton="True" 
+                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}">
                                         ╳
-                                        <!--<StreamGeometry>M 3,3 L 3,4 L 4,4 L 4,3 Z M 5,5 L 5,6 L 6,6 L 6,5 Z M 7,7 L 7,9 L 9,9 L 9,7 Z M 9,9 L 9,10 L 10,10 L 10,9 Z M 11,11 L 11,12 L 12,12 L 12,11 Z M 4,4 L 4,5 L 5,5 L 5,4 Z M 6,6 L 6,7 L 7,7 L 7,6 Z M 12,3 L 12,4 L 13,4 L 13,3 Z M 10,10 L 10,11 L 11,11 L 11,10 Z M 12,12 L 12,13 L 13,13 L 13,12 Z M 11,4 L 11,5 L 12,5 L 12,4 Z M 10,5 L 10,6 L 11,6 L 11,5 Z M 9,6 L 9,7 L 10,7 L 10,6 Z M 6,9 L 6,10 L 7,10 L 7,9 Z M 5,10 L 5,11 L 6,11 L 6,10 Z M 4,11 L 4,12 L 5,12 L 5,11 Z M 3,12 L 3,13 L 4,13 L 4,12 Z</StreamGeometry>-->
                                     </Button>
                                 </StackPanel>
                             </Grid>
@@ -171,6 +171,12 @@
                             <Setter TargetName="RootGrid" Property="Margin" Value="4 7 4 4" />
                             <Setter TargetName="TitleBarPanel" Property="Height" Value="32" />
                             <Setter TargetName="MaximizeButton" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="ResizeMode" Value="NoResize">
+                            <Setter TargetName="MaximizeButton" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="ResizeMode" Value="CanResize">
+                            <Setter TargetName="MaximizeButton" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="WindowState" Value="Normal">
                             <Setter TargetName="RestoreButton" Property="Visibility" Value="Collapsed" />

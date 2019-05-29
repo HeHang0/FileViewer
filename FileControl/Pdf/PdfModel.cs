@@ -8,7 +8,7 @@ using System.Windows.Media.Imaging;
 
 namespace FileViewer.FileControl.Pdf
 {
-    public class PdfModel: INotifyPropertyChanged, IFileChanged
+    public class PdfModel: IFileModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string propertyName)
@@ -21,15 +21,19 @@ namespace FileViewer.FileControl.Pdf
 
         public void OnFileChanged((string FilePath, FileExtension Ext) file)
         {
-            GlobalNotify.OnColorChange(Color.FromRgb(0x47,0x47, 0x47));
+            OnColorChanged(Color.FromRgb(0x47,0x47, 0x47));
             if (filePath != file.FilePath)
             {
                 filePath = file.FilePath;
                 moonPdfPanel?.OpenFile(filePath);
             }
             GlobalNotify.OnLoadingChange(false);
-            System.Console.WriteLine("来了， " + filePath);
             openPdf(filePath);
+        }
+
+        public void OnColorChanged(Color color)
+        {
+            GlobalNotify.OnColorChange(color);
         }
 
         public ICommand GridLoaded => new DelegateCommand<MoonPdfLib.MoonPdfPanel>((panel) => {

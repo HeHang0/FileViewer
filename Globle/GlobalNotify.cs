@@ -11,12 +11,13 @@ namespace FileViewer
         {
             SizeChange?.Invoke(height, width);
         }
-        public delegate void ColorChangeEventHandler(Color color);
+        public delegate void ColorChangeEventHandler(Color color, bool white);
         public static event ColorChangeEventHandler ColorChange;
 
         public static void OnColorChange(Color color)
         {
-            ColorChange?.Invoke(color);
+            var colorMean = (color.R + color.G + color.B) / 3;
+            ColorChange?.Invoke(color, colorMean > 128);
         }
 
 
@@ -42,12 +43,21 @@ namespace FileViewer
             }
             return result;
         }
-        public delegate void FullScreenEventHandler(bool isFullScreen);
+
+        public delegate void FullScreenEventHandler(bool fullScreen);
         public static event FullScreenEventHandler FullScreen;
 
-        public static void OnFullScreen(bool isFullScreen)
+        public static void OnFullScreen(bool fullScreen)
         {
-            FullScreen?.Invoke(isFullScreen);
+            FullScreen?.Invoke(fullScreen);
+        }
+
+        public delegate void ReSizeModeEventHandler(bool resize);
+        public static event ReSizeModeEventHandler ResizeMode;
+
+        public static void OnResizeMode(bool resize)
+        {
+            ResizeMode?.Invoke(resize);
         }
 
         public delegate void WindowCloseEventHandler();

@@ -19,11 +19,19 @@ namespace FileViewer
         {
             myViewer = new Viewer();
             myViewer.ViewerEventer.ReceiveFile += BalloonTips;
-            myViewer.ViewerEventer.ReceiveFile += myViewer.FileInfo.InitFile;
             GlobalNotify.SizeChange += SizeChange;
             GlobalNotify.FullScreen += FullScreen;
+            GlobalNotify.ResizeMode += ResizeModeChange;
             InitializeComponent();
             DataContext = myViewer;
+
+            //非UI线程未捕获异常处理事件
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            GlobalNotify.OnLoadingChange(false);
         }
 
         private void FullScreen(bool isFullScreen)
@@ -37,6 +45,18 @@ namespace FileViewer
             {
                 WindowStyle = System.Windows.WindowStyle.SingleBorderWindow;
                 WindowState = WindowState.Normal;
+            }
+        }
+
+        private void ResizeModeChange(bool resize)
+        {
+            if (resize)
+            {
+                ResizeMode = ResizeMode.CanResize;
+            }
+            else
+            {
+                ResizeMode = ResizeMode.NoResize;
             }
         }
 
@@ -82,7 +102,9 @@ namespace FileViewer
             closeItem.Click += ExitApp;
             MenuItem openItem = new MenuItem("显示");
             openItem.Click += Show;
-            MenuItem[] menu = new MenuItem[] { openItem, closeItem };
+            MenuItem aboutItem = new MenuItem("关于");
+            aboutItem.Click += ShowAbout;
+            MenuItem[] menu = new MenuItem[] { openItem, aboutItem, closeItem };
             notifyIcon.ContextMenu = new ContextMenu(menu);
         }
 
@@ -97,9 +119,25 @@ namespace FileViewer
             Show();
         }
 
-        private void BalloonTips(string msg)
+        private AboutWindow aw;
+        private void ShowAbout(object sender, EventArgs e)
         {
-            msg = Path.GetFileName(msg);
+            if (aw == null)
+            {
+                aw = new AboutWindow();
+                aw.Closed += (a,b) => { aw = null; };
+            }
+            aw.Show();
+            aw.Activate();
+            if (aw.WindowState == WindowState.Minimized)
+            {
+                aw.WindowState = WindowState.Normal;
+            }
+        }
+
+        private void BalloonTips(string filePath)
+        {
+            string msg = Path.GetFileName(filePath);
             if (msg.Length > 16)
             {
                 msg = msg.Substring(0, 13) + "...";
@@ -111,6 +149,7 @@ namespace FileViewer
             {
                 WindowState = WindowState.Normal;
             }
+            myViewer.FileInfo.InitFile(filePath);
         }
 
         private void MyMainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

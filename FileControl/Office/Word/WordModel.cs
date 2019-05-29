@@ -2,21 +2,15 @@
 using FileViewer.FileHelper;
 using FileViewer.Globle;
 using OpenXmlPowerTools;
-using Prism.Commands;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
+using System.Windows.Media;
 using System.Xml.Linq;
 
 namespace FileViewer.FileControl.Word
 {
-    class WordModel: BaseBackgroundWork, INotifyPropertyChanged, IFileChanged
+    class WordModel: BaseBackgroundWork, IFileModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -25,6 +19,7 @@ namespace FileViewer.FileControl.Word
             ShowBrowser = false;
             InitBackGroundWork();
             bgWorker.RunWorkerAsync(file.FilePath);
+            OnColorChanged(Colors.White);
         }
 
         public string WordContent { get; private set; }
@@ -32,29 +27,53 @@ namespace FileViewer.FileControl.Word
 
         protected override void BgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            var bgw = sender as BackgroundWorker;
             var filePath = e.Argument as string;
-            using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
+            try
             {
-                HtmlConverterSettings settings = new HtmlConverterSettings()
+                using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
                 {
-                    PageTitle = Path.GetFileName(filePath)
-                };
-                XElement html = HtmlConverter.ConvertToHtml(doc, settings);
-                var htmlStr = html.ToStringNewLineOnAttributes();
-                e.Result = htmlStr;
+                    HtmlConverterSettings settings = new HtmlConverterSettings()
+                    {
+                        PageTitle = Path.GetFileName(filePath)
+                    };
+                    XElement html = HtmlConverter.ConvertToHtml(doc, settings);
+                    var htmlStr = html.ToStringNewLineOnAttributes();
+                    e.Result = htmlStr;
+                    bgw?.ReportProgress(1, htmlStr);
+                }
             }
-        }
-
-        protected override void BgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            WordContent = (string)e.Result;
-            GlobalNotify.OnLoadingChange(false);
-            GlobalNotify.OnSizeChange(720, 1280);
-            ShowBrowser = true;
+            catch (Exception)
+            {
+                bgw?.ReportProgress(0, Properties.Resources.Html404);
+            }
         }
 
         protected override void BgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
+        }
+
+        protected override void BgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            var result = e.Result as string;
+            if (result == string.Empty)
+            {
+                WordContent = Properties.Resources.Html404;
+                GlobalNotify.OnSizeChange(720, 1075);
+                OnColorChanged(Color.FromRgb(0xCB, 0xE8, 0xE6));
+            }
+            else
+            {
+                WordContent = result;
+                GlobalNotify.OnSizeChange(720, 1280);
+            }
+            GlobalNotify.OnLoadingChange(false);
+            ShowBrowser = true;
+        }
+
+        public void OnColorChanged(Color color)
+        {
+            GlobalNotify.OnColorChange(color);
         }
     }
 }

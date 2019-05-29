@@ -4,11 +4,12 @@ using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace FileViewer.FileControl.Video
 {
-    public class VideoModel : INotifyPropertyChanged, IFileChanged
+    public class VideoModel : IFileModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string propertyName)
@@ -98,6 +99,12 @@ namespace FileViewer.FileControl.Video
                 mediaPlayer.Source = new Uri(filePath);
             }
             ControlsOpacity = 1;
+            OnColorChanged(Colors.Black);
+        }
+
+        public void OnColorChanged(Color color)
+        {
+            GlobalNotify.OnColorChange(color);
         }
 
         public ICommand GridLoaded => new DelegateCommand<System.Windows.Controls.MediaElement>((player) => {

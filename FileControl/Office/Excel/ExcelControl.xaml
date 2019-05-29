@@ -10,7 +10,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <TabControl TabStripPlacement="Bottom" ItemsSource="{Binding SheetList}" BorderThickness="0, 0, 0 1">
+        <TabControl TabStripPlacement="Bottom" ItemsSource="{Binding SheetList}" SelectedItem="{Binding SheetItem}" BorderThickness="0, 0, 0 1">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding SheetName}" />

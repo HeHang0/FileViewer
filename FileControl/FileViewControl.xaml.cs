@@ -1,4 +1,6 @@
-﻿using FileViewer.FileControl.Excel;
+﻿using FileViewer.FileControl.Common;
+using FileViewer.FileControl.Excel;
+using FileViewer.FileControl.Hello;
 using FileViewer.FileControl.Image;
 using FileViewer.FileControl.Music;
 using FileViewer.FileControl.Pdf;
@@ -23,6 +25,7 @@ namespace FileViewer.FileControl
         {
             InitializeComponent();
             DataContextChanged += OnDataContextChanged;
+            MyGrid.Children.Add(new HelloControl());
         }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -34,7 +37,7 @@ namespace FileViewer.FileControl
         private void SetResource(string filePath)
         {
             var typeInfo = FileType.GetFileViewType(filePath);
-            if(lastViewType != typeInfo.Type)
+            if(lastViewType != typeInfo.Type || MyGrid.Children[0] is HelloControl)
             {
                 lastViewType = typeInfo.Type;
                 MyGrid.Children.Clear();
@@ -44,33 +47,46 @@ namespace FileViewer.FileControl
                 (MyGrid.Children[0] as FileControl).OnFileChanged((filePath, typeInfo.Ext));
                 return;
             }
-            FileControl fc = null;
+            FileControl fc;
             switch (typeInfo.Type)
             {
                 case FileViewType.Image:
                     fc = new ImageControl();
+                    GlobalNotify.OnResizeMode(true);
                     break;
                 case FileViewType.Code:
                     fc = new TextControl();
+                    GlobalNotify.OnResizeMode(true);
                     break;
                 case FileViewType.Music:
                     fc = new MusicControl();
+                    GlobalNotify.OnResizeMode(false);
                     break;
                 case FileViewType.Video:
                     fc = new VideoControl();
+                    GlobalNotify.OnResizeMode(true);
                     break;
                 case FileViewType.Pdf:
                     fc = new PdfControl();
+                    GlobalNotify.OnResizeMode(true);
                     break;
                 case FileViewType.Excel:
                     fc = new ExcelControl();
+                    GlobalNotify.OnResizeMode(true);
                     break;
                 case FileViewType.Word:
                     fc = new WordControl();
+                    GlobalNotify.OnResizeMode(true);
                     break;
                 case FileViewType.PowerPoint:
                     fc = new PowerPointControl();
+                    GlobalNotify.OnResizeMode(true);
                     break;
+                default:
+                    fc = new CommonControl();
+                    GlobalNotify.OnResizeMode(false);
+                    break;
+
             }
             if (fc != null) LoadFile(fc, filePath, typeInfo.Ext);
         }
