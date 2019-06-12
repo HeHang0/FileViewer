@@ -175,9 +175,13 @@
                         <Trigger Property="ResizeMode" Value="NoResize">
                             <Setter TargetName="MaximizeButton" Property="Visibility" Value="Collapsed" />
                         </Trigger>
-                        <Trigger Property="ResizeMode" Value="CanResize">
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="ResizeMode" Value="CanResize" />
+                                <Condition Property="WindowState" Value="Normal" />
+                            </MultiTrigger.Conditions>
                             <Setter TargetName="MaximizeButton" Property="Visibility" Value="Visible" />
-                        </Trigger>
+                        </MultiTrigger>
                         <Trigger Property="WindowState" Value="Normal">
                             <Setter TargetName="RestoreButton" Property="Visibility" Value="Collapsed" />
                         </Trigger>
