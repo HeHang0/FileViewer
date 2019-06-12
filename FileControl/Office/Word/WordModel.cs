@@ -40,12 +40,11 @@ namespace FileViewer.FileControl.Word
                     XElement html = HtmlConverter.ConvertToHtml(doc, settings);
                     var htmlStr = html.ToStringNewLineOnAttributes();
                     e.Result = htmlStr;
-                    bgw?.ReportProgress(1, htmlStr);
                 }
             }
             catch (Exception)
             {
-                bgw?.ReportProgress(0, Properties.Resources.Html404);
+                e.Result = string.Empty;
             }
         }
 
