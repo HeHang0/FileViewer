@@ -44,7 +44,7 @@ namespace FileViewer.FileControl.Word
             }
             catch (Exception)
             {
-                e.Result = string.Empty;
+                e.Result = "LoadFailed: " + filePath;
             }
         }
 
@@ -55,11 +55,12 @@ namespace FileViewer.FileControl.Word
         protected override void BgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             var result = e.Result as string;
-            if (result == string.Empty)
+            if (result.StartsWith("LoadFailed: "))
             {
-                WordContent = Properties.Resources.Html404;
-                GlobalNotify.OnSizeChange(720, 1075);
-                OnColorChanged(Color.FromRgb(0xCB, 0xE8, 0xE6));
+                GlobalNotify.OnFileLoadFailed(result.Substring(12));
+                //PowerPointContent = Properties.Resources.Html404;
+                //GlobalNotify.OnSizeChange(720, 1075);
+                //OnColorChanged(Color.FromRgb(0xCB, 0xE8, 0xE6));
             }
             else
             {

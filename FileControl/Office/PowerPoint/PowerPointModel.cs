@@ -45,7 +45,7 @@ namespace FileViewer.FileControl.PowerPoint
             }
             catch (Exception)
             {
-                e.Result = string.Empty;
+                e.Result = "LoadFailed: "+filePath;
             }
         }
 
@@ -56,19 +56,20 @@ namespace FileViewer.FileControl.PowerPoint
         protected override void BgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             var result = e.Result as string;
-            if(result == string.Empty)
+            if(result.StartsWith("LoadFailed: "))
             {
-                PowerPointContent = Properties.Resources.Html404;
-                GlobalNotify.OnSizeChange(720, 1075);
-                OnColorChanged(Color.FromRgb(0xCB, 0xE8, 0xE6));
+                GlobalNotify.OnFileLoadFailed(result.Substring(12));
+                //PowerPointContent = Properties.Resources.Html404;
+                //GlobalNotify.OnSizeChange(720, 1075);
+                //OnColorChanged(Color.FromRgb(0xCB, 0xE8, 0xE6));
             }
             else
             {
                 PowerPointContent = result;
                 GlobalNotify.OnSizeChange(720, 1280);
+                GlobalNotify.OnLoadingChange(false);
+                ShowBrowser = true;
             }
-            GlobalNotify.OnLoadingChange(false);
-            ShowBrowser = true;
         }
 
         public void OnColorChanged(System.Windows.Media.Color color)
