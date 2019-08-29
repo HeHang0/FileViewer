@@ -26,6 +26,7 @@ namespace FileViewer.FileControl
             InitializeComponent();
             DataContextChanged += OnDataContextChanged;
             MyGrid.Children.Add(new HelloControl());
+            GlobalNotify.FileLoadFailed += OnFileLoadFailed;
         }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -34,9 +35,18 @@ namespace FileViewer.FileControl
             SetResource(DataContext as string);
         }
 
-        private void SetResource(string filePath)
+        private void OnFileLoadFailed(string filePath)
+        {
+            SetResource(filePath, true);
+        }
+
+        private void SetResource(string filePath, bool loadWithTypeNone = false)
         {
             var typeInfo = FileType.GetFileViewType(filePath);
+            if (loadWithTypeNone)
+            {
+                typeInfo.Type = FileViewType.None;
+            }
             if(lastViewType != typeInfo.Type || MyGrid.Children[0] is HelloControl)
             {
                 lastViewType = typeInfo.Type;

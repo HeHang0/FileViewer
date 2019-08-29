@@ -67,5 +67,13 @@ namespace FileViewer
         {
             WindowClose?.Invoke();
         }
+
+        public delegate void FileLoadFailedEventHandler(string filePath);
+        public static event FileLoadFailedEventHandler FileLoadFailed;
+
+        public static void OnFileLoadFailed(string filePath)
+        {
+            FileLoadFailed?.Invoke(filePath);
+        }
     }
 }

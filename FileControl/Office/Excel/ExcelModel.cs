@@ -60,22 +60,25 @@ namespace FileViewer.FileControl.Excel
             }
             catch (Exception)
             {
-                bgw?.ReportProgress(0, new SheetDisplay("oo__H__oo", Properties.Resources.Html404));
+                //bgw?.ReportProgress(0, new SheetDisplay("oo__H__oo", Properties.Resources.Html404));
+                bgw?.ReportProgress(0, new SheetDisplay("oo__H__oo", filePath));
             }
         }
 
         protected override void BgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            SheetList.Add(e.UserState as SheetDisplay);
             if(e.ProgressPercentage == 0)
             {
-                GlobalNotify.OnSizeChange(720, 1075);
-                OnColorChanged(Color.FromRgb(0xCB, 0xE8, 0xE6));
+                GlobalNotify.OnFileLoadFailed((e.UserState as SheetDisplay).SheetContent);
+                return;
+                //GlobalNotify.OnSizeChange(720, 1075);
+                //OnColorChanged(Color.FromRgb(0xCB, 0xE8, 0xE6));
             }
             else if(e.ProgressPercentage == 100)
             {
                 OnColorChanged(Colors.White);
             }
+            SheetList.Add(e.UserState as SheetDisplay);
         }
 
         protected override void BgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
