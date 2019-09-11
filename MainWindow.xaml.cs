@@ -87,7 +87,6 @@ namespace FileViewer
         private void MyMainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             InitNotyfy();
-            //Hide();
             myViewer.ViewerEventer.OnLoaded.Execute(null);
         }
 
@@ -157,6 +156,16 @@ namespace FileViewer
             Hide();
             e.Cancel = true;
             GlobalNotify.OnWindowClose();
+        }
+
+        bool loaded = false;
+        private void Loading_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (!loaded)
+            {
+                Hide();
+                loaded = true;
+            }
         }
     }
 }

@@ -24,7 +24,7 @@
         
         <myc:Loading LoadCirclesMargin="200" LoadingText=""
                                  LoadingTextFontSize="8"
-                                 CirclesBrush="Gray"
+                                 CirclesBrush="Gray" IsVisibleChanged="Loading_IsVisibleChanged"
                                  Visibility="{Binding FileInfo.Loading, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"></myc:Loading>
     </Grid>
 </Window>
