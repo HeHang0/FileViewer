@@ -7,9 +7,14 @@
         xmlns:myc="clr-namespace:FileViewer.FileControl"  
         xmlns:themes="clr-namespace:FileViewer.WindowStyle" Height="470" Width="720"  themes:UniversalWindowStyle.Foreground="{Binding FileInfo.TitleBarForeground}"
         Background="{Binding FileInfo.BackgroundColor}"  themes:UniversalWindowStyle.OpenCommond="{Binding FileInfo.OpenFile}"
-        mc:Ignorable="d" Name="MyMainWindow" Icon="logo.ico" Loaded="MyMainWindow_Loaded"
+        mc:Ignorable="d" Name="MyMainWindow" Icon="logo.ico" Loaded="MyMainWindow_Loaded" Topmost="True"
         MinHeight="233" MinWidth="400" Closing="MyMainWindow_Closing" Style="{StaticResource StyleWindowUniversal}"
         Title="{Binding FileInfo.Title}" WindowStartupLocation="CenterScreen">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="StateChanged">
+            <i:InvokeCommandAction Command="{Binding Path=ViewerEventer.StateChanged}" CommandParameter="{Binding ElementName=MyMainWindow}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Window.Resources>
@@ -20,8 +25,8 @@
     </themes:UniversalWindowStyle.TitleBar>-->
     <Grid Margin="0,32,0,0">
 
-        <myc:FileViewControl DataContext="{Binding Path=FileInfo.FilePath}"/>
-        
+        <myc:FileViewControl DataContext="{Binding Path=FileInfo.FilePath}" IsVisibleChanged="FileViewControl_IsVisibleChanged" />
+
         <myc:Loading LoadCirclesMargin="200" LoadingText=""
                                  LoadingTextFontSize="8"
                                  CirclesBrush="Gray" IsVisibleChanged="Loading_IsVisibleChanged"

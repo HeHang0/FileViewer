@@ -227,6 +227,7 @@
     <Compile Include="FileHelper\FileType.cs" />
     <Compile Include="FileHelper\ShellItems.cs" />
     <Compile Include="Globle\BaseBackgroundWork.cs" />
+    <Compile Include="Globle\MutexBool.cs" />
     <Compile Include="Globle\Utils.cs" />
     <Compile Include="Monitor\HotKey.cs" />
     <Compile Include="Monitor\KeyboardHook.cs" />
