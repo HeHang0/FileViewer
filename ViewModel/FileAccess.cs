@@ -12,7 +12,7 @@ namespace FileViewer.ViewModel
         
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public string Title { get; private set; }
+        public string Title { get; set; }
 
         public string FilePath { get; private set; }
 

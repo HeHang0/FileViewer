@@ -17,7 +17,7 @@ namespace FileViewer
         private Viewer myViewer;
         public MainWindow()
         {
-            myViewer = new Viewer();
+            myViewer = new Viewer(Dispatcher);
             myViewer.ViewerEventer.ReceiveFile += BalloonTips;
             GlobalNotify.SizeChange += SizeChange;
             GlobalNotify.FullScreen += FullScreen;
@@ -32,6 +32,12 @@ namespace FileViewer
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             GlobalNotify.OnLoadingChange(false);
+        }
+
+        private void MyMainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            InitNotyfy();
+            myViewer.ViewerEventer.OnLoaded.Execute(this);
         }
 
         private void FullScreen(bool isFullScreen)
@@ -84,18 +90,12 @@ namespace FileViewer
             //Top = workArea.Top + (workArea.Height / 2 - Height / 2);
         }
 
-        private void MyMainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            InitNotyfy();
-            myViewer.ViewerEventer.OnLoaded.Execute(null);
-        }
-
         NotifyIcon notifyIcon;
-        private void InitNotyfy()
+        public void InitNotyfy()
         {
             notifyIcon = new NotifyIcon();
             notifyIcon.Text = Title;//最小化到托盘时，鼠标点击时显示的文本
-            notifyIcon.Icon = Properties.Resources.logo ;//程序图标
+            notifyIcon.Icon = Properties.Resources.logo;//程序图标
             notifyIcon.Visible = true;
             MenuItem closeItem = new MenuItem("退出");
             closeItem.Click += ExitApp;
@@ -107,19 +107,19 @@ namespace FileViewer
             notifyIcon.ContextMenu = new ContextMenu(menu);
         }
 
+        private void Show(object sender, EventArgs e)
+        {
+            Show();
+        }
+
         private void ExitApp(object sender, EventArgs e)
         {
             notifyIcon.Dispose();
             Application.Current.Shutdown();
         }
 
-        private void Show(object sender, EventArgs e)
-        {
-            Show();
-        }
-
         private AboutWindow aw;
-        private void ShowAbout(object sender, EventArgs e)
+        public void ShowAbout(object sender, EventArgs e)
         {
             if (aw == null)
             {
@@ -136,6 +136,7 @@ namespace FileViewer
 
         private void BalloonTips(string filePath)
         {
+
             string msg = Path.GetFileName(filePath);
             if (msg.Length > 16)
             {
@@ -166,6 +167,12 @@ namespace FileViewer
                 Hide();
                 loaded = true;
             }
+        }
+
+        private void FileViewControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            myViewer.ViewerEventer.IsVisibleChanged.Execute(this);
+            if (!IsVisible && loaded) notifyIcon.Text = "";
         }
     }
 }

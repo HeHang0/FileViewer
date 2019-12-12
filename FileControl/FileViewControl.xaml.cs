@@ -9,6 +9,7 @@ using FileViewer.FileControl.Text;
 using FileViewer.FileControl.Video;
 using FileViewer.FileControl.Word;
 using FileViewer.FileHelper;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 

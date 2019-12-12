@@ -4,6 +4,7 @@ using Prism.Commands;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -16,19 +17,66 @@ namespace FileViewer.ViewModel
 {
     public class Eventer : BaseBackgroundWork
     {
+        private readonly MutexBool isLoop = new MutexBool();
+        System.Windows.Threading.Dispatcher dispatcher;
+        public Eventer(System.Windows.Threading.Dispatcher dp)
+        {
+            dispatcher = dp;
+            GlobalNotify.WindowVisableChanged += WindowVisableChanged; 
+        }
 
-        public ICommand OnLoaded => new DelegateCommand<System.Windows.Window>((win) => {
+        private void WindowVisableChanged(bool show)
+        {
+            bool loop = isLoop.getValue();
+            if (loop != show)
+            {
+                if (loop) isLoop.setVal(false);
+                else
+                {
+                    Thread thread = new Thread(new ThreadStart(LoopShowFile));
+                    thread.IsBackground = true;
+                    isLoop.setVal(true);
+                    thread.Start();
+                }
+            }
+        }
+
+        private void LoopShowFile()
+        {
+            while (isLoop.getValue())
+            {
+                var (ok, filePath) = ExplorerFile.GetCurrentFilePath();
+                if (ok)
+                {
+                    dispatcher.Invoke(() =>
+                    {
+                        if(isLoop.getValue()) OnReceiveFile(filePath);
+                    });
+                }
+                Thread.Sleep(400);
+            }
+        }
+
+        public ICommand OnLoaded => new DelegateCommand<MainWindow>((win) => {
             InitHotKey(win);
         });
         public ICommand OpenFile => new DelegateCommand(() => {
             
         });
 
+        public ICommand IsVisibleChanged => new DelegateCommand<MainWindow>((win) => {
+            GlobalNotify.OnWindowVisableChanged(win.IsVisible);
+        });
+
+        public ICommand StateChanged => new DelegateCommand<MainWindow>((win) => {
+            GlobalNotify.OnWindowVisableChanged(win.WindowState != System.Windows.WindowState.Minimized);
+        });
+
         public delegate void ReceiveFileEventHandler(string msg);
         public event ReceiveFileEventHandler ReceiveFile;
-        void OnReceiveFile(string msg)
+        void OnReceiveFile(string filePath)
         {
-            ReceiveFile?.Invoke(msg);
+            ReceiveFile?.Invoke(filePath);
         }
 
         KeyboardHook _keyboardHook;
