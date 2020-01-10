@@ -50,7 +50,7 @@ namespace FileViewer.ViewModel
                 {
                     dispatcher.Invoke(() =>
                     {
-                        if(isLoop.getValue()) OnReceiveFile(filePath);
+                        if(isLoop.getValue()) OnReceiveFile(filePath, false);
                     });
                 }
                 Thread.Sleep(400);
@@ -72,11 +72,11 @@ namespace FileViewer.ViewModel
             GlobalNotify.OnWindowVisableChanged(win.WindowState != System.Windows.WindowState.Minimized);
         });
 
-        public delegate void ReceiveFileEventHandler(string msg);
+        public delegate void ReceiveFileEventHandler(string msg, bool active);
         public event ReceiveFileEventHandler ReceiveFile;
-        void OnReceiveFile(string filePath)
+        void OnReceiveFile(string filePath, bool active = true)
         {
-            ReceiveFile?.Invoke(filePath);
+            ReceiveFile?.Invoke(filePath, active);
         }
 
         KeyboardHook _keyboardHook;

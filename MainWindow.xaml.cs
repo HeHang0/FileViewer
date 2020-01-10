@@ -134,7 +134,7 @@ namespace FileViewer
             }
         }
 
-        private void BalloonTips(string filePath)
+        private void BalloonTips(string filePath, bool active)
         {
 
             string msg = Path.GetFileName(filePath);
@@ -143,8 +143,11 @@ namespace FileViewer
                 msg = msg.Substring(0, 13) + "...";
             }
             notifyIcon.Text = msg;
-            Show();
-            Activate();
+            if (active)
+            {
+                Show();
+                Activate();
+            }
             if(WindowState == WindowState.Minimized)
             {
                 WindowState = WindowState.Normal;
