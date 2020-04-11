@@ -110,7 +110,7 @@ namespace FileViewer.FileControl.Text
                         sb.AppendLine(str);
                         if (sb.Length > 10000) break;
                     }
-                    string result = sb.ToString().Substring(0, 10000);
+                    string result = sb.ToString().Substring(0, Math.Min(10000, sb.Length));
                     if(i == 1000 || sb.Length > 10000)
                     {
                         result += "\r\n...";
@@ -118,7 +118,7 @@ namespace FileViewer.FileControl.Text
                     e.Result = result;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 e.Result = "哈哈哈 没有读取到东西！！！";
             }

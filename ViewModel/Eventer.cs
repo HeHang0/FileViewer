@@ -41,11 +41,13 @@ namespace FileViewer.ViewModel
             }
         }
 
+        private string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         private void LoopShowFile()
         {
             while (isLoop.getValue())
             {
                 var (ok, filePath) = ExplorerFile.GetCurrentFilePath();
+                if (filePath.Contains(desktopPath) && !isLastDesktop) continue;
                 if (ok)
                 {
                     dispatcher.Invoke(() =>
@@ -74,8 +76,12 @@ namespace FileViewer.ViewModel
 
         public delegate void ReceiveFileEventHandler(string msg, bool active);
         public event ReceiveFileEventHandler ReceiveFile;
+        private string lastFilePath = "";
+        private bool isLastDesktop = false;
         void OnReceiveFile(string filePath, bool active = true)
         {
+            lastFilePath = filePath;
+            isLastDesktop = filePath.Contains(desktopPath);
             ReceiveFile?.Invoke(filePath, active);
         }
 
