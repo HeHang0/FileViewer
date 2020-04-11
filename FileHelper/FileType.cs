@@ -54,9 +54,8 @@ namespace FileViewer.FileHelper
                 case FileExtension.GITIGNORE:
                 case FileExtension.GITATTRIBUTE:
                 case FileExtension.RC:
-                    type = FileViewType.Code;
-                    break;
                 case FileExtension.XML:
+                case FileExtension.LOG:
                     type = FileViewType.Code;
                     break;
                 case FileExtension.MP3:

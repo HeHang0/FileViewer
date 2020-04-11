@@ -106,14 +106,16 @@ namespace FileViewer.FileControl.Text
                     for (; i < 1000; i++)
                     {
                         str = st.ReadLine();
-                        if (str == null) break;
+                          if (str == null) break;
                         sb.AppendLine(str);
+                        if (sb.Length > 10000) break;
                     }
-                    if(i == 1000)
+                    string result = sb.ToString().Substring(0, 10000);
+                    if(i == 1000 || sb.Length > 10000)
                     {
-                        sb.AppendLine("...");
+                        result += "\r\n...";
                     }
-                    e.Result = sb.ToString();
+                    e.Result = result;
                 }
             }
             catch (Exception)
