@@ -5,11 +5,10 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using Prism.Commands;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -41,14 +40,45 @@ namespace FileViewer.FileControl.Text
             }
         }
 
-        public IHighlightingDefinition SyntaxHighlighting { get; private set; }
+        public IHighlightingDefinition SyntaxHighlighting { get; set; } = HighlightingManager.Instance.GetDefinitionByExtension(".txt");
+
+        public ReadOnlyCollection<IHighlightingDefinition> HighlightingDefinitions => HighlightingManager.Instance.HighlightingDefinitions;
 
 
 
         private double height = SystemParameters.WorkArea.Height / 2;
         private double width = SystemParameters.WorkArea.Width / 2;
+
+        private Encoding encodingSelected = Encoding.UTF8;
+        public Encoding EncodeSelected
+        {
+            get
+            {
+                return encodingSelected;
+            }
+            set
+            {
+                encodingSelected = value;
+                OnFileChanged(currentFilePath);
+            }
+        }
+
+        public Dictionary<string, Encoding> EncodeList => new Dictionary<string, Encoding>()
+        {
+            {"ASCII", Encoding.ASCII},
+            {"Default", Encoding.Default},
+            {"Unicode", Encoding.Unicode},
+            {"UTF8", Encoding.UTF8},
+            {"GB2312", Encoding.GetEncoding("GB2312")},
+            {"UTF32", Encoding.UTF32},
+            {"BigEndianUnicode", Encoding.BigEndianUnicode},
+            {"UTF7", Encoding.ASCII}
+        };
+
+        private (string FilePath, FileExtension Ext) currentFilePath;
         public void OnFileChanged((string FilePath, FileExtension Ext) file)
         {
+            currentFilePath = file;
             if (file.Ext == FileExtension.JSON || file.Ext == FileExtension.VUE)
             {
                 SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(".JS");
@@ -57,6 +87,7 @@ namespace FileViewer.FileControl.Text
             {
                 SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension("." + file.Ext.ToString().ToLower());
             }
+
             InitBackGroundWork();
             bgWorker.RunWorkerAsync(file.FilePath);
             GlobalNotify.OnSizeChange(height, width);
@@ -67,7 +98,7 @@ namespace FileViewer.FileControl.Text
         {
             try
             {
-                using (StreamReader st = new StreamReader((string)e.Argument, Encoding.GetEncoding("GB2312")))
+                using (StreamReader st = new StreamReader((string)e.Argument, encodingSelected))
                 {
                     StringBuilder sb = new StringBuilder();
                     string str = "";

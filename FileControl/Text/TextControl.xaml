@@ -26,5 +26,22 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </avalonEdit:TextEditor>
+        <Grid Height="20" VerticalAlignment="Bottom">
+            <ComboBox HorizontalAlignment="Right" Width="80"
+                      SelectedValue="{Binding EncodeSelected,Mode=TwoWay}"
+                      ItemsSource="{Binding EncodeList}"
+                      SelectedValuePath="Value"
+                      DisplayMemberPath="Key" Background="Transparent">
+
+            </ComboBox>
+            <ComboBox HorizontalAlignment="Right" Width="90"
+                      SelectedValue="{Binding SyntaxHighlighting,Mode=TwoWay}"
+                      ItemsSource="{Binding HighlightingDefinitions}"
+                      DisplayMemberPath="Name" Background="Transparent" Margin="0,0,79,0">
+
+            </ComboBox>
+
+        </Grid>
+
     </Grid>
 </fc:FileControl>
