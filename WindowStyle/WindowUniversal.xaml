@@ -44,7 +44,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Window">
-                    <Border Padding="4 1 4 4">
+                    <Border Padding="4 1 4 4" Background="{TemplateBinding Background}">
                         <Grid x:Name="RootGrid" Background="{TemplateBinding Background}">
                             <Grid x:Name="TitleBarPanel" VerticalAlignment="Top" Height="31">
                                 <FrameworkElement.Resources>
