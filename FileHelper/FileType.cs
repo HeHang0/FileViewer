@@ -56,6 +56,7 @@ namespace FileViewer.FileHelper
                 case FileExtension.RC:
                 case FileExtension.XML:
                 case FileExtension.LOG:
+                case FileExtension.PY:
                     type = FileViewType.Code;
                     break;
                 case FileExtension.MP3:
@@ -136,6 +137,7 @@ namespace FileViewer.FileHelper
         HLP = 6395,
         None = 0,
         Folder,
+        PY,
         ICO,
         SVG,
         RC,
