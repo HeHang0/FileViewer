@@ -51,12 +51,19 @@ namespace FileViewer.FileHelper
                 case FileExtension.CSS:
                 case FileExtension.MD:
                 case FileExtension.BASH:
+                case FileExtension.SH:
                 case FileExtension.GITIGNORE:
                 case FileExtension.GITATTRIBUTE:
                 case FileExtension.RC:
                 case FileExtension.XML:
                 case FileExtension.LOG:
                 case FileExtension.PY:
+                case FileExtension.JAVA:
+                case FileExtension.C:
+                case FileExtension.CPP:
+                case FileExtension.LESS:
+                case FileExtension.KT:
+                case FileExtension.PHP:
                     type = FileViewType.Code;
                     break;
                 case FileExtension.MP3:
@@ -137,7 +144,14 @@ namespace FileViewer.FileHelper
         HLP = 6395,
         None = 0,
         Folder,
+        SH,
         PY,
+        JAVA,
+        PHP,
+        C,
+        CPP,
+        LESS,
+        KT,
         ICO,
         SVG,
         RC,
