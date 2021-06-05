@@ -25,6 +25,7 @@ namespace FileViewer.FileControl.Image
                 switch (file.Ext)
                 {
                     case FileExtension.GIF:
+                        if (Utils.FileSize(file.FilePath) > 2.5) throw new FileLoadException();
                         ShowGif(file.FilePath);
                         break;
                     case FileExtension.SVG:
@@ -116,13 +117,14 @@ namespace FileViewer.FileControl.Image
             GlobalNotify.OnLoadingChange(false);
             var height = ThumbnailImage.Height;
             var width = ThumbnailImage.Width;
-            if (height < width)
+            //if (height < width)
+            //{
+            //    width -= 5;
+            //}
+            //else
+            if (height > width)
             {
-                width -= 11;
-            }
-            else if (height > width)
-            {
-                height -= 11;
+                width += 5;
             }
             GlobalNotify.OnSizeChange(height, width);
         }

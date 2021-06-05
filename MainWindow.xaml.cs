@@ -94,7 +94,7 @@ namespace FileViewer
         public void InitNotyfy()
         {
             notifyIcon = new NotifyIcon();
-            notifyIcon.Text = Title;//最小化到托盘时，鼠标点击时显示的文本
+            notifyIcon.Text = "FileViewer";//最小化到托盘时，鼠标点击时显示的文本
             notifyIcon.Icon = Properties.Resources.logo;//程序图标
             notifyIcon.Visible = true;
             MenuItem closeItem = new MenuItem("退出");
@@ -175,7 +175,7 @@ namespace FileViewer
         private void FileViewControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             myViewer.ViewerEventer.IsVisibleChanged.Execute(this);
-            if (!IsVisible && loaded) notifyIcon.Text = "";
+            if (!IsVisible && loaded) notifyIcon.Text = "FileViewer";
         }
     }
 }

@@ -2,6 +2,8 @@
 using Prism.Commands;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -17,6 +19,7 @@ namespace FileViewer.FileControl.Pdf
         }
 
         private string filePath;
+        private FileExtension fileExt;
         private MoonPdfLib.MoonPdfPanel moonPdfPanel;
 
         public void OnFileChanged((string FilePath, FileExtension Ext) file)
@@ -26,6 +29,7 @@ namespace FileViewer.FileControl.Pdf
             {
                 filePath = file.FilePath;
                 moonPdfPanel?.OpenFile(filePath);
+                fileExt = file.Ext;
             }
             GlobalNotify.OnLoadingChange(false);
             openPdf(filePath);
@@ -44,9 +48,23 @@ namespace FileViewer.FileControl.Pdf
         private System.Windows.Size pageSize = new System.Windows.Size(1280,720);
         private void openPdf(string filePath)
         {
-            if (moonPdfPanel != null && System.IO.File.Exists(filePath))
+            string outPath = string.Empty;
+            if (fileExt != FileExtension.PDF)
             {
-                moonPdfPanel?.OpenFile(filePath);
+                try
+                {
+                    //outPath = Path.Combine(Path.GetTempPath(), Path.GetFileName(filePath) + ".pdf");
+                    //PdfvertService.ConvertFileToPdf(filePath, outPath);
+                }
+                catch (System.Exception e)
+                {
+                    outPath = string.Empty;
+                }
+            }
+            if (moonPdfPanel != null && File.Exists(filePath))
+            {
+                if (File.Exists(outPath)) moonPdfPanel?.OpenFile(outPath);
+                else moonPdfPanel?.OpenFile(filePath);
                 var sizes = moonPdfPanel.PageBounds;
                 if(sizes != null && sizes.Length > 0)
                 {

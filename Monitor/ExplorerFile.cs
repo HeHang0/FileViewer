@@ -88,7 +88,7 @@ namespace FileViewer.Monitor
                     return (true, files[0].ToString());
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
             return (false, string.Empty);
