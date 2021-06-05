@@ -24,6 +24,11 @@ namespace FileViewer.FileControl.Text
             textEditor = editor;
             setText(textTmp);
         });
+        public ICommand Load10Rows => new DelegateCommand<TextEditor>((editor) => {
+            textEditor = editor;
+            setText(textTmp);
+        });
+        public bool ShowLoad10Rows { get; set; }
 
         private string textTmp = "";
         private void setText(string text)
@@ -118,7 +123,7 @@ namespace FileViewer.FileControl.Text
                     e.Result = result;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 e.Result = "哈哈哈 没有读取到东西！！！";
             }

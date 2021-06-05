@@ -1,18 +1,15 @@
 ﻿using FileViewer.FileHelper;
 using FileViewer.Globle;
-using NPOI.SS.Converter;
+using OfficeOpenXml;
 using Prism.Commands;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Xml;
 
 namespace FileViewer.FileControl.Excel
 {
@@ -38,28 +35,60 @@ namespace FileViewer.FileControl.Excel
             var filePath = e.Argument as string;
             try
             {
-                var workbook = ExcelToHtmlUtils.LoadXls(filePath);
-                for (int i = 1; i <= workbook.NumberOfSheets; i++)
+                ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+                using (FileStream stream = new FileStream(filePath, FileMode.Open))
                 {
-                    var sheet = workbook.GetSheetAt(i-1);
-                    var wb = new NPOI.HSSF.UserModel.HSSFWorkbook();
-                    wb.Add(sheet);
-                    ExcelToHtmlConverter excelToHtmlConverter = new ExcelToHtmlConverter();
-                    excelToHtmlConverter.OutputColumnHeaders = false;
-                    excelToHtmlConverter.OutputHiddenColumns = false;
-                    excelToHtmlConverter.OutputHiddenRows = false;
-                    excelToHtmlConverter.OutputLeadingSpacesAsNonBreaking = false;
-                    excelToHtmlConverter.OutputRowNumbers = false;
-                    excelToHtmlConverter.UseDivsToSpan = false;
-                    excelToHtmlConverter.ProcessWorkbook(wb);
-                    var body = excelToHtmlConverter.Document.GetElementsByTagName("body")[0] as XmlElement;
-                    body.RemoveChild(body.FirstChild);
-                    body.SetAttribute("style", "overflow:auto");
-                    bgw?.ReportProgress(i == workbook.NumberOfSheets ? 100 : i, new SheetDisplay(sheet.SheetName, excelToHtmlConverter.Document.InnerXml));
+                    using (ExcelPackage excelPackage = new ExcelPackage(stream))
+                    {
+                        ExcelWorkbook workbook = excelPackage.Workbook;
+                        if (workbook != null)
+                        {
+                            for (int c = 1; c <= workbook.Worksheets.Count; c++)
+                            {
+                                StringBuilder stringBuilder = new StringBuilder();
+                                stringBuilder.Append(@"<!Doctype html>
+                                                       <html>
+                                                           <head>
+                                                               <meta charset=""UTF-8"">
+                                                               <title>oo__H__oo</title>
+                                                               <style>
+                                                                   table{border-right:1px solid #ffc0cb;border-bottom:1px solid #ffc0cb} 
+                                                                   table td{border-left:1px solid #ffc0cb;border-top:1px solid #ffc0cb} 
+                                                               </style> 
+                                                           </head><body><table>");
+                                ExcelWorksheet worksheet = workbook.Worksheets[c-1];
+                                for (int i = 0; i < worksheet.Dimension.End.Row; i++)
+                                {
+                                    string row = "<tr>";
+                                    for (int j = 0; j < worksheet.Dimension.End.Column; j++)
+                                    {
+                                        string col = "<td>";
+                                        try
+                                        {
+                                            col += worksheet.Cells[i, j].Value;
+                                        }
+                                        catch (Exception)
+                                        {
+                                        }
+                                        col += "</td>";
+                                        row += col;
+                                    }
+                                    row += "</tr>";
+                                    stringBuilder.Append(row);
+                                }
+                                stringBuilder.Append("</table></body></html>");
+                                bgw?.ReportProgress(c*100/workbook.Worksheets.Count, new SheetDisplay(worksheet.Name, stringBuilder.ToString()));
+                            }
+                        }
+                    }
                 }
+                
+
+
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+
                 //bgw?.ReportProgress(0, new SheetDisplay("oo__H__oo", Properties.Resources.Html404));
                 bgw?.ReportProgress(0, new SheetDisplay("oo__H__oo", filePath));
             }
@@ -109,8 +138,8 @@ namespace FileViewer.FileControl.Excel
                 var tables = document.getElementsByTagName("table");
                 foreach (dynamic item in tables)
                 {
-                    SheetWidth = item.offsetWidth;
-                    GlobalNotify.OnSizeChange(item.offsetHeight, item.offsetWidth + 20);
+                    //SheetWidth = item.offsetWidth;
+                    //GlobalNotify.OnSizeChange(item.offsetHeight, item.offsetWidth + 20);
                     break;
                 }
             });

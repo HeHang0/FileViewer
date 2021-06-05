@@ -9,6 +9,9 @@
              xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
     <Grid>
         <avalonEdit:TextEditor
             Name="codeEditor"
@@ -27,20 +30,22 @@
             </i:Interaction.Triggers>
         </avalonEdit:TextEditor>
         <Grid Height="20" VerticalAlignment="Bottom">
+            <Button Content="加载10行" Command="{Binding Load10Rows}" 
+                    Visibility="{Binding ShowLoad10Rows, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" 
+                    HorizontalAlignment="Right" Margin="0,1,167,-1" Width="80" Height="20" BorderBrush="#FFACACAC"/>
             <ComboBox HorizontalAlignment="Right" Width="80"
                       SelectedValue="{Binding EncodeSelected,Mode=TwoWay}"
                       ItemsSource="{Binding EncodeList}"
                       SelectedValuePath="Value"
-                      DisplayMemberPath="Key" Background="Transparent">
+                      DisplayMemberPath="Key" Background="Transparent" Margin="0,1,0,-1">
 
             </ComboBox>
             <ComboBox HorizontalAlignment="Right" Width="90"
                       SelectedValue="{Binding SyntaxHighlighting,Mode=TwoWay}"
                       ItemsSource="{Binding HighlightingDefinitions}"
-                      DisplayMemberPath="Name" Background="Transparent" Margin="0,0,79,0">
+                      DisplayMemberPath="Name" Background="Transparent" Margin="0,1,78,-1">
 
             </ComboBox>
-
         </Grid>
 
     </Grid>
