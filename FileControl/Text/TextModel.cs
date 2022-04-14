@@ -22,16 +22,16 @@ namespace FileViewer.FileControl.Text
         private TextEditor textEditor;
         public ICommand Loaded => new DelegateCommand<TextEditor>((editor) => {
             textEditor = editor;
-            setText(textTmp);
+            SetText(textTmp);
         });
         public ICommand Load10Rows => new DelegateCommand<TextEditor>((editor) => {
             textEditor = editor;
-            setText(textTmp);
+            SetText(textTmp);
         });
         public bool ShowLoad10Rows { get; set; }
 
         private string textTmp = "";
-        private void setText(string text)
+        private void SetText(string text)
         {
             if (text == "") return;
             if(textEditor != null)
@@ -134,7 +134,7 @@ namespace FileViewer.FileControl.Text
         }
         protected override void BgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            setText((string)e.Result);
+            SetText((string)e.Result);
             GlobalNotify.OnLoadingChange(false);
         }
 

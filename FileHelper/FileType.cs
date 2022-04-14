@@ -97,8 +97,100 @@ namespace FileViewer.FileHelper
                 case FileExtension.Folder:
                     type = FileViewType.Folder;
                     break;
+                default:
+                    (type, ext) = ProcessUnknowType(filePath);
+                    break;
+            }
+
+            return (type, ext);
+        }
+
+        private static (FileViewType Type, FileExtension Ext) ProcessUnknowType(string filePath)
+        {
+            var ext = GetFileType(filePath);
+            var type = FileViewType.None;
+            string mime = System.Web.MimeMapping.GetMimeMapping(filePath);
+            if (mime == null) return (type, ext);
+            if (mime.StartsWith("video"))
+            {
+                type = FileViewType.Video;
+            }
+            else if (mime.StartsWith("audio"))
+            {
+                type = FileViewType.Music;
+            }
+            else if (mime.StartsWith("image"))
+            {
+                type = FileViewType.Image;
+            }
+            else if (mime.StartsWith("pdf"))
+            {
+                type = FileViewType.Pdf;
+            }
+            else if (mime.StartsWith("text"))
+            {
+                type = FileViewType.Txt;
+            }else
+            {
+                FileInfo fileInfo = new FileInfo(filePath);
+                if(fileInfo.Length < 10 * 1024 * 1024 && !IsBinary(ReadFirstBytes(filePath)))
+                {
+                    type = FileViewType.Txt;
+                }
             }
             return (type, ext);
+        }
+
+        private static bool IsBinary(byte[] data)
+        {
+            const int maxControlCharsCode = 8;
+            const int unicodeReplacementChar = 0xFFFD;
+            string maybeStr = Encoding.UTF8.GetString(data);
+            int runeCnt = maybeStr.Length;
+            int UTFMax = 4;
+            int runeIndex = 0;
+            int gotRuneErrCnt = 0;
+            int firstRuneErrIndex = -1;
+            foreach (char b in maybeStr)
+            {
+                if (b <= maxControlCharsCode)
+                {
+                    return true;
+                }
+                if (b == unicodeReplacementChar)
+                {
+                    if (runeCnt > UTFMax && runeIndex < runeCnt - UTFMax)
+                    {
+                        return true;
+
+                    }
+                    gotRuneErrCnt++;
+                    if (firstRuneErrIndex == -1)
+                    {
+                        firstRuneErrIndex = runeIndex;
+                    }
+                }
+                runeIndex++;
+            }
+            return false;
+        }
+
+        private static byte[] ReadFirstBytes(string filePath)
+        {
+            byte[] data = new byte[512];
+            using (var reader = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                int len = reader.Read(data, 0, data.Length);
+                if (len == 0)
+                {
+                    data = null;
+                }
+                else
+                {
+                    data = data.Take(len).ToArray();
+                }
+            }
+            return data;
         }
     }
 
