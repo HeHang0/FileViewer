@@ -66,6 +66,7 @@ namespace FileViewer.FileControl
                     GlobalNotify.OnResizeMode(true);
                     break;
                 case FileViewType.Code:
+                case FileViewType.Txt:
                     fc = new TextControl();
                     GlobalNotify.OnResizeMode(true);
                     break;
