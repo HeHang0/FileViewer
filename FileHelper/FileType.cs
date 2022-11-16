@@ -133,7 +133,11 @@ namespace FileViewer.FileHelper
             }else
             {
                 FileInfo fileInfo = new FileInfo(filePath);
-                if(fileInfo.Length < 10 * 1024 * 1024 && !IsBinary(ReadFirstBytes(filePath)))
+                if (ext == FileExtension.MOBILEPROVISION && fileInfo.Length < 1024 * 1024)
+                {
+                    type = FileViewType.MobileProvision;
+                }
+                else if(fileInfo.Length < 10 * 1024 * 1024 && !IsBinary(ReadFirstBytes(filePath)))
                 {
                     type = FileViewType.Txt;
                 }
@@ -196,7 +200,7 @@ namespace FileViewer.FileHelper
 
     public enum FileViewType
     {
-        Image, Code, Txt, Music, Video, Word, Excel, PowerPoint, Pdf, Folder, None
+        Image, Code, Txt, Music, Video, Word, Excel, PowerPoint, Pdf, Folder, MobileProvision, None
     }
 
     public enum FileExtension
@@ -261,6 +265,7 @@ namespace FileViewer.FileHelper
         PPT,
         DOCX,
         XLSX,
-        PPTX
+        PPTX,
+        MOBILEPROVISION
     }
 }
