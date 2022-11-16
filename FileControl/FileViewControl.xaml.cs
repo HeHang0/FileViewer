@@ -2,6 +2,7 @@
 using FileViewer.FileControl.Excel;
 using FileViewer.FileControl.Hello;
 using FileViewer.FileControl.Image;
+using FileViewer.FileControl.MobileProvision;
 using FileViewer.FileControl.Music;
 using FileViewer.FileControl.Pdf;
 using FileViewer.FileControl.PowerPoint;
@@ -92,6 +93,10 @@ namespace FileViewer.FileControl
                     break;
                 case FileViewType.PowerPoint:
                     fc = new PowerPointControl();
+                    GlobalNotify.OnResizeMode(true);
+                    break;
+                case FileViewType.MobileProvision:
+                    fc = new MobileProvisionControl();
                     GlobalNotify.OnResizeMode(true);
                     break;
                 default:

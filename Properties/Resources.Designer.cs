@@ -91,7 +91,19 @@ namespace FileViewer.Properties {
         }
         
         /// <summary>
-        ///   404HTML的本地化字符串。
+        ///   查找类似 &lt;!doctype html&gt;
+        ///&lt;html&gt;
+        ///&lt;head&gt;
+        ///&lt;meta charset=&quot;utf-8&quot;&gt;
+        ///&lt;title&gt;访问错误--页面跳转中...&lt;/title&gt;
+        ///&lt;meta http-equiv=content-type content=&quot;text/html; charset=utf-8&quot;&gt;
+        ///&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+        ///&lt;meta http-equiv=&quot;refresh&quot; content=&quot;500;url=#&quot;&gt;
+        ///&lt;style type=&quot;text/css&quot;&gt;
+        ///    html, body, .container, .container_3, container_3_1{
+        ///        width:100%;
+        ///    }
+        ///	body { background-image:url(data:image/jpeg;base64,/9j/4QAYRXhpZgAASUkqAAgAAAAAAAAAAAAAAP/sABFEdWNreQABAAQAAAA8AAD/4QNvaHR0cDovL25zLmFkb [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Html404 {
             get {
