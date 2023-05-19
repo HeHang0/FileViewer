@@ -10,7 +10,7 @@ namespace FileViewer.FileControl
     /// </summary>
     public class FileControl : UserControl, IFileChanged
     {
-        private readonly IFileChanged model;
+        public readonly IFileChanged model;
         public FileControl(IFileChanged iModel)
         {
             model = iModel;

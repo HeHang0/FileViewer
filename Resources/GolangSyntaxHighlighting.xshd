@@ -1,0 +1,68 @@
+<SyntaxDefinition name="Golang"
+    xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color foreground="Black" name="Default" />
+  <Color name="Comment" foreground="Green" />
+  <Color name="String" foreground="DarkRed" />
+  <Color name="Number" foreground="YellowGreen" />
+  <Color name="Define" foreground="Blue" />
+  <Color name="Keyword" foreground="MediumVioletRed" />
+  <Color name="TypeName" foreground="LightSkyBlue" />
+  <RuleSet>
+    <Span color="Comment" multiline="true">
+      <Begin>\(\*</Begin>
+      <End>\*\)</End>
+    </Span>
+    <Span color="Comment" multiline="false">
+      <Begin>//</Begin>
+      <End>$</End>
+    </Span>
+    <Keywords color="Define">
+      <Word>func</Word>
+      <Word>interface</Word>
+      <Word>interface{}</Word>
+      <Word>any</Word>
+      <Word>import</Word>
+      <Word>package</Word>
+      <Word>type</Word>
+      <Word>struct</Word>
+      <!-- Add more keywords here -->
+    </Keywords>
+    <Keywords color="Keyword">
+      <Word>break</Word>
+      <Word>continue</Word>
+      <Word>default</Word>
+      <Word>case</Word>
+      <Word>defer</Word>
+      <Word>select</Word>
+      <Word>return</Word>
+    </Keywords>
+    <Rule color="Number">
+      (?i)\b(0[xX][0-9a-fA-F]+|(\d+(\.\d+)?([eE][+-]?\d+)?|NaN|nan|Inf|inf))\b
+    </Rule>
+    <Span color="String">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <!-- nested span for escape sequences -->
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+    <Span color="String">
+      <Begin>`</Begin>
+      <End>`</End>
+      <RuleSet>
+        <!-- nested span for escape sequences -->
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+    <Rule color="TypeName">
+      (?i)\b([A-Z]\w\*)\b
+    </Rule>
+    <Rule color="TypeName">
+      (?i)\b(make|new)\b
+    </Rule>
+    <Rule color="Keyword">
+      @functions
+    </Rule>
+  </RuleSet>
+</SyntaxDefinition>

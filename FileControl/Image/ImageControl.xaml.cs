@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WpfAnimatedGif;
 
 namespace FileViewer.FileControl.Image
 {
@@ -21,9 +22,10 @@ namespace FileViewer.FileControl.Image
     /// </summary>
     public partial class ImageControl : FileControl
     {
-        public ImageControl(): base(new ImageModel())
+        public ImageControl():base(new ImageModel())
         {
             InitializeComponent();
+            (model as ImageModel).setGifImageCtrl(GifImage);
         }
     }
 }

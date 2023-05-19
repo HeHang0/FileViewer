@@ -51,8 +51,8 @@ namespace FileViewer.FileControl.Text
 
 
 
-        private double height = SystemParameters.WorkArea.Height / 2;
-        private double width = SystemParameters.WorkArea.Width / 2;
+        private readonly double height = SystemParameters.WorkArea.Height / 2;
+        private readonly double width = SystemParameters.WorkArea.Width / 2;
 
         private Encoding encodingSelected = Encoding.UTF8;
         public Encoding EncodeSelected

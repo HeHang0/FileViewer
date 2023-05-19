@@ -10,6 +10,7 @@ using System.Drawing;
 using System.IO;
 using Svg2Xaml;
 using System.Windows.Media;
+using WpfAnimatedGif;
 
 namespace FileViewer.FileControl.Image
 {
@@ -25,7 +26,7 @@ namespace FileViewer.FileControl.Image
                 switch (file.Ext)
                 {
                     case FileExtension.GIF:
-                        if (Utils.FileSize(file.FilePath) > 2.5) throw new FileLoadException();
+                        if (Utils.FileSize(file.FilePath) > 10) throw new FileLoadException();
                         ShowGif(file.FilePath);
                         break;
                     case FileExtension.SVG:
@@ -59,8 +60,51 @@ namespace FileViewer.FileControl.Image
             IsImg = false;
             IsGif = true;
             FilePath = filePath;
+
+            byte[] data = null;
+            using (FileStream fReader = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            {
+                data = new byte[fReader.Length];
+                fReader.Read(data, 0, (int)fReader.Length);
+            }
+            if (data != null)
+            {
+                gifStream = new MemoryStream(data);
+                var image = new BitmapImage();
+                image.BeginInit();
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.StreamSource = gifStream;
+                image.EndInit();
+                image.Freeze();
+                ImageBehavior.SetAnimatedSource(gifImgCtrl, image);
+                var height = image.Height;
+                var width = image.Width;
+                if (height > width)
+                {
+                    width += 5;
+                }
+                GlobalNotify.OnSizeChange(height, width);
+            }
+
             GlobalNotify.OnLoadingChange(false);
-            GlobalNotify.OnSizeChange(400, 600);
+            //GlobalNotify.OnSizeChange(400, 600);
+        }
+
+        private System.Windows.Controls.Image gifImgCtrl;
+        private MemoryStream gifStream;
+        public void setGifImageCtrl(System.Windows.Controls.Image imgCtrl)
+        {
+            gifImgCtrl = imgCtrl;
+            imgCtrl.Unloaded += ImgCtrl_Unloaded;
+        }
+
+        private void ImgCtrl_Unloaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if(gifStream != null)
+            {
+                gifStream.Close();
+                gifStream = null;
+            }
         }
 
         private void ShowImg((string, FileExtension) file)

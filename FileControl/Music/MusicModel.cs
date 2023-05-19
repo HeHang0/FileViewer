@@ -53,15 +53,15 @@ namespace FileViewer.FileControl.Music
         {
             try
             {
-                TagLib.File file = TagLib.File.Create(filePath);
-                if (file.Tag.Pictures.Count() > 0)
-                {
-                    using(MemoryStream ms = new MemoryStream(file.Tag.Pictures[0].Data.Data))
-                    {
-                        ThumbnailImage = BitmapFrame.Create(ms, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
-                        return;
-                    }
-                }
+                //TagLib.File file = TagLib.File.Create(filePath);
+                //if (file.Tag.Pictures.Count() > 0)
+                //{
+                //    using(MemoryStream ms = new MemoryStream(file.Tag.Pictures[0].Data.Data))
+                //    {
+                //        ThumbnailImage = BitmapFrame.Create(ms, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                //        return;
+                //    }
+                //}
             }
             catch (Exception)
             {

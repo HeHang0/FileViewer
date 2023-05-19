@@ -1,10 +1,13 @@
 ﻿using FileViewer.ViewModel;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using ICSharpCode.AvalonEdit.Highlighting;
 using System;
 using System.Drawing;
 using System.IO;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
+using System.Xml;
 using Application = System.Windows.Application;
 
 namespace FileViewer
@@ -14,7 +17,7 @@ namespace FileViewer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Viewer myViewer;
+        private readonly Viewer myViewer;
         public MainWindow()
         {
             myViewer = new Viewer(Dispatcher);
@@ -38,6 +41,16 @@ namespace FileViewer
         {
             InitNotyfy();
             myViewer.ViewerEventer.OnLoaded.Execute(this);
+            using (MemoryStream stream = new MemoryStream(Properties.Resources.GolangSyntaxHighlighting))
+            {
+                using (XmlReader reader = new XmlTextReader(stream))
+                {
+                    var highlightingDefinition = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+
+                    // 注册自定义的语法高亮定义
+                    HighlightingManager.Instance.RegisterHighlighting("Golang", new string[] { ".go" }, highlightingDefinition);
+                }
+            }
         }
 
         private void FullScreen(bool isFullScreen)
@@ -93,10 +106,12 @@ namespace FileViewer
         NotifyIcon notifyIcon;
         public void InitNotyfy()
         {
-            notifyIcon = new NotifyIcon();
-            notifyIcon.Text = "FileViewer";//最小化到托盘时，鼠标点击时显示的文本
-            notifyIcon.Icon = Properties.Resources.logo;//程序图标
-            notifyIcon.Visible = true;
+            notifyIcon = new NotifyIcon
+            {
+                Text = "FileViewer",//最小化到托盘时，鼠标点击时显示的文本
+                Icon = Properties.Resources.logo,//程序图标
+                Visible = true
+            };
             MenuItem closeItem = new MenuItem("退出");
             closeItem.Click += ExitApp;
             MenuItem openItem = new MenuItem("显示");
@@ -147,6 +162,8 @@ namespace FileViewer
             {
                 Show();
                 Activate();
+                Topmost = true;
+                Topmost = false;
             }
             if(WindowState == WindowState.Minimized)
             {

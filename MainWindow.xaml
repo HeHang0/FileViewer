@@ -2,12 +2,12 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"  
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"  
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:myc="clr-namespace:FileViewer.FileControl"  
         xmlns:themes="clr-namespace:FileViewer.WindowStyle" Height="470" Width="720"  themes:UniversalWindowStyle.Foreground="{Binding FileInfo.TitleBarForeground}"
         Background="{Binding FileInfo.BackgroundColor}"  themes:UniversalWindowStyle.OpenCommond="{Binding FileInfo.OpenFile}"
-        mc:Ignorable="d" Name="MyMainWindow" Icon="logo.ico" Loaded="MyMainWindow_Loaded" Topmost="True"
+        mc:Ignorable="d" Name="MyMainWindow" Icon="logo.ico" Loaded="MyMainWindow_Loaded"
         MinHeight="233" MinWidth="400" Closing="MyMainWindow_Closing" Style="{StaticResource StyleWindowUniversal}"
         Title="{Binding FileInfo.Title}" WindowStartupLocation="CenterScreen">
     <i:Interaction.Triggers>

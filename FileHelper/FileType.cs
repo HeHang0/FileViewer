@@ -28,7 +28,7 @@ namespace FileViewer.FileHelper
         public static (FileViewType Type, FileExtension Ext) GetFileViewType(string filePath)
         {
             var ext = GetFileType(filePath);
-            var type = FileViewType.None;
+            FileViewType type;
             switch (ext)
             {
                 case FileExtension.JPG:
@@ -64,6 +64,7 @@ namespace FileViewer.FileHelper
                 case FileExtension.LESS:
                 case FileExtension.KT:
                 case FileExtension.PHP:
+                case FileExtension.TS:
                     type = FileViewType.Code;
                     break;
                 case FileExtension.MP3:
@@ -76,7 +77,6 @@ namespace FileViewer.FileHelper
                 case FileExtension.RMVB:
                 case FileExtension.RM:
                 case FileExtension.MKV:
-                case FileExtension.TS:
                     type = FileViewType.Video;
                     break;
                 case FileExtension.PDF:

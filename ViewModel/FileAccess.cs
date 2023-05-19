@@ -9,12 +9,15 @@ namespace FileViewer.ViewModel
 {
     public class FileAccess : INotifyPropertyChanged
     {
-        
         public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public string Title { get; set; }
 
-        public string FilePath { get; private set; }
+        public string FilePath { get; set; }
 
         public ImageSource IconImage { get; private set; }
 
