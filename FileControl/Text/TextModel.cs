@@ -84,7 +84,7 @@ namespace FileViewer.FileControl.Text
         public void OnFileChanged((string FilePath, FileExtension Ext) file)
         {
             currentFilePath = file;
-            if (file.Ext == FileExtension.JSON || file.Ext == FileExtension.VUE)
+            if (file.Ext == FileExtension.TS || file.Ext == FileExtension.VUE)
             {
                 SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(".JS");
             }

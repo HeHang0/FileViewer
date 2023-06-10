@@ -2,39 +2,100 @@
     xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
   <Color foreground="Black" name="Default" />
   <Color name="Comment" foreground="Green" />
+  <Color name="FunctionName" foreground="DarkKhaki" />
   <Color name="String" foreground="DarkRed" />
-  <Color name="Number" foreground="YellowGreen" />
+  <Color name="Number" foreground="LimeGreen" />
   <Color name="Define" foreground="Blue" />
-  <Color name="Keyword" foreground="MediumVioletRed" />
+  <Color name="Keyword" foreground="DarkOrchid" />
+  <Color name="Types" foreground="Blue" />
+  <Color name="BuiltIns" foreground="YellowGreen" />
+  <Color name="Literal" foreground="Blue" />
   <Color name="TypeName" foreground="LightSkyBlue" />
   <RuleSet>
     <Span color="Comment" multiline="true">
-      <Begin>\(\*</Begin>
-      <End>\*\)</End>
+      <Begin>/\*</Begin>
+      <End>\*/</End>
     </Span>
     <Span color="Comment" multiline="false">
       <Begin>//</Begin>
       <End>$</End>
     </Span>
-    <Keywords color="Define">
-      <Word>func</Word>
-      <Word>interface</Word>
-      <Word>interface{}</Word>
-      <Word>any</Word>
-      <Word>import</Word>
-      <Word>package</Word>
-      <Word>type</Word>
-      <Word>struct</Word>
-      <!-- Add more keywords here -->
-    </Keywords>
+    <Rule color="FunctionName">
+      \b[a-zA-Z_][a-zA-Z0-9_]+\b(?=\()
+    </Rule>
     <Keywords color="Keyword">
       <Word>break</Word>
+      <Word>case</Word>
+      <Word>chan</Word>
+      <Word>const</Word>
       <Word>continue</Word>
       <Word>default</Word>
-      <Word>case</Word>
       <Word>defer</Word>
-      <Word>select</Word>
+      <Word>else</Word>
+      <Word>fallthrough</Word>
+      <Word>for</Word>
+      <Word>func</Word>
+      <Word>go</Word>
+      <Word>goto</Word>
+      <Word>if</Word>
+      <Word>(</Word>
+      <Word>)</Word>
+      <Word>import</Word>
+      <Word>interface</Word>
+      <Word>map</Word>
+      <Word>package</Word>
+      <Word>range</Word>
       <Word>return</Word>
+      <Word>select</Word>
+      <Word>struct</Word>
+      <Word>switch</Word>
+      <Word>type</Word>
+      <Word>var</Word>
+    </Keywords>
+    <Keywords color="Types">
+      <Word>bool</Word>
+      <Word>byte</Word>
+      <Word>complex64</Word>
+      <Word>complex128</Word>
+      <Word>error</Word>
+      <Word>float32</Word>
+      <Word>float64</Word>
+      <Word>int8</Word>
+      <Word>int16</Word>
+      <Word>int32</Word>
+      <Word>int64</Word>
+      <Word>string</Word>
+      <Word>uint8</Word>
+      <Word>uint16</Word>
+      <Word>uint32</Word>
+      <Word>uint64</Word>
+      <Word>int</Word>
+      <Word>uint</Word>
+      <Word>uintptr</Word>
+      <Word>rune</Word>
+    </Keywords>
+    <Keywords color="BuiltIns">
+      <Word>append</Word>
+      <Word>cap</Word>
+      <Word>close</Word>
+      <Word>complex</Word>
+      <Word>copy</Word>
+      <Word>imag</Word>
+      <Word>len</Word>
+      <Word>make</Word>
+      <Word>new</Word>
+      <Word>panic</Word>
+      <Word>print</Word>
+      <Word>println</Word>
+      <Word>real</Word>
+      <Word>recover</Word>
+      <Word>delete</Word>
+    </Keywords>
+    <Keywords color="Literal">
+      <Word>true</Word>
+      <Word>false</Word>
+      <Word>iota</Word>
+      <Word>nil</Word>
     </Keywords>
     <Rule color="Number">
       (?i)\b(0[xX][0-9a-fA-F]+|(\d+(\.\d+)?([eE][+-]?\d+)?|NaN|nan|Inf|inf))\b
