@@ -36,6 +36,11 @@ namespace FileViewer.FileControl.Text
             if (text == "") return;
             if(textEditor != null)
             {
+                if (SyntaxHighlighting == null && text.StartsWith("<"))
+                {
+                    SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(".xml");
+                }
+
                 textEditor.Text = text;
                 textTmp = "";
             }

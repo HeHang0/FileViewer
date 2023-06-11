@@ -28,6 +28,15 @@ namespace FileViewer.WindowStyle
         public static void SetOpenCommond(DependencyObject element, ICommand value)
             => element.SetValue(OpenCommondProperty, value);
 
+        public static readonly DependencyProperty OpenTextProperty = DependencyProperty.RegisterAttached(
+            "OpenText", typeof(string), typeof(UniversalWindowStyle),
+            new PropertyMetadata(null, OnOpenTextChanged));
+
+        public static string GetOpenText(DependencyObject element) => (string)element.GetValue(OpenTextProperty);
+
+        public static void SetOpenText(DependencyObject element, ICommand value)
+            => element.SetValue(OpenTextProperty, value);
+
         public static readonly DependencyProperty ForegroundProperty = DependencyProperty.RegisterAttached(
             "Foreground", typeof(Brush), typeof(UniversalWindowStyle),
             new PropertyMetadata(Brushes.Black));
@@ -79,6 +88,11 @@ namespace FileViewer.WindowStyle
         }
 
         private static void OnOpenCommondChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+
+        }
+
+        private static void OnOpenTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
 
         }

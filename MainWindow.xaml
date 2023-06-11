@@ -5,10 +5,13 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"  
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:myc="clr-namespace:FileViewer.FileControl"  
-        xmlns:themes="clr-namespace:FileViewer.WindowStyle" Height="470" Width="720"  themes:UniversalWindowStyle.Foreground="{Binding FileInfo.TitleBarForeground}"
-        Background="{Binding FileInfo.BackgroundColor}"  themes:UniversalWindowStyle.OpenCommond="{Binding FileInfo.OpenFile}"
+        xmlns:themes="clr-namespace:FileViewer.WindowStyle" Height="470" Width="720"
+        Background="{Binding FileInfo.BackgroundColor}" Style="{StaticResource StyleWindowUniversal}"
+        themes:UniversalWindowStyle.OpenCommond="{Binding FileInfo.OpenFile}"
+        themes:UniversalWindowStyle.OpenText="{Binding FileInfo.OpenText}"
+        themes:UniversalWindowStyle.Foreground="{Binding FileInfo.TitleBarForeground}"
         mc:Ignorable="d" Name="MyMainWindow" Icon="logo.ico" Loaded="MyMainWindow_Loaded"
-        MinHeight="233" MinWidth="400" Closing="MyMainWindow_Closing" Style="{StaticResource StyleWindowUniversal}"
+        MinHeight="233" MinWidth="400" Closing="MyMainWindow_Closing"
         Title="{Binding FileInfo.Title}" WindowStartupLocation="CenterScreen">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="StateChanged">

@@ -139,9 +139,11 @@
                                 </StackPanel>
                                 <StackPanel x:Name="TitleBarButtonPanel" Orientation="Horizontal"
                                             Margin="0 -5 0 0" HorizontalAlignment="Right">
-                                    <Button ToolTip="打开文件" FontSize="12" Command="{TemplateBinding themes:UniversalWindowStyle.OpenCommond}" 
+                                    <Button FontSize="12" Width="Auto" Padding="0 10 0 10"
+                                            ToolTip="{TemplateBinding themes:UniversalWindowStyle.OpenText}" 
+                                            Content="{TemplateBinding themes:UniversalWindowStyle.OpenText}" 
+                                            Command="{TemplateBinding themes:UniversalWindowStyle.OpenCommond}" 
                                             Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}">
-                                        打开
                                     </Button>
                                     <Button x:Name="MinimizeButton" FontSize="15" themes:UniversalWindowStyle.TitleBarButtonState="Minimized" 
                                             Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}">
