@@ -28,8 +28,6 @@ namespace FileViewer.ViewModel
 
         public bool Loading { get; private set; }
 
-        public ImageSource IconImage { get; private set; }
-
         public Brush BackgroundColor { get; private set; } = Brushes.White;
 
         public Brush TitleBarForeground { get; private set; } = Brushes.Black;
@@ -40,9 +38,6 @@ namespace FileViewer.ViewModel
             if (!Directory.Exists(filePath) && !File.Exists(filePath)) return;
             Title = Path.GetFileName(filePath);
             FilePath = filePath;
-            ShellObject shellFile = ShellObject.FromParsingName(filePath);
-            IconImage = shellFile.Thumbnail.SmallBitmapSource;
-            //SizeChange?.Invoke(ThumbnailImage.Height, ThumbnailImage.Width);
             var (name, execPath) = GetDefaultAppForExtension(Path.GetExtension(filePath));
             this.execPath = execPath;
             if (name == null || name.IsNullOrWhiteSpace())
