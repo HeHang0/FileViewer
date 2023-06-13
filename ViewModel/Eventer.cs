@@ -25,10 +25,11 @@ namespace FileViewer.ViewModel
             GlobalNotify.WindowVisableChanged += WindowVisableChanged; 
         }
 
-        private void WindowVisableChanged(bool show)
+        private void WindowVisableChanged(bool show, bool topmost)
         {
             bool loop = isLoop.getValue();
-            if (loop != show)
+            bool needLoop = show && topmost;
+            if (loop != needLoop)
             {
                 if (loop) isLoop.setVal(false);
                 else
@@ -67,20 +68,21 @@ namespace FileViewer.ViewModel
         });
 
         public ICommand IsVisibleChanged => new DelegateCommand<MainWindow>((win) => {
-            GlobalNotify.OnWindowVisableChanged(win.IsVisible);
+            GlobalNotify.OnWindowVisableChanged(win.IsVisible, win.Topmost);
         });
 
         public ICommand StateChanged => new DelegateCommand<MainWindow>((win) => {
-            GlobalNotify.OnWindowVisableChanged(win.WindowState != System.Windows.WindowState.Minimized);
+            GlobalNotify.OnWindowVisableChanged(win.WindowState != System.Windows.WindowState.Minimized, win.Topmost);
         });
 
         public delegate void ReceiveFileEventHandler(string msg, bool active);
         public event ReceiveFileEventHandler ReceiveFile;
-        private string lastFilePath = "";
         private bool isLastDesktop = false;
+        private string lastFile = "";
         void OnReceiveFile(string filePath, bool active = true)
         {
-            lastFilePath = filePath;
+            if (lastFile == filePath) return;
+            lastFile = filePath;
             isLastDesktop = filePath.Contains(desktopPath);
             ReceiveFile?.Invoke(filePath, active);
         }

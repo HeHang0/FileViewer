@@ -1,12 +1,19 @@
-﻿using Microsoft.Win32;
+﻿using FileViewer.Globle;
+using FileViewer.Monitor;
+using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Shell;
 using Syncfusion.Windows.Shared;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 using System.Windows.Input;
 using System.Windows.Media;
+using File = System.IO.File;
 
 namespace FileViewer.ViewModel
 {
@@ -22,6 +29,8 @@ namespace FileViewer.ViewModel
 
         public string FilePath { get; set; }
 
+        public bool Topmost { get; set; }
+
         public string OpenText { get; set; } = "打开";
 
         private string execPath;
@@ -35,62 +44,95 @@ namespace FileViewer.ViewModel
         public void InitFile(string filePath)
         {
             if (FilePath == filePath) return;
-            if (!Directory.Exists(filePath) && !File.Exists(filePath)) return;
+            bool isDirectory = Directory.Exists(filePath);
+            bool isFile = File.Exists(filePath);
+            if (!isDirectory && !isFile) return;
             Title = Path.GetFileName(filePath);
             FilePath = filePath;
-            var (name, execPath) = GetDefaultAppForExtension(Path.GetExtension(filePath));
+            var (name, execPath) = GetDefaultAppForPath(filePath, isDirectory);
             this.execPath = execPath;
             if (name == null || name.IsNullOrWhiteSpace())
             {
-                OpenText = "打开";
-            }else
+                OpenText = " 打开 ";
+            }
+            else if(Path.GetExtension(filePath).ToLower() == ".lnk")
+            {
+                OpenText = $" 打开 {name} ";
+            }
+            else
             {
                 OpenText = $" 使用 {name} 打开 ";
             }
         }
 
-        private (string Name, string Path) GetDefaultAppForExtension(string extension)
+        private (string Name, string Path) GetDefaultAppForPath(string filePath, bool isDirectory)
         {
             string appName = null;
             string appPath = null;
-
-            // 获取文件扩展名的默认程序的ProgID
-            var subKey = Registry.ClassesRoot.OpenSubKey(extension);
-            string progId = (string)subKey?.GetValue(null);
-            if (progId == null)
+            string progId = null;
+            string extension = Path.GetExtension(filePath).ToLower();
+            if(extension == ".pdf") Topmost= false;
+            if (extension == ".lnk")
             {
-                progId = subKey?.OpenSubKey("OpenWithProgids")?.GetValueNames()?.FirstOrDefault();
+                appPath = Utils.LinkPath(filePath);
             }
+            else if (!isDirectory)
+            {
+                // 获取文件扩展名的默认程序的ProgID
+                var subKey = Registry.ClassesRoot.OpenSubKey(extension);
+                progId = (string)subKey?.GetValue(null);
+                if (progId == null)
+                {
+                    progId = subKey?.OpenSubKey("OpenWithProgids")?.GetValueNames()?.FirstOrDefault();
+                }
+            }
+            else
+            {
+                appPath = "C:\\Windows\\explorer.exe";
+            }
+
             if (progId != null)
             {
                 // 使用ProgID获取应用程序的路径
                 RegistryKey openWithKey = Registry.ClassesRoot.OpenSubKey(progId + "\\shell\\open\\command");
-                if(openWithKey == null) openWithKey = Registry.ClassesRoot.OpenSubKey(progId + "\\shell\\printto\\command");
+                if (openWithKey == null) openWithKey = Registry.ClassesRoot.OpenSubKey(progId + "\\shell\\printto\\command");
                 if (openWithKey != null)
                 {
                     // 获取默认打开方式的路径
                     appPath = (string)openWithKey.GetValue(null);
-                    if(appPath != null)
+                    if (appPath != null)
                     {
                         int index = appPath.IndexOf(appPath.StartsWith("\"") ? "\" " : " ");
-                        if(index > 0) appPath = appPath.Substring(0, index);
-                        appPath = appPath?.Replace("\"", "").Trim();
+                        string originAppPath = appPath;
+                        appPath = appPath.Substring(0, index).Replace("\"", "").Trim();
+                        if (appPath.EndsWith("rundll32.exe"))
+                        {
+                            int dllIndex = originAppPath.IndexOf(".dll");
+                            if (dllIndex > 0)
+                            {
+                                string dllName = originAppPath.Substring(index, dllIndex - index + 4).Trim();
+                                string dllPath = Path.Combine(Path.GetDirectoryName(originAppPath), dllName);
+                                appName = GetDisplayName(dllPath);
+                                appPath = null;
+                            }
+                        }
                     }
                     if (!File.Exists(appPath)) appPath = null;
                 }
-
-
-                // 使用ProgID获取应用程序的名称
-                RegistryKey openWithFriendlyAppName = Registry.ClassesRoot.OpenSubKey(progId + "\\shell\\open");
-                if (openWithFriendlyAppName != null)
+                if (appName == null)
                 {
-                    // 获取默认应用程序的名称
-                    appName = (string)openWithFriendlyAppName.GetValue("FriendlyAppName");
+                    // 使用ProgID获取应用程序的名称
+                    RegistryKey openWithFriendlyAppName = Registry.ClassesRoot.OpenSubKey(progId + "\\shell\\open");
+                    if (openWithFriendlyAppName != null)
+                    {
+                        // 获取默认应用程序的名称
+                        appName = (string)openWithFriendlyAppName.GetValue("FriendlyAppName");
+                    }
                 }
-                if(appName == null && appPath != null)
-                {
-                    appName = GetDisplayName(appPath);
-                }
+            }
+            if(appName == null && appPath != null)
+            {
+                appName = GetDisplayName(appPath);
             }
 
             return (appName, appPath);
@@ -123,15 +165,20 @@ namespace FileViewer.ViewModel
         {
             if(File.Exists(FilePath) || Directory.Exists(FilePath))
             {
-                if(execPath != null && File.Exists(execPath))
+                if(execPath != null && File.Exists(execPath) && Path.GetExtension(FilePath).ToLower() != ".lnk")
                 {
-                    System.Diagnostics.Process.Start(execPath, FilePath);
+                    Process.Start(execPath, FilePath);
                 }
                 else
                 {
-                    System.Diagnostics.Process.Start(FilePath);
+                    Process.Start(FilePath);
                 }
             }
+        });
+
+        public ICommand SwitchTopMost => new Prism.Commands.DelegateCommand(() => {
+            Topmost = !Topmost;
+            GlobalNotify.OnWindowVisableChanged(true, Topmost);
         });
     }
 }

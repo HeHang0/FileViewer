@@ -139,27 +139,25 @@
                                 </StackPanel>
                                 <StackPanel x:Name="TitleBarButtonPanel" Orientation="Horizontal"
                                             Margin="0 -5 0 0" HorizontalAlignment="Right">
-                                    <Button FontSize="12" Width="Auto" Padding="0 10 0 10"
+                                    <Button Width="Auto" MinWidth="45"
                                             ToolTip="{TemplateBinding themes:UniversalWindowStyle.OpenText}" 
                                             Content="{TemplateBinding themes:UniversalWindowStyle.OpenText}" 
                                             Command="{TemplateBinding themes:UniversalWindowStyle.OpenCommond}" 
                                             Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}">
                                     </Button>
-                                    <Button x:Name="MinimizeButton" FontSize="15" themes:UniversalWindowStyle.TitleBarButtonState="Minimized" 
+                                    <Button x:Name="SwitchTopmostButton" FontSize="15" ToolTip="置顶" Content="🔝"
+                                            Command="{TemplateBinding themes:UniversalWindowStyle.SwitchTopmostCommond}" 
                                             Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}">
-                                        ─
                                     </Button>
-                                    <Button x:Name="RestoreButton" FontSize="15" themes:UniversalWindowStyle.TitleBarButtonState="Normal" 
-                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}">
-                                        ◱
+                                    <Button x:Name="MinimizeButton" ToolTip="最小化" themes:UniversalWindowStyle.TitleBarButtonState="Minimized" 
+                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}" Content="&#xE921;" FontFamily="Segoe MDL2 Assets"></Button>
+                                    <Button x:Name="RestoreButton" ToolTip="向下还原" themes:UniversalWindowStyle.TitleBarButtonState="Normal" 
+                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}" FontFamily="Segoe MDL2 Assets" Content="&#xE923;">
                                     </Button>
-                                    <Button x:Name="MaximizeButton" FontSize="15" themes:UniversalWindowStyle.TitleBarButtonState="Maximized" 
-                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}">
-                                        ◻
-                                    </Button>
-                                    <Button x:Name="CloseButton" FontSize="15" Style="{StaticResource Style.Button.Close}" themes:UniversalWindowStyle.IsTitleBarCloseButton="True" 
-                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}">
-                                        ╳
+                                    <Button x:Name="MaximizeButton" ToolTip="最大化" themes:UniversalWindowStyle.TitleBarButtonState="Maximized" 
+                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}" FontFamily="Segoe MDL2 Assets" Content="&#xE922;"></Button>
+                                    <Button x:Name="CloseButton" ToolTip="关闭" Style="{StaticResource Style.Button.Close}" themes:UniversalWindowStyle.IsTitleBarCloseButton="True" 
+                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}" FontFamily="Segoe MDL2 Assets" Content="&#xE8BB;">
                                     </Button>
                                 </StackPanel>
                             </Grid>
@@ -189,6 +187,10 @@
                         </Trigger>
                         <Trigger Property="WindowState" Value="Minimized">
                             <Setter TargetName="MinimizeButton" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Topmost" Value="True">
+                            <Setter TargetName="SwitchTopmostButton" Property="FontWeight" Value="Bold" />
+                            <Setter TargetName="SwitchTopmostButton" Property="FontStyle" Value="Italic" />
                         </Trigger>
                         <Trigger Property="IsActive" Value="False">
                             <Setter TargetName="TitleTextBlock" Property="Foreground" Value="{StaticResource Brush.TitleBar.InactiveForeground}" />

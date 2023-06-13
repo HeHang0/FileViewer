@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Input;
 using System.Windows.Media;
+using FileViewer.Globle;
 
 namespace FileViewer.FileControl.Hello
 {

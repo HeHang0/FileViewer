@@ -27,7 +27,6 @@ namespace FileViewer.FileControl.Word
 
         protected override void BgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            var bgw = sender as BackgroundWorker;
             var filePath = e.Argument as string;
             try
             {

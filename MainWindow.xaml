@@ -5,14 +5,18 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"  
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:myc="clr-namespace:FileViewer.FileControl"  
-        xmlns:themes="clr-namespace:FileViewer.WindowStyle" Height="470" Width="720"
-        Background="{Binding FileInfo.BackgroundColor}" Style="{StaticResource StyleWindowUniversal}"
-        themes:UniversalWindowStyle.OpenCommond="{Binding FileInfo.OpenFile}"
-        themes:UniversalWindowStyle.OpenText="{Binding FileInfo.OpenText}"
-        themes:UniversalWindowStyle.Foreground="{Binding FileInfo.TitleBarForeground}"
+        xmlns:themes="clr-namespace:FileViewer.WindowStyle"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Height="470" Width="720" WindowStartupLocation="CenterScreen"
+        Topmost="{Binding FileInfo.Topmost}" Title="{Binding FileInfo.Title}"
         mc:Ignorable="d" Name="MyMainWindow" Icon="logo.ico" Loaded="MyMainWindow_Loaded"
         MinHeight="233" MinWidth="400" Closing="MyMainWindow_Closing"
-        Title="{Binding FileInfo.Title}" WindowStartupLocation="CenterScreen">
+        Style="{StaticResource StyleWindowUniversal}"
+        Background="{Binding FileInfo.BackgroundColor}"
+        themes:UniversalWindowStyle.OpenCommond="{Binding FileInfo.OpenFile}"
+        themes:UniversalWindowStyle.OpenText="{Binding FileInfo.OpenText}"
+        themes:UniversalWindowStyle.SwitchTopmostCommond="{Binding FileInfo.SwitchTopMost}"
+        themes:UniversalWindowStyle.Foreground="{Binding FileInfo.TitleBarForeground}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="StateChanged">
             <i:InvokeCommandAction Command="{Binding Path=ViewerEventer.StateChanged}" CommandParameter="{Binding ElementName=MyMainWindow}"/>
@@ -26,8 +30,7 @@
                                   ButtonHoverForeground="White" ButtonHoverBackground="#3FFFFFFF"
                                   ButtonPressedForeground="#7FFFFFFF" ButtonPressedBackground="#3F000000" />
     </themes:UniversalWindowStyle.TitleBar>-->
-    <Grid Margin="0,32,0,0">
-
+    <Grid Margin="0,29,0,0">
         <myc:FileViewControl Margin="0" BorderThickness="0" DataContext="{Binding Path=FileInfo.FilePath}" IsVisibleChanged="FileViewControl_IsVisibleChanged" />
 
         <myc:Loading LoadCirclesMargin="200" LoadingText=""

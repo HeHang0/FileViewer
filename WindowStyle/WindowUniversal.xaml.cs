@@ -28,6 +28,15 @@ namespace FileViewer.WindowStyle
         public static void SetOpenCommond(DependencyObject element, ICommand value)
             => element.SetValue(OpenCommondProperty, value);
 
+        public static readonly DependencyProperty SwitchTopmostCommondProperty = DependencyProperty.RegisterAttached(
+            "SwitchTopmostCommond", typeof(ICommand), typeof(UniversalWindowStyle),
+            new PropertyMetadata(null, OnSwitchTopmostCommondChanged));
+
+        public static ICommand GetSwitchTopmostCommond(DependencyObject element) => (ICommand)element.GetValue(SwitchTopmostCommondProperty);
+
+        public static void SetSwitchTopmostCommond(DependencyObject element, ICommand value)
+            => element.SetValue(SwitchTopmostCommondProperty, value);
+
         public static readonly DependencyProperty OpenTextProperty = DependencyProperty.RegisterAttached(
             "OpenText", typeof(string), typeof(UniversalWindowStyle),
             new PropertyMetadata(null, OnOpenTextChanged));
@@ -88,6 +97,11 @@ namespace FileViewer.WindowStyle
         }
 
         private static void OnOpenCommondChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+
+        }
+
+        private static void OnSwitchTopmostCommondChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
 
         }

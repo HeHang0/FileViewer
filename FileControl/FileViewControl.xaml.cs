@@ -10,6 +10,7 @@ using FileViewer.FileControl.Text;
 using FileViewer.FileControl.Video;
 using FileViewer.FileControl.Word;
 using FileViewer.FileHelper;
+using Syncfusion.Windows.Shared;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -44,6 +45,7 @@ namespace FileViewer.FileControl
 
         private void SetResource(string filePath, bool loadWithTypeNone = false)
         {
+            if(filePath == null || filePath.IsNullOrWhiteSpace()) return;
             var typeInfo = FileType.GetFileViewType(filePath);
             if (loadWithTypeNone)
             {

@@ -64,7 +64,7 @@ namespace FileViewer.FileControl.Common
         {
             OnColorChanged(Color.FromRgb(0xA1, 0xD5, 0xD3));
             GlobalNotify.OnSizeChange(450, 800);
-            ShellObject shellFile = ShellObject.FromParsingName(file.FilePath);
+            ShellObject shellFile = ShellObject.FromParsingName(Utils.LinkPath(file.FilePath));
             ThumbnailImage =  shellFile.Thumbnail.ExtraLargeBitmapSource;
             GlobalNotify.OnLoadingChange(false);
             Size = "正在计算大小...";

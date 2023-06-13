@@ -76,12 +76,12 @@ namespace FileViewer
             FileLoadFailed?.Invoke(filePath);
         }
 
-        public delegate void WindowVisableChangedEventHandler(bool show);
+        public delegate void WindowVisableChangedEventHandler(bool show, bool topmost);
         public static event WindowVisableChangedEventHandler WindowVisableChanged;
 
-        public static void OnWindowVisableChanged(bool show)
+        public static void OnWindowVisableChanged(bool show, bool topmost)
         {
-            WindowVisableChanged?.Invoke(show);
+            WindowVisableChanged?.Invoke(show, topmost);
         }
     }
 }

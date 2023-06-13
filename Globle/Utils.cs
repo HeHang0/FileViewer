@@ -1,8 +1,12 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Shell;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace FileViewer.Globle
 {
@@ -38,6 +42,42 @@ namespace FileViewer.Globle
 
 
             return b + " B";
+        }
+
+        public static string LinkPath(string filePath)
+        {
+            string extension = Path.GetExtension(filePath).ToLower();
+            if(extension != ".lnk") return filePath;
+            var shellFile = ShellFile.FromFilePath(filePath);
+            string targetPath = shellFile?.Properties.System.Link.TargetParsingPath.Value ?? filePath;
+            if (!System.IO.File.Exists(targetPath) && targetPath.Contains("Program Files (x86)"))
+            {
+                targetPath = targetPath.Replace("Program Files (x86)", "Program Files");
+            }
+            if (!System.IO.File.Exists(targetPath)) targetPath = filePath;
+            return targetPath;
+        }
+
+        public static BitmapSource GetBitmapSource(Bitmap bmp)
+        {
+            BitmapFrame bf = null;
+
+            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+            {
+                bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                bf = BitmapFrame.Create(ms, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+            }
+            return bf;
+        }
+
+        public static double FileSize(string filePath)
+        {
+            var f = new FileInfo(filePath);
+            if (f.Exists)
+            {
+                return f.Length * 1.0 / 1048576;
+            }
+            return 0;
         }
     }
 }

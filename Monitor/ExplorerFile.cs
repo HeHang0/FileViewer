@@ -14,8 +14,32 @@ namespace FileViewer.Monitor
 {
     public class ExplorerFile
     {
+        [ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("000214E3-0000-0000-C000-000000000046")]
+        interface IShellView
+        {
+        }
+        [ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("000214E6-0000-0000-C000-000000000046")]
+        interface IShellFolder
+        {
+            void ParseDisplayName(IntPtr hwndOwner, IntPtr pbcReserved, [MarshalAs(UnmanagedType.LPWStr)] string pszDisplayName, out uint pchEaten, out IntPtr ppidl, ref uint pdwAttributes);
+            [PreserveSig] int EnumObjects(IntPtr hwndOwner, int grfFlags, out IntPtr ppenumIDList);
+            void BindToObject(IntPtr pidl, IntPtr pbcReserved, [In] ref Guid riid, out IShellView ppvOut);
+            void BindToStorage(IntPtr pidl, IntPtr pbcReserved, [In] ref Guid riid, out IntPtr ppvObj);
+            void CompareIDs(IntPtr lParam, IntPtr pidl1, IntPtr pidl2);
+            void CreateViewObject(IntPtr hwndOwner, [In] ref Guid riid, out IShellView ppvOut);
+            void GetAttributesOf(uint cidl, IntPtr apidl, ref uint rgfInOut);
+            void GetUIObjectOf(IntPtr hwndOwner, uint cidl, [In, MarshalAs(UnmanagedType.LPArray)] IntPtr[] apidl, [In] ref Guid riid, IntPtr rgfReserved, out IntPtr ppvOut);
+            void GetDisplayNameOf(IntPtr pidl, uint uFlags, out IntPtr pName);
+            void SetNameOf(IntPtr hwndOwner, IntPtr pidl, [MarshalAs(UnmanagedType.LPWStr)] string pszName, uint uFlags, out IntPtr ppidlOut);
+        }
+        [DllImport("shell32.dll")]
+        static extern IntPtr SHGetDesktopFolder(out IShellFolder ppshf);
+        [DllImport("user32.dll")]
+        static extern IntPtr GetShellWindow();
         [DllImport("user32", CharSet = CharSet.Auto, ExactSpelling = true)]
         static extern IntPtr GetForegroundWindow();
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         static extern int GetWindowThreadProcessId(IntPtr hwnd, out int ID);
         [DllImport("user32.dll", SetLastError = true)]
@@ -52,10 +76,11 @@ namespace FileViewer.Monitor
             public RECT rectCaret;
         }
         static string desktopFolder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        static readonly string EXPLORER = "explorer";
         public static (bool Ok, string FilePath) GetCurrentFilePath()
         {
             var cpr = GetCurrentProcessInfo();
-            if (cpr.ProcessName != "explorer") return (false, string.Empty);
+            if (cpr.ProcessName != EXPLORER) return (false, string.Empty);
             var status = GetGUICursorStatus(cpr.ProcessId);
             if (status.Ok)
             {
@@ -65,25 +90,27 @@ namespace FileViewer.Monitor
                 }
             }
             try
-             {
+            {
                 var windows = new SHDocVw.ShellWindowsClass();
                 FolderItems fi = null;
                 foreach (SHDocVw.InternetExplorer window in windows)
                 {
+                    if (window.HWND != cpr.Hwnd.ToInt32()) continue;
                     var filename = Path.GetFileNameWithoutExtension(window.FullName).ToLowerInvariant();
-                    if (filename == "explorer" && window.HWND == cpr.Hwnd.ToInt32())
+                    if (filename == EXPLORER)
                     {
                         fi = ((IShellFolderViewDual2)window.Document).SelectedItems();
-                        if(fi != null && fi.Count == 1)
+                        if (fi != null && fi.Count == 1)
                         {
                             return (true, fi.Item(0).Path);
                         }
                     }
                 }
+
                 SendKeys.SendWait("^c");
                 DataObject data = new DataObject(OleGetClipboard());
                 var files = data.GetFileDropList();
-                if(files.Count == 1)
+                if (files.Count == 1)
                 {
                     return (true, files[0].ToString());
                 }
@@ -94,9 +121,17 @@ namespace FileViewer.Monitor
             return (false, string.Empty);
         }
 
+        static readonly string[] ExplorerClassNames = new string[] { "cabinetwclass", "workerw", "progman" };
         static (IntPtr Hwnd, string ProcessName, int ProcessId) GetCurrentProcessInfo()
         {
             IntPtr myPtr = GetForegroundWindow();
+            StringBuilder classNameSB = new StringBuilder(256);
+            GetClassName(myPtr, classNameSB, classNameSB.Capacity);
+            string className = classNameSB.ToString().ToLower();
+            if(!ExplorerClassNames.Contains(className))
+            {
+                return (myPtr, string.Empty, 0);
+            }
 
             int a = GetWindowThreadProcessId(myPtr, out int calcID);
 

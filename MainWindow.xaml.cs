@@ -2,11 +2,9 @@
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Highlighting;
 using System;
-using System.Drawing;
 using System.IO;
 using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Media;
 using System.Xml;
 using Application = System.Windows.Application;
 
@@ -162,8 +160,6 @@ namespace FileViewer
             {
                 Show();
                 Activate();
-                Topmost = true;
-                Topmost = false;
             }
             if(WindowState == WindowState.Minimized)
             {
@@ -184,7 +180,7 @@ namespace FileViewer
         {
             if (!loaded)
             {
-                Hide();
+                //Hide();
                 loaded = true;
             }
         }
