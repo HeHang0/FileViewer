@@ -1,19 +1,12 @@
 ﻿using FileViewer.Globle;
-using FileViewer.Monitor;
 using Microsoft.Win32;
-using Microsoft.WindowsAPICodePack.Shell;
 using Syncfusion.Windows.Shared;
-using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using File = System.IO.File;
 
 namespace FileViewer.ViewModel
 {
@@ -31,9 +24,7 @@ namespace FileViewer.ViewModel
 
         public bool Topmost { get; set; }
 
-        public string OpenText { get; set; } = "打开";
-
-        private string execPath;
+        public string OpenText { get; set; } = "";
 
         public bool Loading { get; private set; }
 
@@ -49,13 +40,17 @@ namespace FileViewer.ViewModel
             if (!isDirectory && !isFile) return;
             Title = Path.GetFileName(filePath);
             FilePath = filePath;
-            var (name, execPath) = GetDefaultAppForPath(filePath, isDirectory);
-            this.execPath = execPath;
-            if (name == null || name.IsNullOrWhiteSpace())
+            var (name, extension) = GetDefaultAppForPath(filePath, isDirectory);
+            if (extension == ".dll")
+            {
+                OpenText = "";
+                return;
+            }
+            else if (name == null || name.IsNullOrWhiteSpace())
             {
                 OpenText = " 打开 ";
             }
-            else if(Path.GetExtension(filePath).ToLower() == ".lnk")
+            else if(extension == ".lnk" || extension == ".exe")
             {
                 OpenText = $" 打开 {name} ";
             }
@@ -65,25 +60,40 @@ namespace FileViewer.ViewModel
             }
         }
 
-        private (string Name, string Path) GetDefaultAppForPath(string filePath, bool isDirectory)
+        private (string appName, string extension) GetDefaultAppForPath(string filePath, bool? isDirectory)
         {
             string appName = null;
             string appPath = null;
             string progId = null;
             string extension = Path.GetExtension(filePath).ToLower();
-            if(extension == ".pdf") Topmost= false;
+            if(extension == ".dll") return (appName, extension);
+            if(isDirectory == null) isDirectory = Directory.Exists(filePath);
+            if (extension == ".pdf") Topmost= false;
             if (extension == ".lnk")
             {
                 appPath = Utils.LinkPath(filePath);
             }
-            else if (!isDirectory)
+            else if(extension == ".exe")
+            {
+                appPath = filePath;
+            }
+            else if (isDirectory == false)
             {
                 // 获取文件扩展名的默认程序的ProgID
                 var subKey = Registry.ClassesRoot.OpenSubKey(extension);
                 progId = (string)subKey?.GetValue(null);
                 if (progId == null)
                 {
-                    progId = subKey?.OpenSubKey("OpenWithProgids")?.GetValueNames()?.FirstOrDefault();
+                    var openWithProgids = subKey?.OpenSubKey("OpenWithProgids");
+                    var names = openWithProgids?.GetValueNames() ?? new string[] { };
+                    foreach (var name in names)
+                    {
+                        if(openWithProgids.GetValueKind(name) == RegistryValueKind.String)
+                        {
+                            progId = name;
+                            break;
+                        }
+                    }
                 }
             }
             else
@@ -105,13 +115,19 @@ namespace FileViewer.ViewModel
                         int index = appPath.IndexOf(appPath.StartsWith("\"") ? "\" " : " ");
                         string originAppPath = appPath;
                         appPath = appPath.Substring(0, index).Replace("\"", "").Trim();
+                        if (!File.Exists(appPath) && originAppPath.Contains(".exe"))
+                        {
+                            index = originAppPath.IndexOf(".exe");
+                            appPath = originAppPath.Substring(0, index+4).Replace("\"", "").Trim();
+                        }
                         if (appPath.EndsWith("rundll32.exe"))
                         {
                             int dllIndex = originAppPath.IndexOf(".dll");
                             if (dllIndex > 0)
                             {
-                                string dllName = originAppPath.Substring(index, dllIndex - index + 4).Trim();
-                                string dllPath = Path.Combine(Path.GetDirectoryName(originAppPath), dllName);
+                                string dllName = originAppPath.Substring(index, dllIndex - index + 4).Replace("\"", "").Trim();
+                                string dllPath = dllName;
+                                if(!File.Exists(dllPath)) dllPath = Path.Combine(Path.GetDirectoryName(originAppPath), dllName);
                                 appName = GetDisplayName(dllPath);
                                 appPath = null;
                             }
@@ -133,9 +149,12 @@ namespace FileViewer.ViewModel
             if(appName == null && appPath != null)
             {
                 appName = GetDisplayName(appPath);
+            }else if(appName == null)
+            {
+                appName = "选取应用";
             }
 
-            return (appName, appPath);
+            return (appName, extension);
         }
 
         private string GetDisplayName(string filePath)
@@ -165,13 +184,13 @@ namespace FileViewer.ViewModel
         {
             if(File.Exists(FilePath) || Directory.Exists(FilePath))
             {
-                if(execPath != null && File.Exists(execPath) && Path.GetExtension(FilePath).ToLower() != ".lnk")
-                {
-                    Process.Start(execPath, FilePath);
-                }
-                else
+                try
                 {
                     Process.Start(FilePath);
+                }
+                catch (System.Exception e)
+                {
+                    MessageBox.Show(Application.Current.MainWindow, e.Message, "提示");
                 }
             }
         });

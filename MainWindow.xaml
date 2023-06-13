@@ -10,7 +10,7 @@
         Height="470" Width="720" WindowStartupLocation="CenterScreen"
         Topmost="{Binding FileInfo.Topmost}" Title="{Binding FileInfo.Title}"
         mc:Ignorable="d" Name="MyMainWindow" Icon="logo.ico" Loaded="MyMainWindow_Loaded"
-        MinHeight="233" MinWidth="400" Closing="MyMainWindow_Closing"
+        MinHeight="233" MinWidth="460" Closing="MyMainWindow_Closing"
         Style="{StaticResource StyleWindowUniversal}"
         Background="{Binding FileInfo.BackgroundColor}"
         themes:UniversalWindowStyle.OpenCommond="{Binding FileInfo.OpenFile}"
