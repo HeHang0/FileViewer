@@ -80,13 +80,13 @@ namespace FileViewer.FileHelper
                     type = FileViewType.Video;
                     break;
                 case FileExtension.PDF:
-                case FileExtension.DOC:
                     type = FileViewType.Pdf;
                     break;
                 case FileExtension.XLSX:
                 case FileExtension.XLS:
                     type = FileViewType.Excel;
                     break;
+                case FileExtension.DOC:
                 case FileExtension.DOCX:
                     type = FileViewType.Word;
                     break;

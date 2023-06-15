@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,35 +21,18 @@ namespace FileViewer.FileControl.Pdf
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private string filePath;
-        private FileExtension fileExt;
-
-        public string PdfFilePath
-        {
-            get
-            {
-                return filePath;
-            }
-            set
-            {
-                filePath = value;
-            }
-        }
+        public string PdfFilePath { get; set; }
 
         public void OnFileChanged((string FilePath, FileExtension Ext) file)
         {
-            OnColorChanged(Color.FromRgb(0x47,0x47, 0x47));
-            if (filePath != file.FilePath)
-            {
-                PdfFilePath = file.FilePath;
-                fileExt = file.Ext;
-            }
+            GlobalNotify.OnColorChange(Color.FromRgb(0x3b, 0x3b, 0x3b));
+            GlobalNotify.OnSizeChange(600, 800);
+            PdfFilePath = file.FilePath;
             GlobalNotify.OnLoadingChange(false);
         }
 
         public void OnColorChanged(Color color)
         {
-            GlobalNotify.OnColorChange(color);
         }
     }
 }

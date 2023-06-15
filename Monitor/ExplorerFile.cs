@@ -1,13 +1,10 @@
-﻿using Microsoft.WindowsAPICodePack.Shell;
-using Shell32;
+﻿using Shell32;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace FileViewer.Monitor
@@ -79,18 +76,18 @@ namespace FileViewer.Monitor
         static readonly string EXPLORER = "explorer";
         public static (bool Ok, string FilePath) GetCurrentFilePath()
         {
-            var cpr = GetCurrentProcessInfo();
-            if (cpr.ProcessName != EXPLORER) return (false, string.Empty);
-            var status = GetGUICursorStatus(cpr.ProcessId);
-            if (status.Ok)
-            {
-                if ((int)status.GUIInfo.hwndCaret != 0)
-                {
-                    return (false, string.Empty);
-                }
-            }
             try
             {
+                var cpr = GetCurrentProcessInfo();
+                if (cpr.ProcessName != EXPLORER) return (false, string.Empty);
+                var status = GetGUICursorStatus(cpr.ProcessId);
+                if (status.Ok)
+                {
+                    if ((int)status.GUIInfo.hwndCaret != 0)
+                    {
+                        return (false, string.Empty);
+                    }
+                }
                 var windows = new SHDocVw.ShellWindowsClass();
                 FolderItems fi = null;
                 foreach (SHDocVw.InternetExplorer window in windows)

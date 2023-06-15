@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Web.WebView2.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,14 +14,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace FileViewer.FileControl.Word
+namespace FileViewer.FileControl.Office
 {
     /// <summary>
-    /// WordControl.xaml 的交互逻辑
+    /// OfficeControl.xaml 的交互逻辑
     /// </summary>
-    public partial class WordControl : FileControl
+    public partial class OfficeControl : FileControl
     {
-        public WordControl(): base(new WordModel())
+        public OfficeControl() : base(new OfficeModel())
         {
             InitializeComponent();
         }

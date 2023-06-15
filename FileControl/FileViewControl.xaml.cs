@@ -1,17 +1,15 @@
 ﻿using FileViewer.FileControl.Common;
-using FileViewer.FileControl.Excel;
 using FileViewer.FileControl.Hello;
 using FileViewer.FileControl.Image;
 using FileViewer.FileControl.MobileProvision;
 using FileViewer.FileControl.Music;
+using FileViewer.FileControl.Office;
 using FileViewer.FileControl.Pdf;
-using FileViewer.FileControl.PowerPoint;
 using FileViewer.FileControl.Text;
 using FileViewer.FileControl.Video;
-using FileViewer.FileControl.Word;
 using FileViewer.FileHelper;
-using Syncfusion.Windows.Shared;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -43,9 +41,23 @@ namespace FileViewer.FileControl
             SetResource(filePath, true);
         }
 
+        private Dictionary<FileViewType, (Type Type, bool ResizeMode)> controlMapping = new Dictionary<FileViewType, (Type, bool)> 
+        {
+            [FileViewType.Image] = (typeof(ImageControl), true),
+            [FileViewType.Code] = (typeof(TextControl), true),
+            [FileViewType.Txt] = (typeof(TextControl), true),
+            [FileViewType.Music] = (typeof(MusicControl), false),
+            [FileViewType.Video] = (typeof(VideoControl), true),
+            [FileViewType.Pdf] = (typeof(PdfControl), true),
+            [FileViewType.Excel] = (typeof(OfficeControl), true),
+            [FileViewType.Word] = (typeof(OfficeControl), true),
+            [FileViewType.PowerPoint] = (typeof(OfficeControl), true),
+            [FileViewType.MobileProvision] = (typeof(MobileProvisionControl), true)
+        };
+
         private void SetResource(string filePath, bool loadWithTypeNone = false)
         {
-            if(filePath == null || filePath.IsNullOrWhiteSpace()) return;
+            if(filePath == null || filePath.Trim() == string.Empty) return;
             var typeInfo = FileType.GetFileViewType(filePath);
             if (loadWithTypeNone)
             {
@@ -61,52 +73,21 @@ namespace FileViewer.FileControl
                 (MyGrid.Children[0] as FileControl).OnFileChanged((filePath, typeInfo.Ext));
                 return;
             }
-            FileControl fc;
-            switch (typeInfo.Type)
-            {
-                case FileViewType.Image:
-                    fc = new ImageControl();
-                    GlobalNotify.OnResizeMode(true);
-                    break;
-                case FileViewType.Code:
-                case FileViewType.Txt:
-                    fc = new TextControl();
-                    GlobalNotify.OnResizeMode(true);
-                    break;
-                case FileViewType.Music:
-                    fc = new MusicControl();
-                    GlobalNotify.OnResizeMode(false);
-                    break;
-                case FileViewType.Video:
-                    fc = new VideoControl();
-                    GlobalNotify.OnResizeMode(true);
-                    break;
-                case FileViewType.Pdf:
-                    fc = new PdfControl();
-                    GlobalNotify.OnResizeMode(true);
-                    break;
-                case FileViewType.Excel:
-                    fc = new ExcelControl();
-                    GlobalNotify.OnResizeMode(true);
-                    break;
-                case FileViewType.Word:
-                    fc = new WordControl();
-                    GlobalNotify.OnResizeMode(true);
-                    break;
-                case FileViewType.PowerPoint:
-                    fc = new PowerPointControl();
-                    GlobalNotify.OnResizeMode(true);
-                    break;
-                case FileViewType.MobileProvision:
-                    fc = new MobileProvisionControl();
-                    GlobalNotify.OnResizeMode(true);
-                    break;
-                default:
-                    fc = new CommonControl();
-                    GlobalNotify.OnResizeMode(false);
-                    break;
 
+            FileControl fc;
+            bool resizeMode;
+            if (controlMapping.TryGetValue(typeInfo.Type, out var controlInfo))
+            {
+                fc = (FileControl)Activator.CreateInstance(controlInfo.Type);
+                resizeMode = controlInfo.ResizeMode;
             }
+            else
+            {
+                fc = new CommonControl();
+                resizeMode = false;
+            }
+
+            GlobalNotify.OnResizeMode(resizeMode);
             if (fc != null) LoadFile(fc, filePath, typeInfo.Ext);
         }
 

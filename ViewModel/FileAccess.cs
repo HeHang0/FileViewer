@@ -1,6 +1,5 @@
 ﻿using FileViewer.Globle;
 using Microsoft.Win32;
-using Syncfusion.Windows.Shared;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -46,7 +45,7 @@ namespace FileViewer.ViewModel
                 OpenText = "";
                 return;
             }
-            else if (name == null || name.IsNullOrWhiteSpace())
+            else if (name == null || name.Trim() == string.Empty)
             {
                 OpenText = " 打开 ";
             }

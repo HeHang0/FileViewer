@@ -180,7 +180,7 @@ namespace FileViewer
         {
             if (!loaded)
             {
-                //Hide();
+                Hide();
                 loaded = true;
             }
         }

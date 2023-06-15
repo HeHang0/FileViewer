@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
@@ -51,11 +52,11 @@ namespace FileViewer.Globle
             if(extension != ".lnk") return filePath;
             var shellFile = ShellFile.FromFilePath(filePath);
             string targetPath = shellFile?.Properties.System.Link.TargetParsingPath.Value ?? filePath;
-            if (!System.IO.File.Exists(targetPath) && targetPath.Contains("Program Files (x86)"))
+            if (!File.Exists(targetPath) && targetPath.Contains("Program Files (x86)"))
             {
                 targetPath = targetPath.Replace("Program Files (x86)", "Program Files");
             }
-            if (!System.IO.File.Exists(targetPath)) targetPath = filePath;
+            if (!File.Exists(targetPath)) targetPath = filePath;
             return targetPath;
         }
 
@@ -119,6 +120,47 @@ namespace FileViewer.Globle
             info.lpFile = filePath;
             info.nShow = SW_NORMAL;
             ShellExecuteEx(ref info);
+        }
+
+        public static string CalculateMD5(string input)
+        {
+            // 创建MD5实例
+            using (MD5 md5 = MD5.Create())
+            {
+                // 计算字符串的字节表示的哈希值
+                byte[] hash = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+                // 将字节转换为十六进制字符串
+                StringBuilder result = new StringBuilder(hash.Length * 2);
+
+                for (int i = 0; i < hash.Length; i++)
+                {
+                    result.Append(hash[i].ToString("X2"));
+                }
+
+                return result.ToString();
+            }
+        }
+
+        public static string CalculateFileMD5(string filePath)
+        {
+            // 创建一个MD5实例
+            using (MD5 md5 = MD5.Create())
+            {
+                // 读取文件的字节并计算哈希值
+                using (FileStream stream = File.OpenRead(filePath))
+                {
+                    byte[] hash = md5.ComputeHash(stream);
+
+                    // 将字节转换为十六进制字符串
+                    StringBuilder result = new StringBuilder(hash.Length * 2);
+                    for (int i = 0; i < hash.Length; i++)
+                    {
+                        result.Append(hash[i].ToString("X2"));
+                    }
+                    return result.ToString();
+                }
+            }
         }
     }
 }

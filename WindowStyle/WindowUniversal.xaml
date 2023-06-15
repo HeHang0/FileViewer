@@ -38,15 +38,15 @@
         </Setter>
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
-                <WindowChrome GlassFrameThickness="0 64 0 0" NonClientFrameEdges="Left,Bottom,Right" UseAeroCaptionButtons="False" />
+                <WindowChrome GlassFrameThickness="0 30 0 0" NonClientFrameEdges="Left,Bottom,Right" UseAeroCaptionButtons="False" />
             </Setter.Value>
         </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Window">
-                    <Border Padding="4 1 4 4" Background="{TemplateBinding Background}">
+                    <Border Background="{TemplateBinding Background}">
                         <Grid x:Name="RootGrid" Background="{TemplateBinding Background}">
-                            <Grid x:Name="TitleBarPanel" VerticalAlignment="Top" Height="31">
+                            <Grid x:Name="TitleBarPanel" VerticalAlignment="Top" Height="30">
                                 <FrameworkElement.Resources>
                                     <Style TargetType="{x:Type Button}">
                                         <Style.Triggers>
@@ -132,14 +132,14 @@
                                         </Style.Triggers>
                                     </Style>
                                 </FrameworkElement.Resources>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5 0 0 0">
                                     <Image Source="{TemplateBinding Icon}" Margin="2" Height="20" Width="20" Stretch="Uniform" HorizontalAlignment="Left"/>
                                     <TextBlock x:Name="TitleTextBlock" FontSize="12" Text="{TemplateBinding Title}"
                                            Margin="0" VerticalAlignment="Center" TextAlignment="Center" Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}" />
                                 </StackPanel>
                                 <StackPanel x:Name="TitleBarButtonPanel" Orientation="Horizontal"
                                             Margin="0 -5 0 0" HorizontalAlignment="Right">
-                                    <Button Width="Auto" MinWidth="45"
+                                    <Button x:Name="OpenTextButton" Width="Auto" MinWidth="45"
                                             ToolTip="{TemplateBinding themes:UniversalWindowStyle.OpenText}" 
                                             Content="{TemplateBinding themes:UniversalWindowStyle.OpenText}" 
                                             Command="{TemplateBinding themes:UniversalWindowStyle.OpenCommond}" 
@@ -169,7 +169,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="WindowState" Value="Maximized">
                             <Setter TargetName="RootGrid" Property="Margin" Value="4 7 4 4" />
-                            <Setter TargetName="TitleBarPanel" Property="Height" Value="32" />
+                            <!--<Setter TargetName="TitleBarPanel" Property="Height" Value="31" />-->
                             <Setter TargetName="MaximizeButton" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="ResizeMode" Value="NoResize">
@@ -193,6 +193,8 @@
                             <Setter TargetName="SwitchTopmostButton" Property="FontStyle" Value="Italic" />
                         </Trigger>
                         <Trigger Property="IsActive" Value="False">
+                            <Setter TargetName="OpenTextButton" Property="Foreground" Value="{StaticResource Brush.TitleBar.InactiveForeground}" />
+                            <Setter TargetName="SwitchTopmostButton" Property="Foreground" Value="{StaticResource Brush.TitleBar.InactiveForeground}" />
                             <Setter TargetName="TitleTextBlock" Property="Foreground" Value="{StaticResource Brush.TitleBar.InactiveForeground}" />
                             <Setter TargetName="MinimizeButton" Property="Foreground" Value="{StaticResource Brush.TitleBar.InactiveForeground}" />
                             <Setter TargetName="RestoreButton" Property="Foreground" Value="{StaticResource Brush.TitleBar.InactiveForeground}" />
