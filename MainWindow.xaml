@@ -22,14 +22,6 @@
             <i:InvokeCommandAction Command="{Binding Path=ViewerEventer.StateChanged}" CommandParameter="{Binding ElementName=MyMainWindow}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-    </Window.Resources>
-    <!--<themes:UniversalWindowStyle.TitleBar>
-        <themes:UniversalTitleBar ForegroundColor="Black" InactiveForegroundColor="#7FFFFFFF"
-                                  ButtonHoverForeground="White" ButtonHoverBackground="#3FFFFFFF"
-                                  ButtonPressedForeground="#7FFFFFFF" ButtonPressedBackground="#3F000000" />
-    </themes:UniversalWindowStyle.TitleBar>-->
     <Grid Margin="0,29,0,0">
         <myc:FileViewControl Margin="0" BorderThickness="0" DataContext="{Binding Path=FileInfo.FilePath}" IsVisibleChanged="FileViewControl_IsVisibleChanged" />
 

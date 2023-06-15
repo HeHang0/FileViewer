@@ -10,9 +10,6 @@
              xmlns:gif="http://wpfanimatedgif.codeplex.com"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-    </UserControl.Resources>
     <Grid>
         <Image Source="{Binding Path=ThumbnailImage}" Visibility="{Binding IsImg, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" Stretch="Uniform"/>
         <Image x:Name="GifImage" Visibility="{Binding IsGif, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" Stretch="Uniform"/>

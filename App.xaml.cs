@@ -9,11 +9,12 @@ namespace FileViewer
     /// </summary>
     public partial class App : Application
     {
+        Mutex mutex;
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
             string appName = Assembly.GetExecutingAssembly().GetName().Name;
-            new Mutex(true, appName, out bool createdNew);
+            mutex = new Mutex(true, appName, out bool createdNew);
             if (!createdNew)
             {
                 // 应用程序的实例已经运行

@@ -7,9 +7,6 @@
              xmlns:local="clr-namespace:FileViewer.FileControl.Office"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <fc:FileControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-    </fc:FileControl.Resources>
     <Grid>
         <DocumentViewer Visibility="{Binding ShowBrowser, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" Document="{Binding OfficeContent}">
             <DocumentViewer.Template>

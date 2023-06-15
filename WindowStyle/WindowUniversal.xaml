@@ -45,7 +45,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Window">
                     <Border Background="{TemplateBinding Background}">
-                        <Grid x:Name="RootGrid" Background="{TemplateBinding Background}">
+                        <Grid x:Name="RootGrid" Background="{TemplateBinding Background}" Margin="3 0 3 3">
                             <Grid x:Name="TitleBarPanel" VerticalAlignment="Top" Height="30">
                                 <FrameworkElement.Resources>
                                     <Style TargetType="{x:Type Button}">
