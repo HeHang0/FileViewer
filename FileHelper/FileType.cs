@@ -36,7 +36,6 @@ namespace FileViewer.FileHelper
                 case FileExtension.PNG:
                 case FileExtension.GIF:
                 case FileExtension.ICO:
-                case FileExtension.SVG:
                     type = FileViewType.Image;
                     break;
                 case FileExtension.TXT:
@@ -79,6 +78,7 @@ namespace FileViewer.FileHelper
                 case FileExtension.MKV:
                     type = FileViewType.Video;
                     break;
+                case FileExtension.SVG:
                 case FileExtension.PDF:
                     type = FileViewType.Pdf;
                     break;

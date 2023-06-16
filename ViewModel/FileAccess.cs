@@ -148,6 +148,10 @@ namespace FileViewer.ViewModel
             {
                 appName = "选取应用";
             }
+            if(appName == "Internet Explorer")
+            {
+                appName = "Microsoft Edge";
+            }
 
             return (appName, extension);
         }
