@@ -1,6 +1,11 @@
 ﻿using System.Windows;
 using System.Threading;
 using System.Reflection;
+using System.IO;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using ICSharpCode.AvalonEdit.Highlighting;
+using System.Xml;
+using Microsoft.Web.WebView2.Core;
 
 namespace FileViewer
 {
@@ -22,6 +27,28 @@ namespace FileViewer
                 Current.Shutdown();
                 return;
             }
+            InitWebView2();
+            InitAvalon();
+        }
+
+        private void InitAvalon()
+        {
+            using (MemoryStream stream = new MemoryStream(FileViewer.Properties.Resources.GolangSyntaxHighlighting))
+            {
+                using (XmlReader reader = new XmlTextReader(stream))
+                {
+                    var highlightingDefinition = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+
+                    // 注册自定义的语法高亮定义
+                    HighlightingManager.Instance.RegisterHighlighting("Golang", new string[] { ".go" }, highlightingDefinition);
+                }
+            }
+        }
+
+        private void InitWebView2()
+        {
+            var webView2Path = Path.Combine(Path.GetTempPath(), "WebView2");
+            CoreWebView2Environment.SetLoaderDllFolderPath(webView2Path);
         }
     }
 }

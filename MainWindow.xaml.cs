@@ -39,16 +39,6 @@ namespace FileViewer
         {
             InitNotyfy();
             myViewer.ViewerEventer.OnLoaded.Execute(this);
-            using (MemoryStream stream = new MemoryStream(Properties.Resources.GolangSyntaxHighlighting))
-            {
-                using (XmlReader reader = new XmlTextReader(stream))
-                {
-                    var highlightingDefinition = HighlightingLoader.Load(reader, HighlightingManager.Instance);
-
-                    // 注册自定义的语法高亮定义
-                    HighlightingManager.Instance.RegisterHighlighting("Golang", new string[] { ".go" }, highlightingDefinition);
-                }
-            }
         }
 
         private void FullScreen(bool isFullScreen)

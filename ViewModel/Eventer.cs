@@ -99,7 +99,7 @@ namespace FileViewer.ViewModel
             handle = false; //预设不拦截任何键
             if (GlobalNotify.IsLoading()) return;
             Keys key = (Keys)hookStruct.vkCode;
-            if (key == Keys.Space)
+            if (key == Keys.Space && hookStruct.flags != 0)
             {
                 InitBackGroundWork();
                 bgWorker.RunWorkerAsync();
@@ -116,7 +116,7 @@ namespace FileViewer.ViewModel
         }
 
         protected override void BgWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
+         {
             var (ok, filePath) = ExplorerFile.GetCurrentFilePath();
             if (ok && !(sender as BackgroundWorker).CancellationPending)
             {

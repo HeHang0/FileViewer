@@ -1,7 +1,5 @@
-﻿using Shell32;
-using System;
+﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -78,28 +76,27 @@ namespace FileViewer.Monitor
         {
             try
             {
-                var cpr = GetCurrentProcessInfo();
-                if (cpr.ProcessName != EXPLORER) return (false, string.Empty);
-                var status = GetGUICursorStatus(cpr.ProcessId);
-                if (status.Ok)
+                (IntPtr activeWindowHandle, string processName, int explorerProcessId) = GetCurrentProcessInfo();
+                if(activeWindowHandle == IntPtr.Zero)
                 {
-                    if ((int)status.GUIInfo.hwndCaret != 0)
-                    {
-                        return (false, string.Empty);
-                    }
+                    return (false, string.Empty);
                 }
-                var windows = new SHDocVw.ShellWindowsClass();
-                FolderItems fi = null;
-                foreach (SHDocVw.InternetExplorer window in windows)
+                IntPtr shellWindowHandle = GetShellWindow();
+                GetWindowThreadProcessId(shellWindowHandle, out int shellProcessId);
+                dynamic shell = Activator.CreateInstance(Type.GetTypeFromProgID("Shell.Application"));
+                for (int i = 0; i < shell.Windows().Count; i++)
                 {
-                    if (window.HWND != cpr.Hwnd.ToInt32()) continue;
-                    var filename = Path.GetFileNameWithoutExtension(window.FullName).ToLowerInvariant();
-                    if (filename == EXPLORER)
+                    var window = shell.Windows().Item(i);
+                    if (window != null && (IntPtr)window.HWND == activeWindowHandle && window.Document != null)
                     {
-                        fi = ((IShellFolderViewDual2)window.Document).SelectedItems();
-                        if (fi != null && fi.Count == 1)
+                        bool isDesktop = (explorerProcessId == shellProcessId);
+                        Console.WriteLine(isDesktop ? "Desktop:" : "Explorer Window:");
+                        if (window.Document.SelectedItems().Count > 0)
                         {
-                            return (true, fi.Item(0).Path);
+                            foreach (var item in window.Document.SelectedItems())
+                            {
+                                return (true, item.Path);
+                            }
                         }
                     }
                 }
@@ -127,14 +124,14 @@ namespace FileViewer.Monitor
             string className = classNameSB.ToString().ToLower();
             if(!ExplorerClassNames.Contains(className))
             {
-                return (myPtr, string.Empty, 0);
+                return (IntPtr.Zero, string.Empty, 0);
             }
 
-            int a = GetWindowThreadProcessId(myPtr, out int calcID);
+            int ProcessId = GetWindowThreadProcessId(myPtr, out int calcID);
 
             Process myProcess = Process.GetProcessById(calcID);
 
-            return (myPtr, myProcess.ProcessName, a);
+            return (myPtr, myProcess.ProcessName, ProcessId);
         }
 
         static (bool Ok, GUITHREADINFO GUIInfo) GetGUICursorStatus(int processId)

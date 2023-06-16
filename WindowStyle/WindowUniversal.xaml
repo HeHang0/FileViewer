@@ -139,7 +139,7 @@
                                 </StackPanel>
                                 <StackPanel x:Name="TitleBarButtonPanel" Orientation="Horizontal"
                                             Margin="0 -5 0 0" HorizontalAlignment="Right">
-                                    <Button x:Name="OpenTextButton" Width="Auto" MinWidth="45"
+                                    <Button x:Name="OpenTextButton" Width="Auto" MinWidth="50"
                                             ToolTip="{TemplateBinding themes:UniversalWindowStyle.OpenText}" 
                                             Content="{TemplateBinding themes:UniversalWindowStyle.OpenText}" 
                                             Command="{TemplateBinding themes:UniversalWindowStyle.OpenCommond}" 

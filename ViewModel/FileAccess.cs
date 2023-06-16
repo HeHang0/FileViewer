@@ -12,10 +12,6 @@ namespace FileViewer.ViewModel
     public class FileAccess : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         public string Title { get; set; }
 
@@ -23,7 +19,7 @@ namespace FileViewer.ViewModel
 
         public bool Topmost { get; set; }
 
-        public string OpenText { get; set; } = "";
+        public string OpenText { get; set; } = "    ";
 
         public bool Loading { get; private set; }
 
