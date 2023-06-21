@@ -308,7 +308,6 @@
     <Compile Include="FileControl\MobileProvision\MobileProvisionControl.xaml.cs">
       <DependentUpon>MobileProvisionControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FileControl\MobileProvision\MobileProvisionBase.cs" />
     <Compile Include="FileControl\Office\OfficeControl.xaml.cs">
       <DependentUpon>OfficeControl.xaml</DependentUpon>
     </Compile>

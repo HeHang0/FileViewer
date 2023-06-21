@@ -3,9 +3,12 @@ using FileViewer.Globle;
 using PListNet;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.Pkcs;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -21,11 +24,40 @@ namespace FileViewer.FileControl.MobileProvision
         {
         }
 
-        public string SignType { get; set; }
-        public string SignExpirationDate { get; set; }
-        public List<KeyValuePair<string, string>> BaseList { get; } = new List<KeyValuePair<string, string>>();
-        public List<KeyValuePair<string, string>> EntitlementsList { get; } = new List<KeyValuePair<string, string>>();
-        public List<KeyValuePair<string, string>> CertificatesList { get; } = new List<KeyValuePair<string, string>>();
+        public string SignName { get; set; }
+        private DateTime _signExpirationDate = DateTime.Now;
+        public string SignExpirationDate
+        {
+            get
+            {
+                return ProcessDateDesc(_signExpirationDate);
+            }
+        }
+        public Brush SignExpirationColor
+        {
+            get
+            {
+                return ProcessDateColor(_signExpirationDate);
+            }
+        }
+        public ObservableCollection<KeyValuePair<string, string>> BaseList { get; } = new ObservableCollection<KeyValuePair<string, string>>();
+        public ObservableCollection<KeyValuePair<string, string>> EntitlementsList { get; } = new ObservableCollection<KeyValuePair<string, string>>();
+        public ObservableCollection<KeyValuePair<string, string>> CertificatesList { get; } = new ObservableCollection<KeyValuePair<string, string>>();
+        public ObservableCollection<KeyValuePair<string, string>> ProvisionedDevices { get; } = new ObservableCollection<KeyValuePair<string, string>>();
+        public bool ShowProvisionedDevices 
+        { 
+            get
+            {
+                return ProvisionedDevices.Count > 0;
+            }
+        }
+        public bool ShowCertificates
+        { 
+            get
+            {
+                return CertificatesList.Count > 0;
+            }
+        }
 
         private double height = SystemParameters.WorkArea.Height / 2;
         private double width = SystemParameters.WorkArea.Width / 2;
@@ -36,28 +68,33 @@ namespace FileViewer.FileControl.MobileProvision
             currentFilePath = file;
             InitBackGroundWork();
             bgWorker.RunWorkerAsync(file.FilePath);
+            GlobalNotify.OnColorChange(Color.FromRgb(0xA1, 0xD5, 0xD3));
             GlobalNotify.OnSizeChange(height, width);
-
         }
 
         protected override void BgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            byte[] bytes = null;
             try
             {
-                string text = File.ReadAllText((string)e.Argument);
-                Match match = Regex.Match(text, "<plist[\\S\\s]+</plist>");
-                if(match.Success)
-                {
-                    e.Result = "<!DOCTYPE plist PUBLIC \" -//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"+match.Value;
-                }
-                else
-                {
-                    e.Result = "";
-                }
+                bytes = File.ReadAllBytes((string)e.Argument);
+                var signedCms = new SignedCms();
+                signedCms.Decode(bytes);
+                e.Result = signedCms.ContentInfo.Content;
             }
             catch (Exception)
             {
-                e.Result = "";
+                if(bytes != null)
+                {
+                    var text = Encoding.UTF8.GetString(bytes);
+                    Match match = Regex.Match(text, "<plist[\\S\\s]+</plist>");
+                    if (match.Success)
+                    {
+                        e.Result = bytes;
+                        return;
+                    }
+                }
+                e.Result = null;
             }
         }
 
@@ -66,18 +103,16 @@ namespace FileViewer.FileControl.MobileProvision
         }
         protected override void BgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            string result = (string)e.Result;
-            if (string.IsNullOrWhiteSpace(result))
+            if (e.Result == null || ((byte[])e.Result).Length <= 0)
             {
                 GlobalNotify.OnFileLoadFailed(currentFilePath.FilePath);
                 return;
             }
-            ProcessXML(result);
+            ProcessXML((byte[])e.Result);
         }
 
-        private void ProcessXML(string text)
+        private void ProcessXML(byte[] data)
         {
-            byte[] data = Encoding.UTF8.GetBytes(text);
             try
             {
                 using (MemoryStream stream = new MemoryStream(data))
@@ -86,48 +121,41 @@ namespace FileViewer.FileControl.MobileProvision
                     BaseList.Clear();
                     EntitlementsList.Clear();
                     CertificatesList.Clear();
-                    DateTime creationDate = DateTime.Now;
-                    DateTime expirationDate = DateTime.Now;
-                    string developerCertificatesBase64 = "";
-                    string teamName = "";
+                    ProvisionedDevices.Clear();
+                    ProcessBase(node);
                     foreach (string key in node.Keys)
                     {
                         switch (key)
                         {
                             case "Name":
-                                PNode<string> name = (PNode<string>)node[key];
-                                SignType = name.Value; break;
+                                SignName = ProcessNodeString(node[key]);
+                                break;
                             case "ExpirationDate":
                                 PListNet.Nodes.DateNode expirationDateNode = (PListNet.Nodes.DateNode)node[key];
-                                expirationDate = expirationDateNode.Value;
-                                SignExpirationDate = ProcessDateDesc(expirationDate); break;
+                                _signExpirationDate = expirationDateNode.Value;
+                                break;
                             case "Entitlements":
                                 PListNet.Nodes.DictionaryNode entitlements = (PListNet.Nodes.DictionaryNode)node[key];
-                                EntitlementsList.AddRange(entitlements.ToList().Select(m => new KeyValuePair<string, string>(m.Key, ProcessNodeString(m.Value))));
+                                EntitlementsList.AddRange(entitlements.Select(m => new KeyValuePair<string, string>(m.Key + ":", ProcessNodeString(m.Value))));
+                                if (entitlements["application-identifier"] != null)
+                                {
+                                    BaseList.Insert(Math.Min(BaseList.Count, 1), new KeyValuePair<string, string>("App ID:", ProcessNodeString(entitlements["application-identifier"])));
+                                }
                                 break;
                             case "DeveloperCertificates":
-                                developerCertificatesBase64 = ProcessNodeString(node[key], true);
+                                ProcessCertificate(ProcessNodeString(node[key], true));
                                 break;
-                            case "DER-Encoded-Profile":
                             case "ProvisionedDevices":
-                            case "Version":
+                                PListNet.Nodes.ArrayNode provisionedDevicesNode = (PListNet.Nodes.ArrayNode)node[key];
+                                ProvisionedDevices.AddRange(provisionedDevicesNode.Select(m => new KeyValuePair<string, string>("Device ID:", ProcessNodeString(m))));
                                 break;
-                            case "CreationDate":
-                                PListNet.Nodes.DateNode creationDateNode = (PListNet.Nodes.DateNode)node[key];
-                                creationDate = creationDateNode.Value;
-                                break;
-                            default:
-                                if (key == "TeamName") teamName = ProcessNodeString(node[key]);
-                                BaseList.Add(new KeyValuePair<string, string>(key, ProcessNodeString(node[key]))); break;
                         }
                     }
-                    BaseList.Add(new KeyValuePair<string, string>("Creation Date", creationDate.ToString()));
-                    BaseList.Add(new KeyValuePair<string, string>("Expiration Date", expirationDate.ToString()));
-                    if(!string.IsNullOrWhiteSpace(teamName) && !string.IsNullOrWhiteSpace(developerCertificatesBase64))
-                    {
-                        CertificatesList.Add(new KeyValuePair<string, string>("Name", ProcessCertificate(developerCertificatesBase64, teamName)));
-                    }
                 }
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ShowProvisionedDevices"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SignExpirationColor"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SignExpirationDate"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ShowCertificates"));
                 GlobalNotify.OnLoadingChange(false);
             }
             catch (Exception)
@@ -136,91 +164,105 @@ namespace FileViewer.FileControl.MobileProvision
             }
         }
 
-        private string ProcessCertificate(string base64Str, string teamName)
+        private void ProcessBase(PListNet.Nodes.DictionaryNode node)
         {
-            string desc = Encoding.UTF8.GetString(Convert.FromBase64String(base64Str));
-            int index = desc.IndexOf(teamName);
-            int length = teamName.Length;
-            if (index > 0)
+            BaseList.Add(new KeyValuePair<string, string>("App ID Name:", ProcessNodeString(node["AppIDName"])));
+            BaseList.Add(new KeyValuePair<string, string>("Team:", $"{ProcessNodeString(node["TeamName"])} ({ProcessNodeString(node["TeamIdentifier"])})"));
+            BaseList.Add(new KeyValuePair<string, string>("Platform:", ProcessNodeString(node["Platform"])));
+            BaseList.Add(new KeyValuePair<string, string>("UUID:", ProcessNodeString(node["UUID"])));
+            BaseList.Add(new KeyValuePair<string, string>("Creation Date:", ProcessNodeString(node["CreationDate"])));
+            BaseList.Add(new KeyValuePair<string, string>("Expiration Date:", ProcessNodeString(node["ExpirationDate"])));
+        }
+
+        private void ProcessCertificate(string base64Str)
+        {
+            X509Certificate2 certificate = new X509Certificate2(Encoding.UTF8.GetBytes(base64Str));
+            CertificatesList.Add(new KeyValuePair<string, string>("Name:", ParseCertificateName(certificate.Subject)));
+            CertificatesList.Add(new KeyValuePair<string, string>("Creation Date:", certificate.NotBefore.ToString()));
+            CertificatesList.Add(new KeyValuePair<string, string>("Expiration Date:", certificate.GetExpirationDateString()));
+            CertificatesList.Add(new KeyValuePair<string, string>("Serial Number:", certificate.SerialNumber));
+        }
+
+        private string ParseCertificateName(string subject)
+        {
+            var subjects = subject.Split(',');
+            for(int i = 0; i < subjects.Length; i++)
             {
-                for (int i = index-1; i > 0; i--)
+                var item = subjects[i].Trim();
+                if(item.ToLower().StartsWith("cn="))
                 {
-                    if(desc[i] == ';')
-                    {
-                        length += (index - i);
-                        index = i+1;
-                        break;
-                    }
+                    return item.Substring(3);
                 }
             }
-            if(index >= 0)
-            {
-                return desc.Substring(index, length);
-            }
-            return teamName;
-            
+            return subject;
         }
 
         private string ProcessNodeString(PNode node, bool arrayFirst=false)
         {
-            if (node.GetType() == typeof(PListNet.Nodes.DictionaryNode))
+            var nodeType = node.GetType();
+            if (nodeType == typeof(PListNet.Nodes.DictionaryNode))
             {
                 PListNet.Nodes.DictionaryNode value = (PListNet.Nodes.DictionaryNode)node;
-                return string.Join(", ", value.Values.ToList().Select(m => ProcessNodeString(m)));
+                return string.Join(", ", value.Values.Select(m => ProcessNodeString(m)));
             }
-            else if (node.GetType() == typeof(PListNet.Nodes.BooleanNode))
+            else if (nodeType == typeof(PListNet.Nodes.BooleanNode))
             {
                 PListNet.Nodes.BooleanNode value = (PListNet.Nodes.BooleanNode)node;
                 return value.Value.ToString();
             }
-            else if (node.GetType() == typeof(PListNet.Nodes.ArrayNode))
+            else if (nodeType == typeof(PListNet.Nodes.ArrayNode))
             {
                 PListNet.Nodes.ArrayNode value = (PListNet.Nodes.ArrayNode)node;
                 if (arrayFirst && value.Count > 0)
                 {
                     return ProcessNodeString(value[0]);
                 }
-                return string.Join(", ", value.ToList().Select(m => ProcessNodeString(m)));
+                return string.Join(", ", value.Select(m => ProcessNodeString(m)));
             }
-            else if (node.GetType() == typeof(PListNet.Nodes.DataNode))
+            else if (nodeType == typeof(PListNet.Nodes.DataNode))
             {
                 PListNet.Nodes.DataNode value = (PListNet.Nodes.DataNode)node;
                 return Convert.ToBase64String(value.Value);
             }
-            else if (node.GetType() == typeof(PListNet.Nodes.DateNode))
+            else if (nodeType == typeof(PListNet.Nodes.DateNode))
             {
                 PListNet.Nodes.DateNode value = (PListNet.Nodes.DateNode)node;
                 return value.Value.ToString();
             }
-            else if (node.GetType() == typeof(PListNet.Nodes.FillNode))
+            else if (nodeType == typeof(PListNet.Nodes.FillNode))
             {
                 PListNet.Nodes.FillNode value = (PListNet.Nodes.FillNode)node;
                 return value.ToString();
             }
-            else if (node.GetType() == typeof(PListNet.Nodes.IntegerNode))
+            else if (nodeType == typeof(PListNet.Nodes.IntegerNode))
             {
                 PListNet.Nodes.IntegerNode value = (PListNet.Nodes.IntegerNode)node;
                 return value.Value.ToString();
             }
-            else if (node.GetType() == typeof(PListNet.Nodes.RealNode))
+            else if (nodeType == typeof(PListNet.Nodes.RealNode))
             {
                 PListNet.Nodes.RealNode value = (PListNet.Nodes.RealNode)node;
                 return value.Value.ToString();
             }
-            else if (node.GetType() == typeof(PListNet.Nodes.StringNode))
+            else if (nodeType == typeof(PListNet.Nodes.StringNode))
             {
                 PListNet.Nodes.StringNode value = (PListNet.Nodes.StringNode)node;
                 return value.Value.ToString();
             }
-            else if (node.GetType() == typeof(PListNet.Nodes.UidNode))
+            else if (nodeType == typeof(PListNet.Nodes.UidNode))
             {
                 PListNet.Nodes.UidNode value = (PListNet.Nodes.UidNode)node;
                 return value.Value.ToString();
             }
             else
             {
-                return "";
+                return node.ToString();
             }
+        }
+
+        private Brush ProcessDateColor(DateTime dateTime)
+        {
+            return dateTime > DateTime.Now ? Brushes.Gray : Brushes.Red;
         }
 
         private string ProcessDateDesc(DateTime dateTime)
