@@ -8,7 +8,13 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows;
 using System.Windows.Media.Imaging;
+using PListNet;
+using System.Xml;
+using System.Windows.Controls;
 
 namespace FileViewer.Globle
 {
@@ -46,6 +52,23 @@ namespace FileViewer.Globle
             return b + " B";
         }
 
+        public static string OuterXmlFormat(this XmlDocument xmlDocument)
+        {
+            StringBuilder sb = new StringBuilder();
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Indent = true; // Enable indenting
+            settings.IndentChars = "  "; // Set the indent characters
+            settings.NewLineChars = "\n"; // Set the newline characters
+            settings.NewLineHandling = NewLineHandling.Replace; // Replace newlines with the NewLineChars string
+
+            using (XmlWriter writer = XmlWriter.Create(sb, settings))
+            {
+                xmlDocument.Save(writer);
+            }
+
+            return sb.ToString();
+        }
+
         public static string LinkPath(string filePath)
         {
             string extension = Path.GetExtension(filePath).ToLower();
@@ -70,6 +93,16 @@ namespace FileViewer.Globle
                 bf = BitmapFrame.Create(ms, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
             }
             return bf;
+        }
+
+        public static BitmapSource GetBitmapSource(Icon icon)
+        {
+            BitmapSource imageSource = Imaging.CreateBitmapSourceFromHIcon(
+                icon.Handle,
+                Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions());
+
+            return imageSource;
         }
 
         public static double FileSize(string filePath)
@@ -160,6 +193,74 @@ namespace FileViewer.Globle
                     }
                     return result.ToString();
                 }
+            }
+        }
+
+        public static string ParsePNodeString(PNode node, bool arrayFirst = false, bool arrayLast = false)
+        {
+            if (node == null) return string.Empty;
+            var nodeType = node.GetType();
+            if (nodeType == typeof(PListNet.Nodes.DictionaryNode))
+            {
+                PListNet.Nodes.DictionaryNode value = (PListNet.Nodes.DictionaryNode)node;
+                return string.Join(", ", value.Values.Select(m => ParsePNodeString(m)));
+            }
+            else if (nodeType == typeof(PListNet.Nodes.BooleanNode))
+            {
+                PListNet.Nodes.BooleanNode value = (PListNet.Nodes.BooleanNode)node;
+                return value.Value.ToString();
+            }
+            else if (nodeType == typeof(PListNet.Nodes.ArrayNode))
+            {
+                PListNet.Nodes.ArrayNode value = (PListNet.Nodes.ArrayNode)node;
+                if (arrayFirst && value.Count > 0)
+                {
+                    return ParsePNodeString(value[0]);
+                }
+                else if(arrayLast && value.Count > 0)
+                {
+                    return ParsePNodeString(value[value.Count - 1]);
+                }
+                return string.Join(", ", value.Select(m => ParsePNodeString(m)));
+            }
+            else if (nodeType == typeof(PListNet.Nodes.DataNode))
+            {
+                PListNet.Nodes.DataNode value = (PListNet.Nodes.DataNode)node;
+                return Convert.ToBase64String(value.Value);
+            }
+            else if (nodeType == typeof(PListNet.Nodes.DateNode))
+            {
+                PListNet.Nodes.DateNode value = (PListNet.Nodes.DateNode)node;
+                return value.Value.ToString();
+            }
+            else if (nodeType == typeof(PListNet.Nodes.FillNode))
+            {
+                PListNet.Nodes.FillNode value = (PListNet.Nodes.FillNode)node;
+                return value.ToString();
+            }
+            else if (nodeType == typeof(PListNet.Nodes.IntegerNode))
+            {
+                PListNet.Nodes.IntegerNode value = (PListNet.Nodes.IntegerNode)node;
+                return value.Value.ToString();
+            }
+            else if (nodeType == typeof(PListNet.Nodes.RealNode))
+            {
+                PListNet.Nodes.RealNode value = (PListNet.Nodes.RealNode)node;
+                return value.Value.ToString();
+            }
+            else if (nodeType == typeof(PListNet.Nodes.StringNode))
+            {
+                PListNet.Nodes.StringNode value = (PListNet.Nodes.StringNode)node;
+                return value.Value.ToString();
+            }
+            else if (nodeType == typeof(PListNet.Nodes.UidNode))
+            {
+                PListNet.Nodes.UidNode value = (PListNet.Nodes.UidNode)node;
+                return value.Value.ToString();
+            }
+            else
+            {
+                return node.ToString();
             }
         }
     }

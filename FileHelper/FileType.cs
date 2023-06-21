@@ -97,6 +97,10 @@ namespace FileViewer.FileHelper
                 case FileExtension.Folder:
                     type = FileViewType.Folder;
                     break;
+                case FileExtension.APK:
+                case FileExtension.IPA:
+                    type = FileViewType.App;
+                    break;
                 default:
                     (type, ext) = ProcessUnknowType(filePath);
                     break;
@@ -200,7 +204,7 @@ namespace FileViewer.FileHelper
 
     public enum FileViewType
     {
-        Image, Code, Txt, Music, Video, Word, Excel, PowerPoint, Pdf, Folder, MobileProvision, None
+        Image, Code, Txt, Music, Video, Word, Excel, PowerPoint, Pdf, Folder, MobileProvision, App, None
     }
 
     public enum FileExtension
@@ -266,6 +270,8 @@ namespace FileViewer.FileHelper
         DOCX,
         XLSX,
         PPTX,
-        MOBILEPROVISION
+        MOBILEPROVISION,
+        APK,
+        IPA
     }
 }

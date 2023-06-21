@@ -1,4 +1,5 @@
-﻿using FileViewer.FileHelper;
+﻿using ApkReader;
+using FileViewer.FileHelper;
 using FileViewer.Globle;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
@@ -12,6 +13,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Xml;
 
 namespace FileViewer.FileControl.Text
 {
@@ -106,9 +108,10 @@ namespace FileViewer.FileControl.Text
 
         protected override void BgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            var filePath = (string)e.Argument;
             try
             {
-                using (StreamReader st = new StreamReader((string)e.Argument, encodingSelected))
+                using (StreamReader st = new StreamReader(filePath, encodingSelected))
                 {
                     StringBuilder sb = new StringBuilder();
                     string str = "";
@@ -127,10 +130,18 @@ namespace FileViewer.FileControl.Text
                     }
                     e.Result = result;
                 }
+                if(Path.GetFileName(filePath).ToLower() == "androidmanifest.xml" && !((string)e.Result).TrimStart().StartsWith("<"))
+                {
+                    using(FileStream stream = File.OpenRead(filePath))
+                    {
+                        XmlDocument xmlDocument = BinaryXmlConvert.ToXmlDocument(stream);
+                        e.Result = xmlDocument.OuterXmlFormat();
+                    }
+                }
             }
             catch (Exception)
             {
-                e.Result = "哈哈哈 没有读取到东西！！！";
+                if(e.Result == null) e.Result = "哈哈哈 没有读取到东西！！！";
             }
         }
 

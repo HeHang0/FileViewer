@@ -1,0 +1,88 @@
+﻿<fc:FileControl x:Class="FileViewer.FileControl.App.AppControl"
+             xmlns:fc="clr-namespace:FileViewer.FileControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FileViewer.FileControl.App"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.8*" MaxWidth="280"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Image Grid.ColumnSpan="3" Source="{Binding HelloBack}" Stretch="Fill" />
+        <Image Source="{Binding Path=ThumbnailImage}" Stretch="Uniform" Margin="50,75"/>
+        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Grid.Column="1" Margin="10 0 10 0">
+            <TextBox HorizontalContentAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,20" Text="{Binding Name, Mode=OneWay}" FontWeight="Bold" FontSize="16"/>
+            <Grid Height="Auto" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"></ColumnDefinition>
+                    <ColumnDefinition Width="4"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBox Text="软件大小" HorizontalContentAlignment="Right" Margin="0" FontWeight="Bold"/>
+                <TextBox Text="{Binding Size, Mode=OneWay}" HorizontalContentAlignment="Left" Grid.Column="2" Margin="0"/>
+            </Grid>
+            <Grid Height="Auto" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"></ColumnDefinition>
+                    <ColumnDefinition Width="4"></ColumnDefinition>
+                    <ColumnDefinition Width="0.58*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBox Text="版本号" HorizontalContentAlignment="Right" Margin="0" FontWeight="Bold"/>
+                <TextBox Text="{Binding Version, Mode=OneWay}" HorizontalContentAlignment="Left" Grid.Column="2" Margin="0"/>
+            </Grid>
+            <Grid Height="Auto" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"></ColumnDefinition>
+                    <ColumnDefinition Width="4"></ColumnDefinition>
+                    <ColumnDefinition Width="0.58*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBox Text="包名" HorizontalContentAlignment="Right" Margin="0" FontWeight="Bold"/>
+                <TextBox Text="{Binding Package, Mode=OneWay}" HorizontalContentAlignment="Left" Grid.Column="2" Margin="0"/>
+            </Grid>
+            <Grid Height="Auto" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"></ColumnDefinition>
+                    <ColumnDefinition Width="4"></ColumnDefinition>
+                    <ColumnDefinition Width="0.58*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBox Text="最低版本" HorizontalContentAlignment="Right" Margin="0" FontWeight="Bold"/>
+                <TextBox Text="{Binding MinOSVersion, Mode=OneWay}" HorizontalContentAlignment="Left" Grid.Column="2" Margin="0"/>
+            </Grid>
+            <Grid Height="Auto" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"></ColumnDefinition>
+                    <ColumnDefinition Width="4"></ColumnDefinition>
+                    <ColumnDefinition Width="0.58*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBox Text="目标版本" HorizontalContentAlignment="Right" Margin="0" FontWeight="Bold"/>
+                <TextBox Text="{Binding TargetOSVersion, Mode=OneWay}" HorizontalContentAlignment="Left" Grid.Column="2" Margin="0"/>
+            </Grid>
+            <Grid Height="Auto" Visibility="{Binding ShowPermissions, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"></ColumnDefinition>
+                    <ColumnDefinition Width="4"></ColumnDefinition>
+                    <ColumnDefinition Width="0.58*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBox Text="权限" HorizontalContentAlignment="Right" Margin="0" FontWeight="Bold"/>
+                <ScrollViewer Grid.Column="2" MaxHeight="200">
+                    <TextBox Text="{Binding Permissions, Mode=OneWay}" AcceptsReturn="True"/>
+                </ScrollViewer>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</fc:FileControl>

@@ -1,4 +1,5 @@
-﻿using FileViewer.FileControl.Common;
+﻿using FileViewer.FileControl.App;
+using FileViewer.FileControl.Common;
 using FileViewer.FileControl.Hello;
 using FileViewer.FileControl.Image;
 using FileViewer.FileControl.MobileProvision;
@@ -52,7 +53,8 @@ namespace FileViewer.FileControl
             [FileViewType.Excel] = (typeof(OfficeControl), true),
             [FileViewType.Word] = (typeof(OfficeControl), true),
             [FileViewType.PowerPoint] = (typeof(OfficeControl), true),
-            [FileViewType.MobileProvision] = (typeof(MobileProvisionControl), true)
+            [FileViewType.MobileProvision] = (typeof(MobileProvisionControl), true),
+            [FileViewType.App] = (typeof(AppControl), true)
         };
 
         private void SetResource(string filePath, bool loadWithTypeNone = false)

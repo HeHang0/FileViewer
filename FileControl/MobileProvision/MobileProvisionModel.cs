@@ -128,7 +128,7 @@ namespace FileViewer.FileControl.MobileProvision
                         switch (key)
                         {
                             case "Name":
-                                SignName = ProcessNodeString(node[key]);
+                                SignName = Utils.ParsePNodeString(node[key]);
                                 break;
                             case "ExpirationDate":
                                 PListNet.Nodes.DateNode expirationDateNode = (PListNet.Nodes.DateNode)node[key];
@@ -136,18 +136,18 @@ namespace FileViewer.FileControl.MobileProvision
                                 break;
                             case "Entitlements":
                                 PListNet.Nodes.DictionaryNode entitlements = (PListNet.Nodes.DictionaryNode)node[key];
-                                EntitlementsList.AddRange(entitlements.Select(m => new KeyValuePair<string, string>(m.Key + ":", ProcessNodeString(m.Value))));
+                                EntitlementsList.AddRange(entitlements.Select(m => new KeyValuePair<string, string>(m.Key + ":", Utils.ParsePNodeString(m.Value))));
                                 if (entitlements["application-identifier"] != null)
                                 {
-                                    BaseList.Insert(Math.Min(BaseList.Count, 1), new KeyValuePair<string, string>("App ID:", ProcessNodeString(entitlements["application-identifier"])));
+                                    BaseList.Insert(Math.Min(BaseList.Count, 1), new KeyValuePair<string, string>("App ID:", Utils.ParsePNodeString(entitlements["application-identifier"])));
                                 }
                                 break;
                             case "DeveloperCertificates":
-                                ProcessCertificate(ProcessNodeString(node[key], true));
+                                ProcessCertificate(Utils.ParsePNodeString(node[key], true));
                                 break;
                             case "ProvisionedDevices":
                                 PListNet.Nodes.ArrayNode provisionedDevicesNode = (PListNet.Nodes.ArrayNode)node[key];
-                                ProvisionedDevices.AddRange(provisionedDevicesNode.Select(m => new KeyValuePair<string, string>("Device ID:", ProcessNodeString(m))));
+                                ProvisionedDevices.AddRange(provisionedDevicesNode.Select(m => new KeyValuePair<string, string>("Device ID:", Utils.ParsePNodeString(m))));
                                 break;
                         }
                     }
@@ -166,12 +166,12 @@ namespace FileViewer.FileControl.MobileProvision
 
         private void ProcessBase(PListNet.Nodes.DictionaryNode node)
         {
-            BaseList.Add(new KeyValuePair<string, string>("App ID Name:", ProcessNodeString(node["AppIDName"])));
-            BaseList.Add(new KeyValuePair<string, string>("Team:", $"{ProcessNodeString(node["TeamName"])} ({ProcessNodeString(node["TeamIdentifier"])})"));
-            BaseList.Add(new KeyValuePair<string, string>("Platform:", ProcessNodeString(node["Platform"])));
-            BaseList.Add(new KeyValuePair<string, string>("UUID:", ProcessNodeString(node["UUID"])));
-            BaseList.Add(new KeyValuePair<string, string>("Creation Date:", ProcessNodeString(node["CreationDate"])));
-            BaseList.Add(new KeyValuePair<string, string>("Expiration Date:", ProcessNodeString(node["ExpirationDate"])));
+            BaseList.Add(new KeyValuePair<string, string>("App ID Name:", Utils.ParsePNodeString(node["AppIDName"])));
+            BaseList.Add(new KeyValuePair<string, string>("Team:", $"{Utils.ParsePNodeString(node["TeamName"])} ({Utils.ParsePNodeString(node["TeamIdentifier"])})"));
+            BaseList.Add(new KeyValuePair<string, string>("Platform:", Utils.ParsePNodeString(node["Platform"])));
+            BaseList.Add(new KeyValuePair<string, string>("UUID:", Utils.ParsePNodeString(node["UUID"])));
+            BaseList.Add(new KeyValuePair<string, string>("Creation Date:", Utils.ParsePNodeString(node["CreationDate"])));
+            BaseList.Add(new KeyValuePair<string, string>("Expiration Date:", Utils.ParsePNodeString(node["ExpirationDate"])));
         }
 
         private void ProcessCertificate(string base64Str)
@@ -185,79 +185,16 @@ namespace FileViewer.FileControl.MobileProvision
 
         private string ParseCertificateName(string subject)
         {
-            var subjects = subject.Split(',');
+            var subjects = subject.Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
             for(int i = 0; i < subjects.Length; i++)
             {
                 var item = subjects[i].Trim();
                 if(item.ToLower().StartsWith("cn="))
                 {
-                    return item.Substring(3);
+                    return item.Substring(3).Trim('"');
                 }
             }
             return subject;
-        }
-
-        private string ProcessNodeString(PNode node, bool arrayFirst=false)
-        {
-            var nodeType = node.GetType();
-            if (nodeType == typeof(PListNet.Nodes.DictionaryNode))
-            {
-                PListNet.Nodes.DictionaryNode value = (PListNet.Nodes.DictionaryNode)node;
-                return string.Join(", ", value.Values.Select(m => ProcessNodeString(m)));
-            }
-            else if (nodeType == typeof(PListNet.Nodes.BooleanNode))
-            {
-                PListNet.Nodes.BooleanNode value = (PListNet.Nodes.BooleanNode)node;
-                return value.Value.ToString();
-            }
-            else if (nodeType == typeof(PListNet.Nodes.ArrayNode))
-            {
-                PListNet.Nodes.ArrayNode value = (PListNet.Nodes.ArrayNode)node;
-                if (arrayFirst && value.Count > 0)
-                {
-                    return ProcessNodeString(value[0]);
-                }
-                return string.Join(", ", value.Select(m => ProcessNodeString(m)));
-            }
-            else if (nodeType == typeof(PListNet.Nodes.DataNode))
-            {
-                PListNet.Nodes.DataNode value = (PListNet.Nodes.DataNode)node;
-                return Convert.ToBase64String(value.Value);
-            }
-            else if (nodeType == typeof(PListNet.Nodes.DateNode))
-            {
-                PListNet.Nodes.DateNode value = (PListNet.Nodes.DateNode)node;
-                return value.Value.ToString();
-            }
-            else if (nodeType == typeof(PListNet.Nodes.FillNode))
-            {
-                PListNet.Nodes.FillNode value = (PListNet.Nodes.FillNode)node;
-                return value.ToString();
-            }
-            else if (nodeType == typeof(PListNet.Nodes.IntegerNode))
-            {
-                PListNet.Nodes.IntegerNode value = (PListNet.Nodes.IntegerNode)node;
-                return value.Value.ToString();
-            }
-            else if (nodeType == typeof(PListNet.Nodes.RealNode))
-            {
-                PListNet.Nodes.RealNode value = (PListNet.Nodes.RealNode)node;
-                return value.Value.ToString();
-            }
-            else if (nodeType == typeof(PListNet.Nodes.StringNode))
-            {
-                PListNet.Nodes.StringNode value = (PListNet.Nodes.StringNode)node;
-                return value.Value.ToString();
-            }
-            else if (nodeType == typeof(PListNet.Nodes.UidNode))
-            {
-                PListNet.Nodes.UidNode value = (PListNet.Nodes.UidNode)node;
-                return value.Value.ToString();
-            }
-            else
-            {
-                return node.ToString();
-            }
         }
 
         private Brush ProcessDateColor(DateTime dateTime)
