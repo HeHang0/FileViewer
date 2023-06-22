@@ -1,6 +1,9 @@
 ﻿using ApkReader;
+using ApkReader.Arsc;
 using FileViewer.FileHelper;
 using FileViewer.Globle;
+using Microsoft.Office.Core;
+using Microsoft.Office.Interop.Word;
 using PListNet;
 using System;
 using System.Collections.Generic;
@@ -8,10 +11,12 @@ using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xml;
 
 namespace FileViewer.FileControl.App
 {
@@ -36,6 +41,8 @@ namespace FileViewer.FileControl.App
         public string TargetOSVersion { get; set; }
 
         public string Permissions { get; set; }
+
+        public string DeviceFamily { get; set; }
 
         public bool ShowPermissions
         {
@@ -119,6 +126,20 @@ namespace FileViewer.FileControl.App
                             ipaInfo.MinSdkVersion = "IOS " + Utils.ParsePNodeString(minOSNode);
                             node.TryGetValue("DTPlatformVersion", out PNode targetOSNode);
                             ipaInfo.TargetSdkVersion = "IOS " + Utils.ParsePNodeString(targetOSNode);
+                            node.TryGetValue("UIDeviceFamily", out PNode familyNode);
+                            if (familyNode != null && familyNode.GetType() == typeof(PListNet.Nodes.ArrayNode))
+                            {
+                                foreach (var item in ((PListNet.Nodes.ArrayNode)familyNode))
+                                {
+                                    var deviceFamily = Utils.ParsePNodeString(item);
+                                    iosDeviceFamily.TryGetValue(deviceFamily, out string deviceFamilyDesc);
+                                    if (!string.IsNullOrWhiteSpace(deviceFamilyDesc))
+                                    {
+                                        ipaInfo.Densities.Add(deviceFamilyDesc);
+                                    }
+                                }
+                            }
+
                             node.TryGetValue("CFBundleIcons", out PNode iconsNode);
                             if (iconsNode != null && iconsNode.GetType() == typeof(PListNet.Nodes.DictionaryNode))
                             {
@@ -165,6 +186,7 @@ namespace FileViewer.FileControl.App
             var fileInfo = new FileInfo(apkPath);
             var fileSize = fileInfo.Length;
             var apkReader = new ApkReader.ApkReader();
+            InjectApkInfoHandler(apkReader);
             ApkInfo apkInfo = apkReader.Read(apkPath);
             string iconPath = "";
             int iconIndexLast = 0;
@@ -215,6 +237,54 @@ namespace FileViewer.FileControl.App
             return (apkInfo, fileSize, apkIcon);
         }
 
+
+        class MyApkInfoHandler : IApkInfoHandler<ApkInfo>
+        {
+            IApkInfoHandler<ApkInfo> parentHandler;
+            public MyApkInfoHandler()
+            {
+                // Get the assembly that contains the internal type.
+                Assembly assembly = Assembly.Load("ApkReader");
+
+                // Get the type of the internal class.
+                Type type = assembly.GetType("ApkReader.ApkInfoHandler");
+
+                // Create an instance of the internal class.
+                parentHandler = (IApkInfoHandler<ApkInfo>)Activator.CreateInstance(type);
+            }
+            public void Execute(XmlDocument androidManifest, ArscFile resources, ApkInfo apkInfo)
+            {
+                parentHandler.Execute(androidManifest, resources, apkInfo);
+                apkInfo.Densities.Clear();
+                apkInfo.Densities.Add("Phone");
+                apkInfo.Densities.Add("Pad");
+                foreach (XmlNode childNode in androidManifest.DocumentElement.ChildNodes)
+                {
+                    if (childNode.LocalName != "uses-feature") continue;
+                    string usesPermission = childNode.Attributes?.GetNamedItem("name")?.Value;
+                    switch (usesPermission)
+                    {
+                        case "android.software.leanback":
+                            apkInfo.Densities.Add("TV");
+                            break;
+                        case "android.hardware.type.automotive":
+                            apkInfo.Densities.Add("Automotive");
+                            break;
+                        case "android.hardware.type.watch":
+                            apkInfo.Densities.Add("Wear");
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void InjectApkInfoHandler(ApkReader<ApkInfo> apkReader)
+        {
+            Type type = typeof(ApkReader<ApkInfo>);
+            FieldInfo fieldInfo = type.GetField("_apkInfoHandlers", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+            fieldInfo.SetValue(apkReader, new List<IApkInfoHandler<ApkInfo>>() { new MyApkInfoHandler() });
+        }
+
         protected override void BgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if(e.Result == null)
@@ -248,6 +318,7 @@ namespace FileViewer.FileControl.App
             MinOSVersion = apkInfo.MinSdkVersion;
             TargetOSVersion = apkInfo.TargetSdkVersion;
             Permissions = string.Join("\n", apkInfo.Permissions);
+            DeviceFamily = string.Join("、", apkInfo.Densities);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ShowPermissions"));
             GlobalNotify.OnLoadingChange(false);
         }
@@ -255,6 +326,16 @@ namespace FileViewer.FileControl.App
         protected override void BgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
         }
+
+        Dictionary<string, string> iosDeviceFamily = new Dictionary<string, string>()
+        {
+            { "1", "iPhone" },
+            { "2", "iPad" },
+            { "3", "Apple TV" },
+            { "4", "Apple Watch" },
+            { "5", "HomePod" },
+            { "6", "Mac" },
+        };
 
         Dictionary<string, string> androidVersions = new Dictionary<string, string>()
         {

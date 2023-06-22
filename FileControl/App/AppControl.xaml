@@ -60,6 +60,15 @@
                     <ColumnDefinition Width="4"></ColumnDefinition>
                     <ColumnDefinition Width="0.58*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
+                <TextBox Text="设备支持" HorizontalContentAlignment="Right" Margin="0" FontWeight="Bold"/>
+                <TextBox Text="{Binding DeviceFamily, Mode=OneWay}" HorizontalContentAlignment="Left" Grid.Column="2" Margin="0"/>
+            </Grid>
+            <Grid Height="Auto" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"></ColumnDefinition>
+                    <ColumnDefinition Width="4"></ColumnDefinition>
+                    <ColumnDefinition Width="0.58*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
                 <TextBox Text="最低版本" HorizontalContentAlignment="Right" Margin="0" FontWeight="Bold"/>
                 <TextBox Text="{Binding MinOSVersion, Mode=OneWay}" HorizontalContentAlignment="Left" Grid.Column="2" Margin="0"/>
             </Grid>
