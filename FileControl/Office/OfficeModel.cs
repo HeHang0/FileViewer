@@ -150,7 +150,7 @@ namespace FileViewer.FileControl.Office
                 var formatIntent = Microsoft.Office.Interop.PowerPoint.PpFixedFormatIntent.ppFixedFormatIntentScreen;
                 presentation.ExportAsFixedFormat(xpsFilePath, formatType, formatIntent);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 success = false;
             }

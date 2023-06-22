@@ -20,47 +20,19 @@ namespace FileViewer.FileControl.MobileProvision
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public MobileProvisionModel()
-        {
-        }
-
         public string SignName { get; set; }
-        private DateTime _signExpirationDate = DateTime.Now;
-        public string SignExpirationDate
-        {
-            get
-            {
-                return ProcessDateDesc(_signExpirationDate);
-            }
-        }
-        public Brush SignExpirationColor
-        {
-            get
-            {
-                return ProcessDateColor(_signExpirationDate);
-            }
-        }
+        public DateTime SignExpirationDateTime { get; set; } = DateTime.Now;
+        public string SignExpirationDate => ProcessDateDesc(SignExpirationDateTime);
+        public Brush SignExpirationColor => ProcessDateColor(SignExpirationDateTime);
         public ObservableCollection<KeyValuePair<string, string>> BaseList { get; } = new ObservableCollection<KeyValuePair<string, string>>();
         public ObservableCollection<KeyValuePair<string, string>> EntitlementsList { get; } = new ObservableCollection<KeyValuePair<string, string>>();
         public ObservableCollection<KeyValuePair<string, string>> CertificatesList { get; } = new ObservableCollection<KeyValuePair<string, string>>();
         public ObservableCollection<KeyValuePair<string, string>> ProvisionedDevices { get; } = new ObservableCollection<KeyValuePair<string, string>>();
-        public bool ShowProvisionedDevices 
-        { 
-            get
-            {
-                return ProvisionedDevices.Count > 0;
-            }
-        }
-        public bool ShowCertificates
-        { 
-            get
-            {
-                return CertificatesList.Count > 0;
-            }
-        }
+        public bool ShowProvisionedDevices => ProvisionedDevices.Count > 0;
+        public bool ShowCertificates => CertificatesList.Count > 0;
 
-        private double height = SystemParameters.WorkArea.Height / 2;
-        private double width = SystemParameters.WorkArea.Width / 2;
+        private readonly double height = SystemParameters.WorkArea.Height / 2;
+        private readonly double width = SystemParameters.WorkArea.Width / 2;
 
         private (string FilePath, FileExtension Ext) currentFilePath;
         public void OnFileChanged((string FilePath, FileExtension Ext) file)
@@ -132,7 +104,7 @@ namespace FileViewer.FileControl.MobileProvision
                                 break;
                             case "ExpirationDate":
                                 PListNet.Nodes.DateNode expirationDateNode = (PListNet.Nodes.DateNode)node[key];
-                                _signExpirationDate = expirationDateNode.Value;
+                                SignExpirationDateTime = expirationDateNode.Value;
                                 break;
                             case "Entitlements":
                                 PListNet.Nodes.DictionaryNode entitlements = (PListNet.Nodes.DictionaryNode)node[key];
@@ -152,10 +124,6 @@ namespace FileViewer.FileControl.MobileProvision
                         }
                     }
                 }
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ShowProvisionedDevices"));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SignExpirationColor"));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SignExpirationDate"));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ShowCertificates"));
                 GlobalNotify.OnLoadingChange(false);
             }
             catch (Exception)

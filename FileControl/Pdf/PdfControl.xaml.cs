@@ -38,9 +38,27 @@ namespace FileViewer.FileControl.Pdf
             {
                 Directory.CreateDirectory(webView2Path);
             }
-            if (!File.Exists(loaderPath))
+            var architecture = RuntimeInformation.ProcessArchitecture;
+            var architectureName = architecture.ToString().ToLower();
+            var architecturePath = loaderPath + ".architecture";
+            if (File.Exists(loaderPath) && 
+                File.Exists(architecturePath) && 
+                File.ReadAllText(architecturePath) == architectureName)
             {
-                File.WriteAllBytes(loaderPath, Properties.Resources.WebView2Loader);
+                return;
+            }
+            File.WriteAllText(architecturePath, architectureName);
+            switch (architecture)
+            {
+                case Architecture.X86:
+                    File.WriteAllBytes(loaderPath, Properties.Resources.WebView2Loader_x86);
+                    break;
+                case Architecture.X64:
+                    File.WriteAllBytes(loaderPath, Properties.Resources.WebView2Loader_x64);
+                    break;
+                case Architecture.Arm64:
+                    File.WriteAllBytes(loaderPath, Properties.Resources.WebView2Loader_arm64);
+                    break;
             }
         }
     }

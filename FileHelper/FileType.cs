@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MimeMapping;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -119,7 +120,7 @@ namespace FileViewer.FileHelper
         {
             var ext = GetFileType(filePath);
             var type = FileViewType.None;
-            string mime = System.Web.MimeMapping.GetMimeMapping(filePath);
+            string mime = MimeUtility.GetMimeMapping(filePath);
             if (mime == null) return (type, ext);
             if (mime.StartsWith("video"))
             {

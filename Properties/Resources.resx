@@ -163,7 +163,13 @@
   <data name="GolangSyntaxHighlighting" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\GolangSyntaxHighlighting.xshd;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="WebView2Loader" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\packages\Microsoft.Web.WebView2.1.0.1823.32\runtimes\win-x86\native\WebView2Loader.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="WebView2Loader_arm64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WebView2Loader.arm64.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="WebView2Loader_x64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WebView2Loader.x64.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="WebView2Loader_x86" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WebView2Loader.x86.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

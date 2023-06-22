@@ -1,10 +1,7 @@
 ﻿using ApkReader;
 using ApkReader.Arsc;
 using FileViewer.FileHelper;
-using FileViewer.FileHelper.IcnsParser;
 using FileViewer.Globle;
-using Microsoft.Office.Core;
-using Microsoft.Office.Interop.Word;
 using PListNet;
 using System;
 using System.Collections.Generic;
@@ -14,12 +11,10 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace FileViewer.FileControl.App
 {
@@ -47,13 +42,7 @@ namespace FileViewer.FileControl.App
 
         public string DeviceFamily { get; set; }
 
-        public bool ShowPermissions
-        {
-            get
-            {
-                return !string.IsNullOrWhiteSpace(Permissions);
-            }
-        }
+        public bool ShowPermissions => !string.IsNullOrWhiteSpace(Permissions);
 
         public void OnColorChanged(Color color)
         {

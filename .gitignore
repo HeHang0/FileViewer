@@ -341,4 +341,4 @@ healthchecksdb
 
 FodyWeavers.*
 
-MoonPdfLib/*.dll
+Resources/*.dll
