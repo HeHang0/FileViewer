@@ -19,51 +19,53 @@
 
 ### Run
 
--   Run `FileViewer.exe` (only necessary on first run)
--   Select any file or folder on anywhere
--   Press `Space`
--   Enjoy the preview
--   Preview other file just select the file
+- Run `FileViewer.exe` (only necessary on first run)
+- Select any file or folder on anywhere
+- Press `Space`
+- Enjoy the preview
+- Preview other file just select the file
 
 ### Hotkeys
 
--   `Space` Show/Hide the preview window
+- `Space` Show/Hide the preview window
 
 ## Supported FileTypes
 
-#### General
+### General
 
 ![Common Directory](Demo/common_dir.png)
 ![Common Directory](Demo/common_file.png)
 
-#### Image
+### Image
 
 ![Image](Demo/image.png)
 
-#### Music
-
-![Music](Demo/music.png)
-
-#### Movie
-
-![Movie](Demo/movie.png)
-
-#### Pdf
+### Pdf
 
 ![Pdf](Demo/pdf.png)
 
-### Word
+### Office
 
 ![Word](Demo/word.png)
 
-### Excel
-
 ![Excel](Demo/excel.png)
 
-### PowerPoint
-
 ![PowerPoint](Demo/ppt.png)
+
+### Application
+
+![Android](Demo/apk.png)
+
+![iOS](Demo/ipa.png)
+
+![MacOS App](Demo/mac_app.png)
 
 ### Text / Code
 
 ![Text](Demo/text.png)
+
+### Media
+
+![Music](Demo/music.png)
+
+![Movie](Demo/movie.png)
