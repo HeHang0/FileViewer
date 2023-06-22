@@ -20,6 +20,10 @@ namespace FileViewer.FileHelper
             }
             else if (Directory.Exists(filePath))
             {
+                if (Path.GetExtension(filePath).TrimStart('.').ToUpper() == FileExtension.APP.ToString())
+                {
+                    return FileExtension.APP;
+                }
                 return FileExtension.Folder;
             }
             return FileExtension.None;
@@ -36,6 +40,7 @@ namespace FileViewer.FileHelper
                 case FileExtension.PNG:
                 case FileExtension.GIF:
                 case FileExtension.ICO:
+                case FileExtension.ICNS:
                     type = FileViewType.Image;
                     break;
                 case FileExtension.TXT:
@@ -99,6 +104,7 @@ namespace FileViewer.FileHelper
                     break;
                 case FileExtension.APK:
                 case FileExtension.IPA:
+                case FileExtension.APP:
                     type = FileViewType.App;
                     break;
                 default:
@@ -272,6 +278,8 @@ namespace FileViewer.FileHelper
         PPTX,
         MOBILEPROVISION,
         APK,
-        IPA
+        IPA,
+        APP,
+        ICNS
     }
 }

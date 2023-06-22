@@ -350,6 +350,11 @@
     </Compile>
     <Compile Include="FileControl\Video\VideoModel.cs" />
     <Compile Include="FileHelper\FileType.cs" />
+    <Compile Include="FileHelper\IcnsParser\IcnsDecoder.cs" />
+    <Compile Include="FileHelper\IcnsParser\IcnsImage.cs" />
+    <Compile Include="FileHelper\IcnsParser\IcnsImageParser.cs" />
+    <Compile Include="FileHelper\IcnsParser\IcnsType.cs" />
+    <Compile Include="FileHelper\IcnsParser\Rle24Compression.cs" />
     <Compile Include="FileHelper\ShellItems.cs" />
     <Compile Include="Globle\BaseBackgroundWork.cs" />
     <Compile Include="Globle\MutexBool.cs" />
@@ -460,7 +465,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="MoonPdfLib\setupMoonPdfLib.ps1" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

@@ -15,6 +15,8 @@ using System.Windows.Media.Imaging;
 using PListNet;
 using System.Xml;
 using System.Windows.Controls;
+using FileViewer.FileHelper.IcnsParser;
+using System.Drawing.Imaging;
 
 namespace FileViewer.Globle
 {
@@ -262,6 +264,11 @@ namespace FileViewer.Globle
             {
                 return node.ToString();
             }
+        }
+
+        public static Bitmap GetIcnsMax(string icnsPath)
+        {
+            return IcnsImageParser.GetImages(icnsPath).OrderByDescending(m => m.Bitmap.Height).FirstOrDefault().Bitmap;
         }
     }
 }

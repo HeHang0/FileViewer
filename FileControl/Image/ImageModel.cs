@@ -32,6 +32,9 @@ namespace FileViewer.FileControl.Image
                     case FileExtension.SVG:
                         ShowSVG(file.FilePath);
                         break;
+                    case FileExtension.ICNS:
+                        ShowICNS(file.FilePath);
+                        break;
                     default:
                         ShowImg(file);
                         break;
@@ -125,6 +128,15 @@ namespace FileViewer.FileControl.Image
                 GlobalNotify.OnLoadingChange(false);
                 GlobalNotify.OnSizeChange(ThumbnailImage.Height, ThumbnailImage.Width);
             }
+        }
+
+        private void ShowICNS(string filePath)
+        {
+            IsImg = true;
+            IsGif = false;
+            ThumbnailImage = Utils.GetBitmapSource(Utils.GetIcnsMax(filePath));
+            GlobalNotify.OnLoadingChange(false);
+            GlobalNotify.OnSizeChange(ThumbnailImage.Height, ThumbnailImage.Width);
         }
 
         protected override void BgWorker_DoWork(object sender, DoWorkEventArgs e)

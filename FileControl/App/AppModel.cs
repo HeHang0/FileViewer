@@ -1,6 +1,7 @@
 ﻿using ApkReader;
 using ApkReader.Arsc;
 using FileViewer.FileHelper;
+using FileViewer.FileHelper.IcnsParser;
 using FileViewer.Globle;
 using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Word;
@@ -8,6 +9,7 @@ using PListNet;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -17,6 +19,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace FileViewer.FileControl.App
 {
@@ -66,34 +69,113 @@ namespace FileViewer.FileControl.App
             GlobalNotify.OnLoadingChange(true);
             InitBackGroundWork();
             filePath = file.FilePath;
-            bgWorker.RunWorkerAsync(file.FilePath);
+            bgWorker.RunWorkerAsync(file);
         }
 
         protected override void BgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            var appPath = e.Argument as string;
             try
             {
-                var extension = Path.GetExtension(appPath);
-                if(extension.ToLower() == ".ipa")
+                (string appPath, FileExtension extension) = ((string FilePath, FileExtension Ext))e.Argument;
+                switch (extension)
                 {
-                    e.Result = ParseIpaInfo(appPath);
-                }
-                else
-                {
-                    e.Result = ParseAndroidInfo(appPath);
+                    case FileExtension.APK:
+                        e.Result = ParseAndroidInfo(appPath);
+                        break;
+                    case FileExtension.IPA:
+                        e.Result = ParseIpaInfo(appPath);
+                        break;
+                    case FileExtension.APP:
+                        e.Result = ParseMacAppInfo(appPath);
+                        break;
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(ex);
-                e.Result = null;
             }
+        }
+
+        private long GetDirectorySize(string dirPath)
+        {
+            return GetDirectorySize(new DirectoryInfo(dirPath));
+        }
+
+        private long GetDirectorySize(DirectoryInfo dirInfo)
+        {
+            long totalSize = 0;
+            foreach (var fileInfo in dirInfo.GetFiles())
+            {
+                totalSize += fileInfo.Length;
+            }
+            foreach (var dirItemInfo in dirInfo.GetDirectories())
+            {
+                totalSize += GetDirectorySize(dirItemInfo);
+            }
+            return totalSize;
+        }
+
+        private (ApkInfo, long, byte[]) ParseMacAppInfo(string appPath)
+        {
+            if (!Directory.Exists(appPath)) throw new DirectoryNotFoundException();
+            string infoPath = Path.Combine(filePath, "Contents", "Info.plist");
+            if (!File.Exists(infoPath)) throw new FileNotFoundException();
+            byte[] appIcon = null;
+            var fileSize = GetDirectorySize(appPath);
+            ApkInfo appInfo = new ApkInfo();
+            using (FileStream stream = File.OpenRead(infoPath))
+            {
+                PListNet.Nodes.DictionaryNode node = (PListNet.Nodes.DictionaryNode)PList.Load(stream);
+                node.TryGetValue("CFBundleName", out PNode nameNode);
+                appInfo.Label = Utils.ParsePNodeString(nameNode);
+                node.TryGetValue("CFBundleIdentifier", out PNode packageNode);
+                appInfo.PackageName = Utils.ParsePNodeString(packageNode);
+                node.TryGetValue("CFBundleShortVersionString", out PNode versionNode);
+                appInfo.VersionName = Utils.ParsePNodeString(versionNode);
+                node.TryGetValue("LSMinimumSystemVersion", out PNode minOSNode);
+                appInfo.MinSdkVersion = "MacOS " + Utils.ParsePNodeString(minOSNode);
+                node.TryGetValue("DTSDKName", out PNode targetOSNode);
+                appInfo.TargetSdkVersion = "MacOS " + Regex.Replace(Utils.ParsePNodeString(targetOSNode), "[a-zA-Z]", "");
+                node.TryGetValue("CFBundleSupportedPlatforms", out PNode familyNode);
+                if (familyNode != null && familyNode.GetType() == typeof(PListNet.Nodes.ArrayNode))
+                {
+                    foreach (var item in ((PListNet.Nodes.ArrayNode)familyNode))
+                    {
+                        appInfo.Densities.Add(Utils.ParsePNodeString(item));
+                    }
+                }
+
+                node.TryGetValue("CFBundleIconFile", out PNode iconsNode);
+                string appIconName = Utils.ParsePNodeString(iconsNode);
+                string resourcePath = Path.Combine(filePath, "Contents", "Resources");
+                if (Directory.Exists(resourcePath))
+                {
+                    foreach (var resourceInfo in new DirectoryInfo(resourcePath).GetFiles())
+                    {
+                        if (resourceInfo.Name.StartsWith(appIconName))
+                        {
+                            try
+                            {
+                                var iconBitmap = Utils.GetIcnsMax(resourceInfo.FullName);
+                                using(MemoryStream ms = new MemoryStream())
+                                {
+                                    iconBitmap.Save(ms, ImageFormat.Png);
+                                    appIcon = ms.ToArray();
+                                }
+                            }
+                            catch (Exception)
+                            {
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            return (appInfo, fileSize, appIcon);
         }
 
         private (ApkInfo, long, byte[]) ParseIpaInfo(string ipaPath)
         {
-            byte[] apkIcon = null;
+            byte[] ipaIcon = null;
             var fileInfo = new FileInfo(ipaPath);
             var fileSize = fileInfo.Length;
             ApkInfo ipaInfo = new ApkInfo();
@@ -123,9 +205,9 @@ namespace FileViewer.FileControl.App
                             node.TryGetValue("CFBundleShortVersionString", out PNode versionNode);
                             ipaInfo.VersionName = Utils.ParsePNodeString(versionNode);
                             node.TryGetValue("MinimumOSVersion", out PNode minOSNode);
-                            ipaInfo.MinSdkVersion = "IOS " + Utils.ParsePNodeString(minOSNode);
+                            ipaInfo.MinSdkVersion = "iOS " + Utils.ParsePNodeString(minOSNode);
                             node.TryGetValue("DTPlatformVersion", out PNode targetOSNode);
-                            ipaInfo.TargetSdkVersion = "IOS " + Utils.ParsePNodeString(targetOSNode);
+                            ipaInfo.TargetSdkVersion = "iOS " + Utils.ParsePNodeString(targetOSNode);
                             node.TryGetValue("UIDeviceFamily", out PNode familyNode);
                             if (familyNode != null && familyNode.GetType() == typeof(PListNet.Nodes.ArrayNode))
                             {
@@ -169,7 +251,7 @@ namespace FileViewer.FileControl.App
                                 using (MemoryStream ms = new MemoryStream())
                                 {
                                     stream.CopyTo(ms);
-                                    apkIcon = ms.ToArray();
+                                    ipaIcon = ms.ToArray();
                                 }
                             }
                             break;
@@ -177,7 +259,7 @@ namespace FileViewer.FileControl.App
                     }
                 }
             }
-            return (ipaInfo, fileSize, apkIcon);
+            return (ipaInfo, fileSize, ipaIcon);
         }
 
         private (ApkInfo, long, byte[]) ParseAndroidInfo(string apkPath)
