@@ -33,11 +33,11 @@ namespace FileViewer.FileControl.Pdf
             {
                 var environment = await CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
                 await webView2.EnsureCoreWebView2Async(environment);
+                webView2.WebMessageReceived += WebMessageReceived;
             }
             catch (Exception)
             {
             }
-            webView2.WebMessageReceived += WebMessageReceived;
         }
 
         private void TextFileChanged()

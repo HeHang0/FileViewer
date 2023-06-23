@@ -1,12 +1,10 @@
 ﻿using FileViewer.ViewModel;
-using ICSharpCode.AvalonEdit.Highlighting.Xshd;
-using ICSharpCode.AvalonEdit.Highlighting;
 using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Forms;
-using System.Xml;
 using Application = System.Windows.Application;
+using System.Windows.Media;
 
 namespace FileViewer
 {
@@ -28,6 +26,22 @@ namespace FileViewer
 
             //非UI线程未捕获异常处理事件
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            CheckWindows7();
+        }
+
+        private void CheckWindows7()
+        {
+            if(Environment.OSVersion.Version.Major < 6 || 
+                (Environment.OSVersion.Version.Major == 6 && 
+                Environment.OSVersion.Version.Minor <= 1))
+            {
+                Resources["TitleBarButtonFontFamily"] = new FontFamily("Marlett");
+                Resources["TitleBarTopmostButtonText"] = "☘️";
+                Resources["TitleBarMinimizedButtonText"] = "0";
+                Resources["TitleBarNormalButtonText"] = "2";
+                Resources["TitleBarMaximizedButtonText"] = "1";
+                Resources["TitleBarCloseButtonText"] = "r";
+            }
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

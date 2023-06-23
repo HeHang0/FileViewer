@@ -1,7 +1,14 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
                     xmlns:themes="clr-namespace:FileViewer.WindowStyle">
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    <FontFamily x:Key="TitleBarButtonFontFamily">Segoe MDL2 Assets</FontFamily>
+    <sys:String x:Key="TitleBarTopmostButtonText">🔝</sys:String>
+    <sys:String x:Key="TitleBarMinimizedButtonText">&#xE921;</sys:String>
+    <sys:String x:Key="TitleBarNormalButtonText">&#xE923;</sys:String>
+    <sys:String x:Key="TitleBarMaximizedButtonText">&#xE922;</sys:String>
+    <sys:String x:Key="TitleBarCloseButtonText">&#xE8BB;</sys:String>
     <Style x:Key="AllHarfCircularButton" TargetType="{x:Type Button}">
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
@@ -145,19 +152,19 @@
                                             Command="{TemplateBinding themes:UniversalWindowStyle.OpenCommond}" 
                                             Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}">
                                     </Button>
-                                    <Button x:Name="SwitchTopmostButton" FontSize="15" ToolTip="置顶" Content="🔝"
+                                    <Button x:Name="SwitchTopmostButton" FontSize="15" ToolTip="置顶" Content="{DynamicResource TitleBarTopmostButtonText}"
                                             Command="{TemplateBinding themes:UniversalWindowStyle.SwitchTopmostCommond}" 
                                             Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}">
                                     </Button>
                                     <Button x:Name="MinimizeButton" ToolTip="最小化" themes:UniversalWindowStyle.TitleBarButtonState="Minimized" 
-                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}" Content="&#xE921;" FontFamily="Segoe MDL2 Assets"></Button>
+                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}" Content="{DynamicResource TitleBarMinimizedButtonText}" FontFamily="{DynamicResource TitleBarButtonFontFamily}"></Button>
                                     <Button x:Name="RestoreButton" ToolTip="向下还原" themes:UniversalWindowStyle.TitleBarButtonState="Normal" 
-                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}" FontFamily="Segoe MDL2 Assets" Content="&#xE923;">
+                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}" FontFamily="{DynamicResource TitleBarButtonFontFamily}" Content="{DynamicResource TitleBarNormalButtonText}">
                                     </Button>
                                     <Button x:Name="MaximizeButton" ToolTip="最大化" themes:UniversalWindowStyle.TitleBarButtonState="Maximized" 
-                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}" FontFamily="Segoe MDL2 Assets" Content="&#xE922;"></Button>
+                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}" FontFamily="{DynamicResource TitleBarButtonFontFamily}" Content="{DynamicResource TitleBarMaximizedButtonText}"></Button>
                                     <Button x:Name="CloseButton" ToolTip="关闭" Style="{StaticResource Style.Button.Close}" themes:UniversalWindowStyle.IsTitleBarCloseButton="True" 
-                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}" FontFamily="Segoe MDL2 Assets" Content="&#xE8BB;">
+                                            Foreground="{TemplateBinding themes:UniversalWindowStyle.Foreground}" FontFamily="{DynamicResource TitleBarButtonFontFamily}" Content="{DynamicResource TitleBarCloseButtonText}">
                                     </Button>
                                 </StackPanel>
                             </Grid>

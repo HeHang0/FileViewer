@@ -88,7 +88,8 @@ namespace FileViewer.FileControl
             {
                 typeInfo.Type = FileViewType.None;
             }
-            if(!controlMapping.TryGetValue(typeInfo.Type, out var controlInfo))
+            if(!controlMapping.TryGetValue(typeInfo.Type, out var controlInfo) || 
+                (!isWebView2Installed && typeInfo.Type == FileViewType.Pdf))
             {
                 controlInfo = (typeof(CommonControl), false);
             }

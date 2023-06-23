@@ -69,24 +69,23 @@ namespace FileViewer.FileControl.Office
 
         private bool ConvertOfficeToXps(string officeFilePath, string xpsFilePath)
         {
-            if (!IsOfficeInstalled()) return false;
-            var ext = Path.GetExtension(officeFilePath).ToLower();
-            if(ext.StartsWith(".ppt"))
+            try
             {
-                return ConvertPowerPointToXps(officeFilePath, xpsFilePath);
+                var ext = Path.GetExtension(officeFilePath).ToLower();
+                if (ext.StartsWith(".ppt"))
+                {
+                    return ConvertPowerPointToXps(officeFilePath, xpsFilePath);
+                }
+                else if (ext.StartsWith(".xls"))
+                {
+                    return ConvertExcelToXps(officeFilePath, xpsFilePath);
+                }
+                return ConvertWordToXps(officeFilePath, xpsFilePath);
             }
-            else if(ext.StartsWith(".xls"))
+            catch (Exception)
             {
-                return ConvertExcelToXps(officeFilePath, xpsFilePath);
+                return false;
             }
-            return ConvertWordToXps(officeFilePath, xpsFilePath);
-        }
-
-        private static bool IsOfficeInstalled()
-        {
-            // 检查注册表以确定是否安装了Office
-            RegistryKey officeKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Office");
-            return officeKey != null;
         }
 
         private bool ConvertWordToXps(string wordFilePath, string xpsFilePath)
