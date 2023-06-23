@@ -3,18 +3,14 @@ using System.Windows.Media;
 
 namespace FileViewer.FileControl
 {
-    interface IFileModel: IFileChanged, INotifyPropertyChanged, IColorChanged
+    interface IFileModel: IFileChanged, INotifyPropertyChanged
     {
     }
 
 
     public interface IFileChanged
     {
-        void OnFileChanged((string FilePath, FileHelper.FileExtension Ext) file);
-    }
-
-    public interface IColorChanged
-    {
-        void OnColorChanged(Color color);
+        void ChangeFile((string FilePath, FileHelper.FileExtension Ext) file);
+        void ChangeTheme(bool dark);
     }
 }

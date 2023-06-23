@@ -35,13 +35,17 @@ namespace FileViewer.FileControl.MobileProvision
         private readonly double width = SystemParameters.WorkArea.Width / 2;
 
         private (string FilePath, FileExtension Ext) currentFilePath;
-        public void OnFileChanged((string FilePath, FileExtension Ext) file)
+        public void ChangeFile((string FilePath, FileExtension Ext) file)
         {
             currentFilePath = file;
             InitBackGroundWork();
             bgWorker.RunWorkerAsync(file.FilePath);
             GlobalNotify.OnColorChange(Color.FromRgb(0xA1, 0xD5, 0xD3));
             GlobalNotify.OnSizeChange(height, width);
+        }
+
+        public void ChangeTheme(bool dark)
+        {
         }
 
         protected override void BgWorker_DoWork(object sender, DoWorkEventArgs e)

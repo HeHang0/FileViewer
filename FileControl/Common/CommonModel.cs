@@ -60,7 +60,7 @@ namespace FileViewer.FileControl.Common
             GlobalNotify.OnColorChange(color);
         }
 
-        public void OnFileChanged((string FilePath, FileExtension Ext) file)
+        public void ChangeFile((string FilePath, FileExtension Ext) file)
         {
             OnColorChanged(Color.FromRgb(0xA1, 0xD5, 0xD3));
             GlobalNotify.OnSizeChange(450, 800);
@@ -73,6 +73,10 @@ namespace FileViewer.FileControl.Common
             InitBackGroundWork();
             bgWorker.WorkerReportsProgress = true;
             bgWorker.RunWorkerAsync(file.FilePath);
+        }
+
+        public void ChangeTheme(bool dark)
+        {
         }
 
         protected override void BgWorker_DoWork(object sender, DoWorkEventArgs e)

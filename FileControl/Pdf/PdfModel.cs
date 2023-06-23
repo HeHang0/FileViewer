@@ -15,11 +15,14 @@ namespace FileViewer.FileControl.Pdf
 
         public string RealFilePath;
 
-        public void OnFileChanged((string FilePath, FileExtension Ext) file)
+        private FileExtension extension = FileExtension.None;
+
+        public void ChangeFile((string FilePath, FileExtension Ext) file)
         {
             if (RealFilePath != file.FilePath)
             {
                 RealFilePath = file.FilePath;
+                extension = file.Ext;
                 if (file.Ext == FileExtension.PDF)
                 {
                     PdfFilePath = file.FilePath;
@@ -32,9 +35,30 @@ namespace FileViewer.FileControl.Pdf
             GlobalNotify.OnLoadingChange(false);
         }
 
-        public void OnColorChanged(Color color)
+        public void ChangeTheme(bool dark)
         {
-            GlobalNotify.OnColorChange(color);
+            if (dark)
+            {
+                if (extension == FileExtension.PDF)
+                {
+                    GlobalNotify.OnColorChange(Color.FromRgb(0x33, 0x33, 0x33));
+                }
+                else
+                {
+                    GlobalNotify.OnColorChange(Color.FromRgb(0x1E, 0x1E, 0x1E));
+                }
+            }
+            else
+            {
+                if (extension == FileExtension.PDF)
+                {
+                    GlobalNotify.OnColorChange(Color.FromRgb(0xF7, 0xF7, 0xF7));
+                }
+                else
+                {
+                    GlobalNotify.OnColorChange(Color.FromRgb(0xFF, 0xFF, 0xFE));
+                }
+            }
         }
     }
 }

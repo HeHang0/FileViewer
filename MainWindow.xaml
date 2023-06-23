@@ -23,7 +23,7 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid Margin="0,29,0,0">
-        <myc:FileViewControl Margin="0" BorderThickness="0" DataContext="{Binding Path=FileInfo.FilePath}" IsVisibleChanged="FileViewControl_IsVisibleChanged" />
+        <myc:FileViewControl Background="{Binding FileInfo.BackgroundColor}" Margin="0" BorderThickness="0" DataContext="{Binding Path=FileInfo.FilePath}" IsVisibleChanged="FileViewControl_IsVisibleChanged" />
 
         <myc:Loading LoadCirclesMargin="200" LoadingText=""
                                  LoadingTextFontSize="8"

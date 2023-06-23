@@ -130,6 +130,7 @@
     <Compile Include="Globle\Utils.cs" />
     <Compile Include="Monitor\HotKey.cs" />
     <Compile Include="Monitor\KeyboardHook.cs" />
+    <Compile Include="Monitor\ThemeListener.cs" />
     <Compile Include="ViewModel\Eventer.cs" />
     <Compile Include="ViewModel\FileAccess.cs" />
     <Compile Include="ViewModel\Viewer.cs" />

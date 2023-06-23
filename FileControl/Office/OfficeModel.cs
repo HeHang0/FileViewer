@@ -15,12 +15,17 @@ namespace FileViewer.FileControl.Office
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void OnFileChanged((string FilePath, FileExtension Ext) file)
+        public void ChangeFile((string FilePath, FileExtension Ext) file)
         {
             ShowBrowser = false;
             InitBackGroundWork();
             bgWorker.RunWorkerAsync(file.FilePath);
             GlobalNotify.OnColorChange(Color.FromRgb(0xEE, 0xF5, 0xFD));
+        }
+
+        public void ChangeTheme(bool dark)
+        {
+
         }
 
         public IDocumentPaginatorSource OfficeContent { get; set; }
@@ -60,11 +65,6 @@ namespace FileViewer.FileControl.Office
             }
             ShowBrowser = true;
             GlobalNotify.OnLoadingChange(false);
-        }
-
-        public void OnColorChanged(Color color)
-        {
-            GlobalNotify.OnColorChange(color);
         }
 
         private bool ConvertOfficeToXps(string officeFilePath, string xpsFilePath)

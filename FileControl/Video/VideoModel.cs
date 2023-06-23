@@ -88,7 +88,7 @@ namespace FileViewer.FileControl.Video
             }
         }
 
-        public void OnFileChanged((string FilePath, FileExtension Ext) file)
+        public void ChangeFile((string FilePath, FileExtension Ext) file)
         {
             filePath = file.FilePath;
             StopCommand.Execute(null);
@@ -99,12 +99,11 @@ namespace FileViewer.FileControl.Video
                 mediaPlayer.Source = new Uri(filePath);
             }
             ControlsOpacity = 1;
-            OnColorChanged(Colors.Black);
+            GlobalNotify.OnColorChange(Colors.Black);
         }
 
-        public void OnColorChanged(Color color)
+        public void ChangeTheme(bool dark)
         {
-            GlobalNotify.OnColorChange(color);
         }
 
         public ICommand GridLoaded => new DelegateCommand<System.Windows.Controls.MediaElement>((player) => {

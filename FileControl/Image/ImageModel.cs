@@ -19,7 +19,7 @@ namespace FileViewer.FileControl.Image
         public event PropertyChangedEventHandler PropertyChanged;
         public ImageSource ThumbnailImage { get; private set; }
 
-        public void OnFileChanged((string FilePath, FileExtension Ext) file)
+        public void ChangeFile((string FilePath, FileExtension Ext) file)
         {
             try
             {
@@ -44,12 +44,11 @@ namespace FileViewer.FileControl.Image
             {
                 ShowThumbnail(GetDefaultThumbnail(file.FilePath));
             }
-            OnColorChanged(Colors.White);
+            GlobalNotify.OnColorChange(Colors.White);
         }
 
-        public void OnColorChanged(System.Windows.Media.Color color)
+        public void ChangeTheme(bool dark)
         {
-            GlobalNotify.OnColorChange(color);
         }
 
         public bool IsGif { get; private set; }

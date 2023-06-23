@@ -10,8 +10,12 @@ using FileViewer.FileControl.Text;
 using FileViewer.FileControl.Video;
 using FileViewer.FileHelper;
 using FileViewer.Globle;
+using FileViewer.Monitor;
+using Microsoft.Web.WebView2.Core;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -26,6 +30,8 @@ namespace FileViewer.FileControl
 
         private bool cloudflareOK = false;
 
+        private bool isWebView2Installed = false;
+
         public FileViewControl()
         {
             InitializeComponent();
@@ -33,6 +39,20 @@ namespace FileViewer.FileControl
             MyGrid.Children.Add(new HelloControl());
             GlobalNotify.FileLoadFailed += OnFileLoadFailed;
             cloudflareOK = Utils.CheckUrlOK("https://cdnjs.cloudflare.com");
+            new ThemeListener().ThemeChanged += OnThemeChanged;
+            CheckWebView2();
+        }
+
+        private async void CheckWebView2()
+        {
+            try
+            {
+                var webView2Environment = await CoreWebView2Environment.CreateAsync(userDataFolder: Path.Combine(Path.GetTempPath(), "WebView2"));
+                isWebView2Installed = webView2Environment != null;
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -73,14 +93,14 @@ namespace FileViewer.FileControl
                 controlInfo = (typeof(CommonControl), false);
             }
 
-            if(typeInfo.Type == FileViewType.Text && cloudflareOK)
+            if(cloudflareOK && isWebView2Installed && typeInfo.Type == FileViewType.Text)
             {
                 controlInfo.Type = typeof(PdfControl);
             }
 
             if(lastViewType == controlInfo.Type)
             {
-                (MyGrid.Children[0] as FileControl).OnFileChanged((filePath, typeInfo.Ext));
+                (MyGrid.Children[0] as FileControl).ChangeFile((filePath, typeInfo.Ext));
                 return;
             }
             lastViewType = controlInfo.Type;
@@ -95,7 +115,13 @@ namespace FileViewer.FileControl
         {
             MyGrid.Children.Add(fc);
             fc.Margin = new Thickness(0);
-            fc.OnFileChanged((filePath, ext));
+            fc.ChangeFile((filePath, ext));
+            fc.ChangeTheme(ThemeListener.IsDarkMode());
+        }
+
+        private void OnThemeChanged(bool isDark)
+        {
+            (MyGrid.Children[0] as FileControl).ChangeTheme(isDark);
         }
     }
 }

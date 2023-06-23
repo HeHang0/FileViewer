@@ -38,7 +38,6 @@ namespace FileViewer.FileControl.Pdf
             {
             }
             webView2.WebMessageReceived += WebMessageReceived;
-            webView2.NavigationCompleted += InjectTheme;
         }
 
         private void TextFileChanged()
@@ -95,25 +94,7 @@ namespace FileViewer.FileControl.Pdf
                 case "loaded":
                     ShowTextWithWebView2(_model.RealFilePath);
                     break;
-                case "theme-dark":
-                    _model.OnColorChanged(Color.FromRgb(0x1E, 0x1E, 0x1E));
-                    break;
-                case "theme-light":
-                    _model.OnColorChanged(Color.FromRgb(0xFF, 0xFF, 0xFE));
-                    break;
             }
-        }
-
-        private void InjectTheme(object sender, CoreWebView2NavigationCompletedEventArgs e)
-        {
-            string themeScript = @"
-const themeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-const message = dark => (dark ? 'theme-dark' : 'theme-light');
-window.chrome.webview?.postMessage(message(themeMediaQuery.matches));
-themeMediaQuery.addEventListener('change', function (ev) {
-  window.chrome.webview?.postMessage(message(ev.matches));
-});";
-            webView2.ExecuteScriptAsync(themeScript);
         }
 
         private void SetLoaderDllFolderPath(string webView2Path)

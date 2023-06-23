@@ -4,9 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" x:Name="root"
              mc:Ignorable="d" >
-    <UserControl.Background>
-        <SolidColorBrush Color="White" Opacity="0.4" ></SolidColorBrush>
-    </UserControl.Background>
     <Viewbox  Margin="{Binding LoadCirclesMargin,ElementName=root}"
             HorizontalAlignment="Center"  
             VerticalAlignment="Center">

@@ -20,9 +20,14 @@ namespace FileViewer.FileControl
         {
         }
 
-        public void OnFileChanged((string FilePath, FileExtension Ext) file)
+        public void ChangeFile((string FilePath, FileExtension Ext) file)
         {
-            model.OnFileChanged(file);
+            model.ChangeFile(file);
+        }
+
+        public void ChangeTheme(bool dark)
+        {
+            model.ChangeTheme(dark);
         }
     }
 }

@@ -71,7 +71,7 @@ namespace FileViewer.FileControl.Text
             set
             {
                 encodingSelected = value;
-                OnFileChanged(currentFilePath);
+                ChangeFile(currentFilePath);
             }
         }
 
@@ -88,7 +88,7 @@ namespace FileViewer.FileControl.Text
         };
 
         private (string FilePath, FileExtension Ext) currentFilePath;
-        public void OnFileChanged((string FilePath, FileExtension Ext) file)
+        public void ChangeFile((string FilePath, FileExtension Ext) file)
         {
             currentFilePath = file;
             if (file.Ext == FileExtension.TS || file.Ext == FileExtension.VUE)
@@ -103,7 +103,11 @@ namespace FileViewer.FileControl.Text
             InitBackGroundWork();
             bgWorker.RunWorkerAsync(file.FilePath);
             GlobalNotify.OnSizeChange(height, width);
-            OnColorChanged(Colors.White);
+            GlobalNotify.OnColorChange(Colors.White);
+        }
+
+        public void ChangeTheme(bool dark)
+        {
         }
 
         protected override void BgWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -152,11 +156,6 @@ namespace FileViewer.FileControl.Text
         {
             SetText((string)e.Result);
             GlobalNotify.OnLoadingChange(false);
-        }
-
-        public void OnColorChanged(Color color)
-        {
-            GlobalNotify.OnColorChange(color);
         }
     }
 }

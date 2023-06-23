@@ -35,19 +35,18 @@ namespace FileViewer.FileControl.Music
             defaultThumbnail = Utils.GetBitmapSource(Properties.Resources.cloundmusic.ToBitmap());
         }
 
-        public void OnFileChanged((string FilePath, FileExtension Ext) file)
+        public void ChangeFile((string FilePath, FileExtension Ext) file)
         {
             filePath = file.FilePath;
             StopCommand.Execute(null);
             GlobalNotify.OnLoadingChange(false);
             GlobalNotify.OnSizeChange(450, 500);
             SetThumbnailImage();
-            OnColorChanged(Colors.White);
+            GlobalNotify.OnColorChange(Colors.White);
         }
 
-        public void OnColorChanged(System.Windows.Media.Color color)
+        public void ChangeTheme(bool dark)
         {
-            GlobalNotify.OnColorChange(color);
         }
 
         private void SetThumbnailImage()
