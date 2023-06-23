@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Forms;
+using System.Threading;
+using System.Windows;
 
 namespace FileViewer.Monitor
 {
@@ -76,7 +76,7 @@ namespace FileViewer.Monitor
         {
             try
             {
-                (IntPtr activeWindowHandle, string processName, int explorerProcessId) = GetCurrentProcessInfo();
+                (IntPtr activeWindowHandle, string className) = GetCurrentProcessInfo();
                 if(activeWindowHandle == IntPtr.Zero)
                 {
                     return (false, string.Empty);
@@ -84,29 +84,41 @@ namespace FileViewer.Monitor
                 IntPtr shellWindowHandle = GetShellWindow();
                 GetWindowThreadProcessId(shellWindowHandle, out int shellProcessId);
                 dynamic shell = Activator.CreateInstance(Type.GetTypeFromProgID("Shell.Application"));
-                for (int i = 0; i < shell.Windows().Count; i++)
+                if(cabinetWClass == className)
                 {
-                    var window = shell.Windows().Item(i);
-                    if (window != null && (IntPtr)window.HWND == activeWindowHandle && window.Document != null)
+                    for (int i = 0; i < shell.Windows().Count; i++)
                     {
-                        bool isDesktop = (explorerProcessId == shellProcessId);
-                        Console.WriteLine(isDesktop ? "Desktop:" : "Explorer Window:");
-                        if (window.Document.SelectedItems().Count > 0)
+                        var window = shell.Windows().Item(i);
+                        if (window != null && (IntPtr)window.HWND == activeWindowHandle && window.Document != null)
                         {
-                            foreach (var item in window.Document.SelectedItems())
+                            if (window.Document.SelectedItems().Count > 0)
                             {
-                                return (true, item.Path);
+                                foreach (var item in window.Document.SelectedItems())
+                                {
+                                    return (true, item.Path);
+                                }
                             }
                         }
                     }
-                }
-
-                SendKeys.SendWait("^c");
-                DataObject data = new DataObject(OleGetClipboard());
-                var files = data.GetFileDropList();
-                if (files.Count == 1)
+                }else
                 {
-                    return (true, files[0].ToString());
+                    string filePath = string.Empty;
+                    RunAsSTA(() =>
+                    {
+                        var originalData = Clipboard.GetDataObject();
+                        System.Windows.Forms.SendKeys.SendWait("^c");
+                        Thread.Sleep(100);
+                        var files = Clipboard.GetFileDropList();
+                        Clipboard.SetDataObject(originalData, true);
+                        if (files.Count > 0)
+                        {
+                            filePath = files[0];
+                        }
+                    });
+                    if (!string.IsNullOrEmpty(filePath))
+                    {
+                        return (true, filePath);
+                    }
                 }
             }
             catch (Exception)
@@ -115,8 +127,24 @@ namespace FileViewer.Monitor
             return (false, string.Empty);
         }
 
-        static readonly string[] ExplorerClassNames = new string[] { "cabinetwclass", "workerw", "progman" };
-        static (IntPtr Hwnd, string ProcessName, int ProcessId) GetCurrentProcessInfo()
+        private static void RunAsSTA(Action threadStart)
+        {
+            try
+            {
+                Thread t = new Thread(new ThreadStart(threadStart));
+                t.SetApartmentState(ApartmentState.STA);
+                t.Start();
+                t.Join();
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        static readonly string cabinetWClass = "cabinetwclass";
+
+        static readonly string[] ExplorerClassNames = new string[] { cabinetWClass, "workerw", "progman" };
+        static (IntPtr, string) GetCurrentProcessInfo()
         {
             IntPtr myPtr = GetForegroundWindow();
             StringBuilder classNameSB = new StringBuilder(256);
@@ -124,14 +152,10 @@ namespace FileViewer.Monitor
             string className = classNameSB.ToString().ToLower();
             if(!ExplorerClassNames.Contains(className))
             {
-                return (IntPtr.Zero, string.Empty, 0);
+                return (IntPtr.Zero, string.Empty);
             }
 
-            int ProcessId = GetWindowThreadProcessId(myPtr, out int calcID);
-
-            Process myProcess = Process.GetProcessById(calcID);
-
-            return (myPtr, myProcess.ProcessName, ProcessId);
+            return (myPtr, className);
         }
 
         static (bool Ok, GUITHREADINFO GUIInfo) GetGUICursorStatus(int processId)
