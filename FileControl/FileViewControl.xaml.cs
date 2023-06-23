@@ -9,6 +9,7 @@ using FileViewer.FileControl.Pdf;
 using FileViewer.FileControl.Text;
 using FileViewer.FileControl.Video;
 using FileViewer.FileHelper;
+using FileViewer.Globle;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -21,7 +22,9 @@ namespace FileViewer.FileControl
     /// </summary>
     public partial class FileViewControl : UserControl
     {
-        private FileViewType lastViewType = FileViewType.None;
+        private Type lastViewType = null;
+
+        private bool cloudflareOK = false;
 
         public FileViewControl()
         {
@@ -29,6 +32,7 @@ namespace FileViewer.FileControl
             DataContextChanged += OnDataContextChanged;
             MyGrid.Children.Add(new HelloControl());
             GlobalNotify.FileLoadFailed += OnFileLoadFailed;
+            cloudflareOK = Utils.CheckUrlOK("https://cdnjs.cloudflare.com");
         }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -45,8 +49,7 @@ namespace FileViewer.FileControl
         private Dictionary<FileViewType, (Type Type, bool ResizeMode)> controlMapping = new Dictionary<FileViewType, (Type, bool)> 
         {
             [FileViewType.Image] = (typeof(ImageControl), true),
-            [FileViewType.Code] = (typeof(TextControl), true),
-            [FileViewType.Txt] = (typeof(TextControl), true),
+            [FileViewType.Text] = (typeof(TextControl), true),
             [FileViewType.Music] = (typeof(MusicControl), false),
             [FileViewType.Video] = (typeof(VideoControl), true),
             [FileViewType.Pdf] = (typeof(PdfControl), true),
@@ -65,39 +68,34 @@ namespace FileViewer.FileControl
             {
                 typeInfo.Type = FileViewType.None;
             }
-            if(lastViewType != typeInfo.Type || MyGrid.Children[0] is HelloControl)
+            if(!controlMapping.TryGetValue(typeInfo.Type, out var controlInfo))
             {
-                lastViewType = typeInfo.Type;
-                MyGrid.Children.Clear();
+                controlInfo = (typeof(CommonControl), false);
             }
-            else if(MyGrid.Children.Count == 1)
+
+            if(typeInfo.Type == FileViewType.Text && cloudflareOK)
+            {
+                controlInfo.Type = typeof(PdfControl);
+            }
+
+            if(lastViewType == controlInfo.Type)
             {
                 (MyGrid.Children[0] as FileControl).OnFileChanged((filePath, typeInfo.Ext));
                 return;
             }
+            lastViewType = controlInfo.Type;
+            MyGrid.Children.Clear();
+            FileControl fc = (FileControl)Activator.CreateInstance(controlInfo.Type);
 
-            FileControl fc;
-            bool resizeMode;
-            if (controlMapping.TryGetValue(typeInfo.Type, out var controlInfo))
-            {
-                fc = (FileControl)Activator.CreateInstance(controlInfo.Type);
-                resizeMode = controlInfo.ResizeMode;
-            }
-            else
-            {
-                fc = new CommonControl();
-                resizeMode = false;
-            }
-
-            GlobalNotify.OnResizeMode(resizeMode);
+            GlobalNotify.OnResizeMode(controlInfo.ResizeMode);
             if (fc != null) LoadFile(fc, filePath, typeInfo.Ext);
         }
 
         private void LoadFile(FileControl fc, string filePath, FileExtension ext)
         {
+            MyGrid.Children.Add(fc);
             fc.Margin = new Thickness(0);
             fc.OnFileChanged((filePath, ext));
-            MyGrid.Children.Add(fc);
         }
     }
 }

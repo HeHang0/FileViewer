@@ -1,8 +1,14 @@
-﻿using Microsoft.Web.WebView2.Core;
+﻿using ApkReader;
+using Microsoft.Web.WebView2.Core;
 using System;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Xml;
+using FileViewer.Globle;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Media;
 
 namespace FileViewer.FileControl.Pdf
 {
@@ -11,10 +17,12 @@ namespace FileViewer.FileControl.Pdf
     /// </summary>
     public partial class PdfControl : FileControl
     {
+        private PdfModel _model => (PdfModel)model;
         public PdfControl():base(new PdfModel())
         {
             var webView2Path = Path.Combine(Path.GetTempPath(), "WebView2");
             SetLoaderDllFolderPath(webView2Path);
+            _model.TextFileChanged += TextFileChanged;
             InitializeComponent();
             InitWebView2(webView2Path);
         }
@@ -29,6 +37,83 @@ namespace FileViewer.FileControl.Pdf
             catch (Exception)
             {
             }
+            webView2.WebMessageReceived += WebMessageReceived;
+            webView2.NavigationCompleted += InjectTheme;
+        }
+
+        private void TextFileChanged()
+        {
+            var htmlPath = Path.Combine(Path.GetTempPath(), "WebView2", "monaco_editor.html");
+            if (!File.Exists(htmlPath))
+            {
+                File.WriteAllText(htmlPath, Properties.Resources.monaco_editor);
+            }
+            if(_model.PdfFilePath == htmlPath)
+            {
+                ShowTextWithWebView2(_model.RealFilePath);
+            }
+            else
+            {
+                _model.PdfFilePath = htmlPath;
+            }
+        }
+
+        private static readonly long MAX_Text_LENGTH = 10485760;
+        private void ShowTextWithWebView2(string filePath)
+        {
+            webView2.CoreWebView2.PostWebMessageAsJson($"{{\"message\": \"extension\",\"value\": \"{Path.GetExtension(filePath)}\"}}");
+            string content;
+            var fileInfo = new FileInfo(filePath);
+            var buffer = new char[Math.Min(MAX_Text_LENGTH, fileInfo.Length)];
+
+            using (StreamReader st = new StreamReader(filePath, Encoding.Default))
+            {
+                int length = st.ReadBlock(buffer, 0, buffer.Length);
+                content = new string(buffer.Take(length).ToArray());
+            }
+            if (Path.GetFileName(filePath).ToLower() == "androidmanifest.xml" && !content.TrimStart().StartsWith("<"))
+            {
+                using (FileStream stream = File.OpenRead(filePath))
+                {
+                    XmlDocument xmlDocument = BinaryXmlConvert.ToXmlDocument(stream);
+                    content = xmlDocument.OuterXmlFormat();
+                }
+            }
+            Dictionary<string, string> data = new Dictionary<string, string>()
+            {
+                { "message", "text" },
+                { "value", content }
+            };
+            webView2.CoreWebView2.PostWebMessageAsJson(Encoding.UTF8.GetString(System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(data)));
+        }
+
+        private void WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
+        {
+            var message = e.TryGetWebMessageAsString();
+            switch (message)
+            {
+                case "loaded":
+                    ShowTextWithWebView2(_model.RealFilePath);
+                    break;
+                case "theme-dark":
+                    _model.OnColorChanged(Color.FromRgb(0x1E, 0x1E, 0x1E));
+                    break;
+                case "theme-light":
+                    _model.OnColorChanged(Color.FromRgb(0xFF, 0xFF, 0xFE));
+                    break;
+            }
+        }
+
+        private void InjectTheme(object sender, CoreWebView2NavigationCompletedEventArgs e)
+        {
+            string themeScript = @"
+const themeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+const message = dark => (dark ? 'theme-dark' : 'theme-light');
+window.chrome.webview?.postMessage(message(themeMediaQuery.matches));
+themeMediaQuery.addEventListener('change', function (ev) {
+  window.chrome.webview?.postMessage(message(ev.matches));
+});";
+            webView2.ExecuteScriptAsync(themeScript);
         }
 
         private void SetLoaderDllFolderPath(string webView2Path)

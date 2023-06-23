@@ -70,7 +70,7 @@ namespace FileViewer.FileHelper
                 case FileExtension.KT:
                 case FileExtension.PHP:
                 case FileExtension.TS:
-                    type = FileViewType.Code;
+                    type = FileViewType.Text;
                     break;
                 case FileExtension.MP3:
                 case FileExtension.WMA:
@@ -140,7 +140,7 @@ namespace FileViewer.FileHelper
             }
             else if (mime.StartsWith("text"))
             {
-                type = FileViewType.Txt;
+                type = FileViewType.Text;
             }else
             {
                 FileInfo fileInfo = new FileInfo(filePath);
@@ -150,7 +150,7 @@ namespace FileViewer.FileHelper
                 }
                 else if(fileInfo.Length < 10 * 1024 * 1024 && !IsBinary(ReadFirstBytes(filePath)))
                 {
-                    type = FileViewType.Txt;
+                    type = FileViewType.Text;
                 }
             }
             return (type, ext);
@@ -211,7 +211,7 @@ namespace FileViewer.FileHelper
 
     public enum FileViewType
     {
-        Image, Code, Txt, Music, Video, Word, Excel, PowerPoint, Pdf, Folder, MobileProvision, App, None
+        Image, Text, Music, Video, Word, Excel, PowerPoint, Pdf, Folder, MobileProvision, App, None
     }
 
     public enum FileExtension

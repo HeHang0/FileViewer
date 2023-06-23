@@ -111,6 +111,38 @@ namespace FileViewer.Properties {
         }
         
         /// <summary>
+        ///   查找类似 &lt;!DOCTYPE html&gt;
+        ///&lt;html&gt;
+        ///  &lt;head&gt;
+        ///    &lt;meta charset=&quot;UTF-8&quot; /&gt;
+        ///    &lt;title&gt;Monaco Editor Sample&lt;/title&gt;
+        ///    &lt;style&gt;
+        ///      html,
+        ///      body {
+        ///        margin: 0;
+        ///        padding: 0;
+        ///        overflow: hidden;
+        ///      }
+        ///      ::-webkit-scrollbar {
+        ///        width: 8px;
+        ///        height: 8px;
+        ///      }
+        ///      ::-webkit-scrollbar-thumb {
+        ///        background-color: #acadae;
+        ///        border-radius: 4px;
+        ///      }
+        ///      ::-webkit-scrollbar-thumb:hover {
+        ///        background-color: #7b7c7c;
+        ///      }
+        ///    &lt;/style&gt;        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string monaco_editor {
+            get {
+                return ResourceManager.GetString("monaco_editor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
         internal static System.Drawing.Bitmap preview {

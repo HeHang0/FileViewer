@@ -1,22 +1,18 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Interop;
-using System.Windows.Media;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using PListNet;
 using System.Xml;
-using System.Windows.Controls;
 using FileViewer.FileHelper.IcnsParser;
-using System.Drawing.Imaging;
+using System.Net.Http;
 
 namespace FileViewer.Globle
 {
@@ -269,6 +265,23 @@ namespace FileViewer.Globle
         public static Bitmap GetIcnsMax(string icnsPath)
         {
             return IcnsImageParser.GetImages(icnsPath).OrderByDescending(m => m.Bitmap.Height).FirstOrDefault().Bitmap;
+        }
+
+        public static bool CheckUrlOK(string url)
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromSeconds(1);
+                    var response = client.SendAsync(new HttpRequestMessage(HttpMethod.Head, url)).Result;
+                    return response.IsSuccessStatusCode;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }
