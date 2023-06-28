@@ -127,6 +127,7 @@ namespace FileViewer
         private void Show(object sender, EventArgs e)
         {
             Show();
+            Activate();
         }
 
         private void ExitApp(object sender, EventArgs e)
