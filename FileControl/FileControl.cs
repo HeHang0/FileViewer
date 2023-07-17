@@ -22,12 +22,12 @@ namespace FileViewer.FileControl
 
         public void ChangeFile((string FilePath, FileExtension Ext) file)
         {
-            model.ChangeFile(file);
+            model?.ChangeFile(file);
         }
 
         public void ChangeTheme(bool dark)
         {
-            model.ChangeTheme(dark);
+            model?.ChangeTheme(dark);
         }
     }
 }

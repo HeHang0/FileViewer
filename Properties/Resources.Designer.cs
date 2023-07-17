@@ -134,7 +134,8 @@ namespace FileViewer.Properties {
         ///      ::-webkit-scrollbar-thumb:hover {
         ///        background-color: #7b7c7c;
         ///      }
-        ///    &lt;/style&gt;        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///    &lt;/style&gt;
+        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string monaco_editor {
             get {

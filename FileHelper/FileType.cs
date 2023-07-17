@@ -18,6 +18,10 @@ namespace FileViewer.FileHelper
                 {
                     return ext;
                 }
+                if(Path.GetExtension(filePath).ToUpper() == ".7Z")
+                {
+                    return FileExtension.SEVENZIP;
+                }
             }
             else if (Directory.Exists(filePath))
             {
@@ -102,6 +106,13 @@ namespace FileViewer.FileHelper
                     break;
                 case FileExtension.Folder:
                     type = FileViewType.Folder;
+                    break;
+                case FileExtension.ZIP:
+                case FileExtension.RAR:
+                case FileExtension.TAR:
+                case FileExtension.GZ:
+                case FileExtension.SEVENZIP:
+                    type = FileViewType.Compressed;
                     break;
                 case FileExtension.APK:
                 case FileExtension.IPA:
@@ -211,7 +222,7 @@ namespace FileViewer.FileHelper
 
     public enum FileViewType
     {
-        Image, Text, Music, Video, Word, Excel, PowerPoint, Pdf, Folder, MobileProvision, App, None
+        Image, Text, Music, Video, Word, Excel, PowerPoint, Pdf, Compressed, Folder, MobileProvision, App, None
     }
 
     public enum FileExtension
@@ -281,6 +292,9 @@ namespace FileViewer.FileHelper
         APK,
         IPA,
         APP,
-        ICNS
+        ICNS,
+        TAR,
+        GZ,
+        SEVENZIP
     }
 }
