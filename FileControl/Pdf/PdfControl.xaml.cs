@@ -65,7 +65,7 @@ namespace FileViewer.FileControl.Pdf
             var fileInfo = new FileInfo(filePath);
             var buffer = new char[Math.Min(MAX_Text_LENGTH, fileInfo.Length)];
 
-            using (StreamReader st = new StreamReader(filePath, Encoding.Default))
+            using (StreamReader st = new StreamReader(filePath, true))
             {
                 int length = st.ReadBlock(buffer, 0, buffer.Length);
                 content = new string(buffer.Take(length).ToArray());
@@ -113,18 +113,24 @@ namespace FileViewer.FileControl.Pdf
             {
                 return;
             }
-            File.WriteAllText(architecturePath, architectureName);
-            switch (architecture)
+            try
             {
-                case Architecture.X86:
-                    File.WriteAllBytes(loaderPath, Properties.Resources.WebView2Loader_x86);
-                    break;
-                case Architecture.X64:
-                    File.WriteAllBytes(loaderPath, Properties.Resources.WebView2Loader_x64);
-                    break;
-                case Architecture.Arm64:
-                    File.WriteAllBytes(loaderPath, Properties.Resources.WebView2Loader_arm64);
-                    break;
+                File.WriteAllText(architecturePath, architectureName);
+                switch (architecture)
+                {
+                    case Architecture.X86:
+                        File.WriteAllBytes(loaderPath, Properties.Resources.WebView2Loader_x86);
+                        break;
+                    case Architecture.X64:
+                        File.WriteAllBytes(loaderPath, Properties.Resources.WebView2Loader_x64);
+                        break;
+                    case Architecture.Arm64:
+                        File.WriteAllBytes(loaderPath, Properties.Resources.WebView2Loader_arm64);
+                        break;
+                }
+            }
+            catch (Exception)
+            {
             }
         }
     }

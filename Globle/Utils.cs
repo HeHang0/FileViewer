@@ -273,7 +273,7 @@ namespace FileViewer.Globle
             {
                 using (var client = new HttpClient())
                 {
-                    client.Timeout = TimeSpan.FromSeconds(1);
+                    client.Timeout = TimeSpan.FromSeconds(5);
                     var response = client.SendAsync(new HttpRequestMessage(HttpMethod.Head, url)).Result;
                     return response.IsSuccessStatusCode;
                 }

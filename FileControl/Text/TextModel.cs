@@ -26,11 +26,6 @@ namespace FileViewer.FileControl.Text
             textEditor = editor;
             SetText(textTmp);
         });
-        public ICommand Load10Rows => new DelegateCommand<TextEditor>((editor) => {
-            textEditor = editor;
-            SetText(textTmp);
-        });
-        public bool ShowLoad10Rows { get; set; }
 
         private string textTmp = "";
         private void SetText(string text)
@@ -43,12 +38,12 @@ namespace FileViewer.FileControl.Text
                     SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(".xml");
                 }
 
-                textEditor.Text = text;
+                textEditor.Text = text + "\n";
                 textTmp = "";
             }
             else
             {
-                textTmp = text;
+                textTmp = text + "\n";
             }
         }
 
@@ -61,32 +56,6 @@ namespace FileViewer.FileControl.Text
         private readonly double height = SystemParameters.WorkArea.Height / 2;
         private readonly double width = SystemParameters.WorkArea.Width / 2;
 
-        private Encoding encodingSelected = Encoding.UTF8;
-        public Encoding EncodeSelected
-        {
-            get
-            {
-                return encodingSelected;
-            }
-            set
-            {
-                encodingSelected = value;
-                ChangeFile(currentFilePath);
-            }
-        }
-
-        public Dictionary<string, Encoding> EncodeList => new Dictionary<string, Encoding>()
-        {
-            {"ASCII", Encoding.ASCII},
-            {"Default", Encoding.Default},
-            {"Unicode", Encoding.Unicode},
-            {"UTF8", Encoding.UTF8},
-            {"GB2312", Encoding.GetEncoding("GB2312")},
-            {"UTF32", Encoding.UTF32},
-            {"BigEndianUnicode", Encoding.BigEndianUnicode},
-            {"UTF7", Encoding.ASCII}
-        };
-
         private (string FilePath, FileExtension Ext) currentFilePath;
         public void ChangeFile((string FilePath, FileExtension Ext) file)
         {
@@ -97,7 +66,7 @@ namespace FileViewer.FileControl.Text
             }
             else
             {
-                SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension("." + file.Ext.ToString().ToLower());
+                SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(Path.GetExtension(file.FilePath));
             }
 
             InitBackGroundWork();
@@ -115,7 +84,7 @@ namespace FileViewer.FileControl.Text
             var filePath = (string)e.Argument;
             try
             {
-                using (StreamReader st = new StreamReader(filePath, encodingSelected))
+                using (StreamReader st = new StreamReader(filePath, true))
                 {
                     StringBuilder sb = new StringBuilder();
                     string str = "";
