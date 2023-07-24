@@ -70,8 +70,7 @@ namespace FileViewer.Monitor
             public IntPtr hwndCaret;
             public RECT rectCaret;
         }
-        static string desktopFolder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-        static readonly string EXPLORER = "explorer";
+
         public static (bool Ok, string FilePath) GetCurrentFilePath()
         {
             try

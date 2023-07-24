@@ -10,21 +10,16 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <avalonEdit:TextEditor
-            Name="codeEditor"
+        <avalonEdit:TextEditor Background="{Binding Background}"
             ShowLineNumbers="True"
             WordWrap="True"
             SyntaxHighlighting="{Binding SyntaxHighlighting}"
             FontFamily="Consolas"
             FontSize="10pt"
             IsReadOnly="True"
+            Document="{Binding Document}"
             HorizontalScrollBarVisibility="Auto"
             VerticalScrollBarVisibility="Auto">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="Loaded">
-                    <i:InvokeCommandAction Command="{Binding Path=Loaded}" CommandParameter="{Binding ElementName=codeEditor}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
         </avalonEdit:TextEditor>
     </Grid>
 </fc:FileControl>

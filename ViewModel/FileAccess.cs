@@ -189,7 +189,7 @@ namespace FileViewer.ViewModel
                 }
                 catch (System.Exception e)
                 {
-                    MessageBox.Show(Application.Current.MainWindow, e.Message, "提示");
+                    //MessageBox.Show(Application.Current.MainWindow, e.Message, "提示");
                 }
             }
         });
