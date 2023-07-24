@@ -1,0 +1,48 @@
+<UserControl x:Class="FileViewer.Plugins.Media.MediaControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:converter="clr-namespace:FileViewer.Base.Converter;assembly=FileViewer.Base"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:local="clr-namespace:FileViewer.Plugins.Media"
+    mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <sys:Double x:Key="SliderOutsideTickBarThemeHeight">8</sys:Double>
+        <sys:Double x:Key="SliderHorizontalHeight">45</sys:Double>
+        <sys:Double x:Key="SliderHorizontalThumbWidth">10</sys:Double>
+        <sys:Double x:Key="SliderHorizontalThumbHeight">10</sys:Double>
+        <CornerRadius x:Key="SliderTrackCornerRadius">0</CornerRadius>
+        <converter:TimespanToDoubleConverter x:Key="TimespanToDouble" />
+        <converter:DurationToDoubleConverter x:Key="DurationToDouble" />
+        <converter:TimespanToStringConverter x:Key="TimespanToString" />
+        <converter:DurationToStringConverter x:Key="DurationToString" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibility"/>
+    </UserControl.Resources>
+    <Grid Background="#01000000">
+        <MediaElement Name="MediaPlayer" LoadedBehavior="Manual"/>
+        <Label x:Name="MusicLabel" Content="&#x1F3B6;" FontFamily="Segoe UI Emoji" VerticalContentAlignment="Center" HorizontalAlignment="Center" FontSize="120" Opacity="0"/>
+        <Grid Height="60" VerticalAlignment="Bottom" Name="ControlPannel" Opacity="1">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="0.5">
+                    <GradientStop Color="Transparent" Offset="0"/>
+                    <GradientStop Color="{DynamicResource SystemAltMediumHighColor}" Offset="1"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+            <ProgressBar Height="2" VerticalAlignment="Top" x:Name="MediaProgress1" Margin="0,20,0,0"/>
+            <Slider VerticalAlignment="Top" Margin="0,5,0,0" IsMoveToPointEnabled="True" x:Name="MediaProgress" Cursor="Hand"
+                    MouseLeftButtonUp="MediaProgress_MouseLeftButtonUp" PreviewMouseLeftButtonUp="MediaProgress_MouseLeftButtonDown"
+                    Thumb.DragStarted="MediaProgress_DragStarted" Thumb.DragCompleted="MediaProgress_DragCompleted" Height="22"></Slider>
+            <Label x:Name="CurrentTime"
+                   VerticalAlignment="Bottom" Margin="10 0 0 0" HorizontalAlignment="Left" Width="100" Height="38" VerticalContentAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,10,0" HorizontalAlignment="Right" Height="38" VerticalAlignment="Bottom">
+                <Label x:Name="MuteButton" FontFamily="Segoe UI Emoji" FontSize="18" Margin="0 0 10 0" VerticalContentAlignment="Center" MouseLeftButtonUp="MuteButton_MouseLeftButtonUp" Background="#01FFFFFF"
+                   VerticalAlignment="Center" HorizontalAlignment="Right" Width="NaN" HorizontalContentAlignment="Right" Height="38" Cursor="Hand"/>
+                <Label x:Name="TotalTime" VerticalContentAlignment="Center"
+                   VerticalAlignment="Center" Width="NaN" HorizontalContentAlignment="Right" Height="38"/>
+            </StackPanel>
+            <Label x:Name="PlayButton" FontFamily="Segoe UI Emoji" FontSize="20" MouseUp="SwitchPlayState" Cursor="Hand" VerticalContentAlignment="Center" Margin="0,27,0,5" 
+                   HorizontalAlignment="Center" Width="25" HorizontalContentAlignment="Center"/>
+        </Grid>
+    </Grid>
+</UserControl>

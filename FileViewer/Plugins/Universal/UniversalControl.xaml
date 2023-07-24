@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="FileViewer.Plugins.Universal.UniversalControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FileViewer.Plugins.Universal"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:Universal}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.3*"></ColumnDefinition>
+            <ColumnDefinition Width="80"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Image Grid.ColumnSpan="3" Source="{Binding HelloBack}" Stretch="Fill" />
+        <Image Source="{Binding Path=ThumbnailImage}" Stretch="Uniform" Margin="50,75"/>
+        <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Label Content="" FontWeight="Bold" FontSize="18" Margin="0 5"/>
+            <Label Content="大小"  FontSize="16" Margin="0 5"/>
+            <Label Content="创建时间"  FontSize="16" Margin="0 5"/>
+            <Label Content="修改时间"  FontSize="16" Margin="0 5"/>
+        </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Label Content="" FontWeight="Bold" FontSize="18" Margin="0 5"/>
+            <Label Content="{Binding Size}"  FontSize="16" Margin="0 5"/>
+            <Label Content="{Binding CreateTime}"  FontSize="16" Margin="0 5"/>
+            <Label Content="{Binding ModifyTime}"  FontSize="16" Margin="0 5"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Grid.ColumnSpan="2" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Label x:Name="LabelName" ToolTip="{Binding Name}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 5 20 5">
+                <TextBlock FontWeight="Bold" FontSize="18" Text="{Binding Name}"
+                           TextTrimming="CharacterEllipsis" HorizontalAlignment="Left"
+                           Foreground="{Binding ElementName=LabelName, Path=Foreground}"/>
+            </Label>
+            <Label Content=""  FontSize="16" Margin="0 5"/>
+            <Label Content=""  FontSize="16" Margin="0 5"/>
+            <Label Content=""  FontSize="16" Margin="0 5"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

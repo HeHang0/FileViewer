@@ -40,11 +40,15 @@
 
 ![Image](Demo/image.png)
 
-### Pdf
+#### Music
 
-![Pdf](Demo/pdf.png)
+![Music](Demo/music.png)
 
-### Office
+#### Movie
+
+![Movie](Demo/movie.png)
+
+### Word
 
 ![Word](Demo/word.png)
 

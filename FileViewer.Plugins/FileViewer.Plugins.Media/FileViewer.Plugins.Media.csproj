@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <BaseOutputPath>..\..\FileViewer\bin</BaseOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\FileViewer.Base\FileViewer.Base.csproj" />
+    <ProjectReference Include="..\..\FileViewer.Tools\FileViewer.Tools.csproj" />
+  </ItemGroup>
+
+</Project>

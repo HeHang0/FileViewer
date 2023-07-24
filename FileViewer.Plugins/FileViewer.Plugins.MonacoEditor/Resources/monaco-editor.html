@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Monaco Editor Sample</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: #acadae;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: #7b7c7c;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container" style="width: 100vw; height: 100vh"></div>
+
+    <!-- Load the Monaco Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
+    <script>
+      require.config({
+        paths: {
+          vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs'
+        }
+      });
+      let editor;
+      const darkModeMediaQuery = window.matchMedia(
+        '(prefers-color-scheme: dark)'
+      );
+      const languageMatch = { '.xsd': 'xml', '.sln': 'vb' };
+      require(['vs/editor/editor.main'], function () {
+        editor = monaco.editor.create(document.getElementById('container'), {
+          language: 'plaintext',
+          readOnly: true,
+          automaticLayout: true,
+          wordWrap: 'on',
+          theme: darkModeMediaQuery.matches ? 'vs-dark' : 'vs'
+        });
+        const languages = monaco.languages.getLanguages();
+        languages.map(m => {
+          Array.isArray(m.extensions) &&
+            m.extensions.map(ext => {
+              languageMatch[ext.toLowerCase()] = m.id;
+            });
+        });
+        window.chrome.webview?.postMessage('loaded');
+      });
+      darkModeMediaQuery.addEventListener('change', function (ev) {
+        monaco && monaco.editor.setTheme(ev.matches ? 'vs-dark' : 'vs');
+      });
+      window.chrome.webview?.addEventListener('message', event => {
+        let data = event.data;
+        switch (data.message) {
+          case 'extension':
+            editor &&
+              monaco.editor.setModelLanguage(
+                editor.getModel(),
+                languageMatch[data.value] || 'plaintext'
+              );
+            break;
+          case 'text':
+            editor && editor.getModel().setValue(data.value);
+            break;
+        }
+      });
+    </script>
+  </body>
+</html>

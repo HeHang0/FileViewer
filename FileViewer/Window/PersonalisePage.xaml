@@ -1,0 +1,39 @@
+﻿<Page x:Class="FileViewer.PersonalisePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:local="clr-namespace:FileViewer"
+    mc:Ignorable="d" 
+    d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel Orientation="Vertical" Margin="20 0 0 0">
+        <Label FontWeight="Bold" FontSize="20">
+            主题
+        </Label>
+        <Label Margin="0 10 0 0">
+            选择应用的主题。这不会影响你的Windows主题。
+        </Label>
+        <ui:RadioButtons x:Name="SelectedTheme" SelectionChanged="OnThemeSelectionChanged">
+            <!-- A RadioButton group. -->
+            <RadioButton x:Name="ThemeLightMode" Content="浅色" Tag="Light"/>
+            <RadioButton x:Name="ThemeDarkMode" Content="深色" Tag="Dark"/>
+            <RadioButton x:Name="ThemeSystemMode" Content="使用 Windows 设置" />
+        </ui:RadioButtons>
+        <Button Margin="0 10 0 0" Padding="0" Background="Transparent" Click="OpenSystemTheme" Cursor="Hand">
+            <TextBlock Text="在 Windows 设置中更改颜色" 
+                       Padding="11,5,11,6" TextDecorations="Underline"
+                       Foreground="{DynamicResource SystemAccentColorDark1Brush}">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="TextDecorations" Value="None" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Button>
+    </StackPanel>
+</Page>

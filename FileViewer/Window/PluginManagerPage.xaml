@@ -1,0 +1,108 @@
+﻿<Page x:Class="FileViewer.PluginManagerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:converter="clr-namespace:FileViewer.Base.Converter;assembly=FileViewer.Base"
+    xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
+    xmlns:local="clr-namespace:FileViewer"
+    mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:PluginManager}"
+    d:DesignHeight="450" d:DesignWidth="800" x:Name="PluginWindow"
+    Title="PluginManagerPage">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding Path=SaveCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Page.Resources>
+        <converter:DecreaseValueConverter x:Key="DecreaseValue" />
+        <converter:BoolToStrikethroughConverter x:Key="BoolToStrikethrough" />
+    </Page.Resources>
+    <ui:ListView x:Name="PluginList" ItemsSource="{Binding Plugins}" IsSelectionEnabled="False"
+                     dd:DragDrop.IsDragSource="True" VirtualizingStackPanel.IsVirtualizing="True"
+                     dd:DragDrop.IsDropTarget="True" VirtualizingStackPanel.VirtualizationMode="Recycling"
+                     VirtualizingPanel.ScrollUnit="Pixel">
+        <ui:ListView.ItemTemplate>
+            <DataTemplate>
+                <Grid x:Name="PluginGrid" Margin="0 5" AllowDrop="True" Background="#01000000"
+                          Width="{Binding ElementName=PluginWindow, Path=ActualWidth, Converter={StaticResource DecreaseValue},ConverterParameter=20}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Drop">
+                            <i:InvokeCommandAction Command="{Binding Path=DropFile}" PassEventArgsToCommand="true"/>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="PreviewDragOver">
+                            <i:InvokeCommandAction Command="{Binding Path=DragOver}" PassEventArgsToCommand="true"/>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseLeftButtonUp">
+                            <i:InvokeCommandAction Command="{Binding Path=SwitchExpand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="68" />
+                    </Grid.ColumnDefinitions>
+                    <Image Source="{Binding Icon, Mode=OneWay}"
+                           MaxHeight="100" Stretch="Uniform" VerticalAlignment="Center"/>
+
+                    <StackPanel Margin="20,10,0,0" Grid.Column="1" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Left"
+                                    Margin="0,0,0,6">
+                            <TextBlock Text="{Binding PluginName, Mode=OneWay}"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                LineHeight="20" />
+                            <Border CornerRadius="5" ToolTip="{Binding DllPath}" Background="{Binding PluginTypeColor}" Padding="5 0" Height="18" Margin="10 0 0 0">
+                                <Label Content="{Binding PluginTypeText}" FontSize="12" Foreground="Black" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBlock
+                                Text="{Binding Description, Mode=OneWay}"
+                                FontFamily="Segoe UI"
+                                FontWeight="Normal"
+                                TextTrimming="CharacterEllipsis"
+                                Width="NaN"
+                                TextWrapping="Wrap" />
+                        <Expander Margin="0 10 0 0"
+                                Header="Extensions"
+                                ExpandDirection="Down"
+                                IsExpanded="{Binding IsExpanded}">
+                            <ui:GridView ItemsSource="{Binding Extensions, Mode=OneWay}" IsSelectionEnabled="False">
+
+                                <ui:GridView.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ExtensionName}"
+                                                       TextDecorations="{Binding IsEnabled, Converter={StaticResource BoolToStrikethrough}}">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="MouseLeftButtonUp">
+                                                        <i:InvokeCommandAction Command="{Binding Path=SwitchEnabled}" PassEventArgsToCommand="True"/>
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </ui:GridView.ItemTemplate>
+                                <ui:GridView.ItemContainerStyle>
+                                    <Style TargetType="ui:GridViewItem">
+                                        <Setter Property="Margin" Value="0" />
+                                    </Style>
+                                </ui:GridView.ItemContainerStyle>
+
+                                <ui:GridView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ui:GridView.ItemsPanel>
+                            </ui:GridView>
+                        </Expander>
+                    </StackPanel>
+                    <ui:AppBarToggleButton VerticalAlignment="Center" Grid.Column="2" Icon="World"
+                                           LabelPosition="Default" IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                           Label="{Binding EnabledText}" VerticalContentAlignment="Center"/>
+                </Grid>
+            </DataTemplate>
+        </ui:ListView.ItemTemplate>
+    </ui:ListView>
+</Page>
