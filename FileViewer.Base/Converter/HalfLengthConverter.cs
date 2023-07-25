@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace FileViewer.Base.Converter
 {
-    internal class HalfLengthConverter : IValueConverter
+    public class HalfLengthConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

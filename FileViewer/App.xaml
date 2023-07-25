@@ -2,6 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ui="http://schemas.modernwpf.com/2019"
+            xmlns:converter="clr-namespace:FileViewer.Base.Converter;assembly=FileViewer.Base"
              xmlns:local="clr-namespace:FileViewer"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
@@ -10,6 +11,15 @@
                 <ui:ThemeResources />
                 <ui:XamlControlsResources />
             </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibility"/>
+            <converter:PixelsToGridLengthConverter x:Key="PixelsToGridLength" />
+            <converter:HalfLengthConverter x:Key="HalfLength" />
+            <converter:DecreaseValueConverter x:Key="DecreaseValue" />
+            <converter:BoolToStrikethroughConverter x:Key="BoolToStrikethrough" />
+            <converter:TimespanToDoubleConverter x:Key="TimespanToDouble" />
+            <converter:DurationToDoubleConverter x:Key="DurationToDouble" />
+            <converter:TimespanToStringConverter x:Key="TimespanToString" />
+            <converter:DurationToStringConverter x:Key="DurationToString" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

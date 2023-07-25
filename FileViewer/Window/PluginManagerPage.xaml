@@ -5,7 +5,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-    xmlns:converter="clr-namespace:FileViewer.Base.Converter;assembly=FileViewer.Base"
     xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
     xmlns:local="clr-namespace:FileViewer"
     mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:PluginManager}"
@@ -16,10 +15,6 @@
             <i:InvokeCommandAction Command="{Binding Path=SaveCommand}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Page.Resources>
-        <converter:DecreaseValueConverter x:Key="DecreaseValue" />
-        <converter:BoolToStrikethroughConverter x:Key="BoolToStrikethrough" />
-    </Page.Resources>
     <ui:ListView x:Name="PluginList" ItemsSource="{Binding Plugins}" IsSelectionEnabled="False"
                      dd:DragDrop.IsDragSource="True" VirtualizingStackPanel.IsVirtualizing="True"
                      dd:DragDrop.IsDropTarget="True" VirtualizingStackPanel.VirtualizationMode="Recycling"

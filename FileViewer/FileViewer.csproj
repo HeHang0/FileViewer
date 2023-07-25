@@ -20,6 +20,9 @@
   <ItemGroup>
     <Compile Remove="Style\RoundedContextMenuStrip.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Window\NavigationViewItem.cs1" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="Resources\logo.ico" />

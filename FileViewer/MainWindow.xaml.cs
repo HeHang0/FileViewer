@@ -42,7 +42,6 @@ namespace FileViewer
             Closing += OnClosing;
             InitNotify();
             InitHello();
-
             DependencyPropertyDescriptor desc = DependencyPropertyDescriptor.FromProperty(ThemeManager.ActualApplicationThemeProperty, ThemeManager.Current.GetType());
             desc.AddValueChanged(ThemeManager.Current, OnThemeChanged);
         }

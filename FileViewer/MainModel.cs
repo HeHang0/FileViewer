@@ -48,7 +48,7 @@ namespace FileViewer
 
         public bool TopMostShow { get; set; } = false;
 
-        public static bool UseModernWindowStyle => !OSVersionHelper.IsWindows7OrLess;
+        public static bool UseModernWindowStyle => OSVersionHelper.IsWindows8OrGreater;
 
         public double OpenTextMaxWidth => OSVersionHelper.IsWindows7OrLess ? double.MaxValue : (Width / 2);
 
