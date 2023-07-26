@@ -25,7 +25,8 @@ namespace FileViewer
             if (!OSVersionHelper.IsWindows7OrLess)
             {
                 theme = ThemeManager.Current.ActualApplicationTheme;
-            }else
+            }
+            else
             {
                 ThemeSystemMode.Visibility = Visibility.Collapsed;
                 OpenSystemThemeButton.Visibility = Visibility.Collapsed;

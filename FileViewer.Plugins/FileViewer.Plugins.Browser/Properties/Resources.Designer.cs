@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace FileViewer.Plugins.MonacoEditor.Properties {
+namespace FileViewer.Plugins.Browser.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace FileViewer.Plugins.MonacoEditor.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FileViewer.Plugins.MonacoEditor.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FileViewer.Plugins.Browser.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,55 +61,11 @@ namespace FileViewer.Plugins.MonacoEditor.Properties {
         }
         
         /// <summary>
-        ///   查找类似 &lt;!DOCTYPE html&gt;
-        ///&lt;html&gt;
-        ///  &lt;head&gt;
-        ///    &lt;meta charset=&quot;UTF-8&quot; /&gt;
-        ///    &lt;style&gt;
-        ///      html,
-        ///      body {
-        ///        margin: 0;
-        ///        padding: 0;
-        ///        overflow: hidden;
-        ///        background-color: var(--background-color);
-        ///      }
-        ///      ::-webkit-scrollbar {
-        ///        width: 8px;
-        ///        height: 8px;
-        ///      }
-        ///      ::-webkit-scrollbar-thumb {
-        ///        background-color: #acadae;
-        ///        border-radius: 4px;
-        ///      }
-        ///      ::-webkit-scrollbar-thumb:hover {
-        ///        background-color: #7b7c7c;
-        ///      }
-        ///    &lt;/style&gt;
-        ///  &lt;/head&gt;
-        ///  [字符串的其余部分被截断]&quot;; 的本地化字符串。
-        /// </summary>
-        internal static string monaco_editor {
-            get {
-                return ResourceManager.GetString("monaco_editor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
-        /// </summary>
-        internal static byte[] monacojs {
-            get {
-                object obj = ResourceManager.GetObject("monacojs", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap vscode {
+        internal static System.Drawing.Bitmap webview2 {
             get {
-                object obj = ResourceManager.GetObject("vscode", resourceCulture);
+                object obj = ResourceManager.GetObject("webview2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

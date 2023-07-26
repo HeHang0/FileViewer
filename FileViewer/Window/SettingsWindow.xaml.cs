@@ -1,9 +1,5 @@
 ﻿using FileViewer.Base;
-using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using static FileViewer.SettingsWindow;
 
 namespace FileViewer
 {
@@ -27,7 +23,7 @@ namespace FileViewer
 
         private void Navigate(object? sender, object content, object? extraData)
         {
-            if(extraData != null)
+            if (extraData != null)
             {
                 NavigationFrame.Navigate(content, extraData);
             }

@@ -44,13 +44,17 @@ namespace FileViewer
             InitHello();
             DependencyPropertyDescriptor desc = DependencyPropertyDescriptor.FromProperty(ThemeManager.ActualApplicationThemeProperty, ThemeManager.Current.GetType());
             desc.AddValueChanged(ThemeManager.Current, OnThemeChanged);
+            _model.SetDarkMode(IsDark);
         }
+
+        private static bool IsDark => ThemeManager.Current.ActualApplicationTheme == ApplicationTheme.Dark;
 
         private void OnThemeChanged(object? sender, EventArgs e)
         {
-            var isDark = ThemeManager.Current.ActualApplicationTheme == ApplicationTheme.Dark;
+            var isDark = IsDark;
             if (_settingsWindow != null) _settingsWindow.Background = new SolidColorBrush(isDark ? Utils.BackgroundDark : Utils.BackgroundLight);
             currentPlugin?.ChangeTheme(isDark);
+            _model.SetDarkMode(isDark);
             MicaHelper.Apply(this, isDark);
         }
 

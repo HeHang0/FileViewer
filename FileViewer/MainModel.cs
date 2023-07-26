@@ -1,7 +1,6 @@
 ﻿using FileViewer.Base;
 using FileViewer.Tools;
 using Microsoft.Win32;
-using ModernWpf;
 using Prism.Commands;
 using System;
 using System.ComponentModel;
@@ -313,9 +312,15 @@ namespace FileViewer
             return Loading;
         }
 
+        private bool _isDark = false;
         public bool IsDarkMode()
         {
-            return ThemeManager.Current.ActualApplicationTheme == ApplicationTheme.Dark;
+            return _isDark;
+        }
+
+        public void SetDarkMode(bool isDark)
+        {
+            _isDark = isDark;
         }
     }
 }

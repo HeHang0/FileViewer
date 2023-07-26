@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -57,6 +58,21 @@ namespace FileViewer.Tools
                 return f.Length * 1.0 / 1048576;
             }
             return 0;
+        }
+
+        public static bool UnZip(Stream stream, string extractPath, bool overwriteFiles = true)
+        {
+            try
+            {
+                Directory.CreateDirectory(extractPath);
+                using ZipArchive zipArchive = new(stream);
+                zipArchive.ExtractToDirectory(extractPath, overwriteFiles);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         //private static IEnumerable<int> FindChildProcessIds(int parentId, string? childName)

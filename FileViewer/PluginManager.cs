@@ -46,6 +46,7 @@ namespace FileViewer
             LoadPluginFormType(typeof(Plugins.Office.PluginOffice));
             LoadPluginFormType(typeof(Plugins.Pdf.PluginPdf));
             LoadPluginFormType(typeof(Plugins.Text.PluginText));
+            LoadPluginFormType(typeof(Plugins.Browser.PluginBrowser));
         }
 
         public IPlugin GetPlugin(string filePath)

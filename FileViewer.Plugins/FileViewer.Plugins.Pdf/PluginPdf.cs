@@ -25,7 +25,7 @@ namespace FileViewer.Plugins.Pdf
                 {
                     if (instance == null)
                     {
-                        this._manager = manager;
+                        _manager = manager;
                         instance = new WebView2.WebView2();
                     }
                 }

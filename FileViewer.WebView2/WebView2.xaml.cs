@@ -53,13 +53,17 @@ namespace FileViewer.WebView2
                             _webview2 = new Microsoft.Web.WebView2.Wpf.WebView2();
                             InitWebView2(Path.Combine(Path.GetTempPath(), "WebView2"));
                             Content = _webview2;
-                            _webview2.WebMessageReceived += WebMessageReceived;
+                            _webview2.WebMessageReceived += OnWebMessageReceived;
                         }
                     }
                 }
                 return _webview2;
             }
+        }
 
+        private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
+        {
+            WebMessageReceived?.Invoke(this, e);
         }
 
         public static bool Available => _available;

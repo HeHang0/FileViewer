@@ -2,13 +2,13 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Monaco Editor Sample</title>
     <style>
       html,
       body {
         margin: 0;
         padding: 0;
         overflow: hidden;
+        background-color: var(--background-color);
       }
       ::-webkit-scrollbar {
         width: 8px;
@@ -24,14 +24,23 @@
     </style>
   </head>
   <body>
+    <script>
+      const queryParams = window.location.search;
+      const isDarkMode = queryParams.includes('dark=1');
+      var backgroundColor = isDarkMode ? '#1E1E1E' : '#FFFFFE';
+      var styleElement = document.createElement('style');
+      var styleContent = `:root { --background-color: ${backgroundColor}; }`;
+      styleElement.innerHTML = styleContent;
+      document.head.appendChild(styleElement);
+    </script>
     <div id="container" style="width: 100vw; height: 100vh"></div>
 
     <!-- Load the Monaco Editor -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
+    <script src="http://FileViewerLocalMonaco/loader.js"></script>
     <script>
       require.config({
         paths: {
-          vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs'
+          vs: 'http://FileViewerLocalMonaco'
         }
       });
       let editor;
@@ -45,7 +54,8 @@
           readOnly: true,
           automaticLayout: true,
           wordWrap: 'on',
-          theme: darkModeMediaQuery.matches ? 'vs-dark' : 'vs'
+          theme: isDarkMode ? 'vs-dark' : 'vs',
+          scrollBeyondLastLine: false
         });
         const languages = monaco.languages.getLanguages();
         languages.map(m => {
@@ -55,9 +65,6 @@
             });
         });
         window.chrome.webview?.postMessage('loaded');
-      });
-      darkModeMediaQuery.addEventListener('change', function (ev) {
-        monaco && monaco.editor.setTheme(ev.matches ? 'vs-dark' : 'vs');
       });
       window.chrome.webview?.addEventListener('message', event => {
         let data = event.data;
@@ -71,6 +78,13 @@
             break;
           case 'text':
             editor && editor.getModel().setValue(data.value);
+            break;
+          case 'load-file':
+            window.chrome.webview?.postMessage('loaded');
+            break;
+          case 'theme':
+            monaco &&
+              monaco.editor.setTheme(data.value == 'dark' ? 'vs-dark' : 'vs');
             break;
         }
       });

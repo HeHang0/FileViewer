@@ -45,6 +45,7 @@
     <ProjectReference Include="..\FileViewer.Base\FileViewer.Base.csproj" />
     <ProjectReference Include="..\FileViewer.Hook\FileViewer.Hook.csproj" />
     <ProjectReference Include="..\FileViewer.Icns\FileViewer.Icns.csproj" />
+    <ProjectReference Include="..\FileViewer.Plugins\FileViewer.Plugins.Browser\FileViewer.Plugins.Browser.csproj" />
     <ProjectReference Include="..\FileViewer.Tools\FileViewer.Tools.csproj" />
     <ProjectReference Include="..\FileViewer.WebView2\FileViewer.WebView2.csproj" />
     <ProjectReference Include="..\FileViewer.Plugins\FileViewer.Plugins.App\FileViewer.Plugins.App.csproj" />
