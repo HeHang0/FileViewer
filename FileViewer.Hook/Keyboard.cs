@@ -51,6 +51,65 @@ namespace FileViewer.Hook
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetModuleHandle(string name);
 
+        [DllImport("user32.dll")]
+        internal static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct INPUT
+        {
+            public uint type;
+            public InputUnion inputUnion;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        public struct InputUnion
+        {
+            [FieldOffset(0)]
+            public MOUSEINPUT mouseInput;
+            [FieldOffset(0)]
+            public KEYBDINPUT keyboardInput;
+            [FieldOffset(0)]
+            public HARDWAREINPUT hardwareInput;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MOUSEINPUT
+        {
+            public int dx;
+            public int dy;
+            public uint mouseData;
+            public uint dwFlags;
+            public uint time;
+            public IntPtr dwExtraInfo;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct KEYBDINPUT
+        {
+            public ushort wVk;
+            public ushort wScan;
+            public uint dwFlags;
+            public uint time;
+            public IntPtr dwExtraInfo;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct HARDWAREINPUT
+        {
+            public uint uMsg;
+            public ushort wParamL;
+            public ushort wParamH;
+        }
+
+        // 定义常量
+        public const int INPUT_MOUSE = 0;
+        public const int INPUT_KEYBOARD = 1;
+        public const int INPUT_HARDWARE = 2;
+        public const uint KEYEVENTF_KEYDOWN = 0x0000;
+        public const uint KEYEVENTF_KEYUP = 0x0002;
+        public const ushort VK_CONTROL = 0x11;
+        public const ushort VK_C = 0x43;
+
         private IntPtr _hookWindowPtr = IntPtr.Zero;
 
         //构造器

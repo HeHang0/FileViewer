@@ -1,5 +1,4 @@
-﻿using FileViewer.Base;
-using System.Windows;
+﻿using System.Windows;
 
 namespace FileViewer
 {
@@ -11,7 +10,7 @@ namespace FileViewer
         public SettingsWindow(PluginManager model)
         {
             InitializeComponent();
-            if (OSVersionHelper.IsWindows8OrGreater)
+            if (Tools.OSVersionHelper.IsWindows8OrGreater)
             {
                 ModernWpf.Controls.Primitives.WindowHelper.SetUseModernWindowStyle(this, true);
             }

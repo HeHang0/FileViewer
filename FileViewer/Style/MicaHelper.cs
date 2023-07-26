@@ -1,5 +1,4 @@
-﻿using FileViewer.Base;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -12,9 +11,9 @@ namespace FileViewer.Style
         {
             get
             {
-                if (!OSVersionHelper.IsWindowsNT) { return false; }
+                if (!Tools.OSVersionHelper.IsWindowsNT) { return false; }
 
-                return OSVersionHelper.OSVersion >= new Version(10, 0, 21996);
+                return Tools.OSVersionHelper.OSVersion >= new Version(10, 0, 21996);
             }
         }
 

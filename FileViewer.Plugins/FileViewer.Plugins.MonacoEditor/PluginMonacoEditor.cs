@@ -144,7 +144,7 @@ namespace FileViewer.Plugins.MonacoEditor
         {
             if (_instance == null) return;
             string targetUrl = (string)e.Result!;
-            UriBuilder uriBuilder = new UriBuilder(targetUrl);
+            UriBuilder uriBuilder = new(targetUrl);
             if (_manager?.IsDarkMode() ?? false)
             {
                 uriBuilder.Query = "dark=1";

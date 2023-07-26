@@ -9,139 +9,57 @@ namespace FileViewer.Hook
 {
     public class ExplorerFile
     {
-        [ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("000214E3-0000-0000-C000-000000000046")]
-        interface IShellView
-        {
-        }
-        [ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("000214E6-0000-0000-C000-000000000046")]
-        interface IShellFolder
-        {
-            void ParseDisplayName(IntPtr hwndOwner, IntPtr pbcReserved, [MarshalAs(UnmanagedType.LPWStr)] string pszDisplayName, out uint pchEaten, out IntPtr ppidl, ref uint pdwAttributes);
-            [PreserveSig] int EnumObjects(IntPtr hwndOwner, int grfFlags, out IntPtr ppenumIDList);
-            void BindToObject(IntPtr pidl, IntPtr pbcReserved, [In] ref Guid riid, out IShellView ppvOut);
-            void BindToStorage(IntPtr pidl, IntPtr pbcReserved, [In] ref Guid riid, out IntPtr ppvObj);
-            void CompareIDs(IntPtr lParam, IntPtr pidl1, IntPtr pidl2);
-            void CreateViewObject(IntPtr hwndOwner, [In] ref Guid riid, out IShellView ppvOut);
-            void GetAttributesOf(uint cidl, IntPtr apidl, ref uint rgfInOut);
-            void GetUIObjectOf(IntPtr hwndOwner, uint cidl, [In, MarshalAs(UnmanagedType.LPArray)] IntPtr[] apidl, [In] ref Guid riid, IntPtr rgfReserved, out IntPtr ppvOut);
-            void GetDisplayNameOf(IntPtr pidl, uint uFlags, out IntPtr pName);
-            void SetNameOf(IntPtr hwndOwner, IntPtr pidl, [MarshalAs(UnmanagedType.LPWStr)] string pszName, uint uFlags, out IntPtr ppidlOut);
-        }
-        [DllImport("shell32.dll")]
-        static extern IntPtr SHGetDesktopFolder(out IShellFolder ppshf);
-        [DllImport("user32.dll")]
-        static extern IntPtr GetShellWindow();
         [DllImport("user32", CharSet = CharSet.Auto, ExactSpelling = true)]
         static extern IntPtr GetForegroundWindow();
         [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        static extern int GetWindowThreadProcessId(IntPtr hwnd, out int ID);
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern bool GetGUIThreadInfo(int hTreadID, ref GUITHREADINFO lpgui);
-        [DllImport("shell32.dll")]
-        private static extern Int32 SHGetDesktopFolder(out IntPtr ppshf);
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        static extern IntPtr FindWindowEx(IntPtr parentHandle, IntPtr childAfter, string className, string? windowTitle);
+        [DllImport("shlwapi.dll")]
+        static extern int IUnknown_QueryService(IntPtr pUnk, ref Guid guidService, ref Guid riid,
+                [MarshalAs(UnmanagedType.IUnknown)] out object ppv);
 
-        [StructLayout(LayoutKind.Sequential)]
-        struct RECT
+        private static readonly Guid ClsidShellWindows = new("9BA05972-F6A8-11CF-A442-00A0C90A8F39");
+        private static readonly Guid SID_STopLevelBrowser = new(1284947520u, 37212, 4559, 153, 211, 0, 170, 0, 74, 232, 55);
+        private static readonly Guid IID_IShellBrowser = new("000214E2-0000-0000-C000-000000000046");
+
+        public static IntPtr FindChildWindow(IntPtr parentHandle, string className, string? windowTitle = null)
         {
-            public int iLeft;
-            public int iTop;
-            public int iRight;
-            public int iBottom;
-        }
-        [StructLayout(LayoutKind.Sequential)]
-        struct GUITHREADINFO
-        {
-            public int cbSize;
-            public int flags;
-            public IntPtr hwndActive;
-            public IntPtr hwndFocus;
-            public IntPtr hwndCapture;
-            public IntPtr hwndMenuOwner;
-            public IntPtr hwndMoveSize;
-            public IntPtr hwndCaret;
-            public RECT rectCaret;
+            return FindWindowEx(parentHandle, IntPtr.Zero, className, windowTitle);
         }
 
-        [DllImport("user32.dll")]
-        private static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct INPUT
+        static string GetWindowText(IntPtr handle)
         {
-            public uint type;
-            public InputUnion inputUnion;
+            const int nChars = 256;
+            StringBuilder Buff = new(nChars);
+            if (GetWindowText(handle, Buff, nChars) > 0)
+            {
+                return Buff.ToString();
+            }
+            return string.Empty;
         }
-
-        [StructLayout(LayoutKind.Explicit)]
-        public struct InputUnion
-        {
-            [FieldOffset(0)]
-            public MOUSEINPUT mouseInput;
-            [FieldOffset(0)]
-            public KEYBDINPUT keyboardInput;
-            [FieldOffset(0)]
-            public HARDWAREINPUT hardwareInput;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct MOUSEINPUT
-        {
-            public int dx;
-            public int dy;
-            public uint mouseData;
-            public uint dwFlags;
-            public uint time;
-            public IntPtr dwExtraInfo;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct KEYBDINPUT
-        {
-            public ushort wVk;
-            public ushort wScan;
-            public uint dwFlags;
-            public uint time;
-            public IntPtr dwExtraInfo;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct HARDWAREINPUT
-        {
-            public uint uMsg;
-            public ushort wParamL;
-            public ushort wParamH;
-        }
-
-        // 定义常量
-        public const int INPUT_MOUSE = 0;
-        public const int INPUT_KEYBOARD = 1;
-        public const int INPUT_HARDWARE = 2;
-        public const uint KEYEVENTF_KEYDOWN = 0x0000;
-        public const uint KEYEVENTF_KEYUP = 0x0002;
-        public const ushort VK_CONTROL = 0x11;
-        public const ushort VK_C = 0x43;
 
         static void SendCopy()
         {
-            // 模拟按下 Ctrl 键
-            INPUT[] inputs = new INPUT[1];
-            inputs[0].type = INPUT_KEYBOARD;
-            inputs[0].inputUnion.keyboardInput.wVk = VK_CONTROL;
-            inputs[0].inputUnion.keyboardInput.dwFlags = KEYEVENTF_KEYDOWN;
-            _ = SendInput(1, inputs, Marshal.SizeOf(typeof(INPUT)));
-            // 模拟按下 C 键
-            inputs[0].inputUnion.keyboardInput.wVk = VK_C;
-            inputs[0].inputUnion.keyboardInput.dwFlags = KEYEVENTF_KEYDOWN;
-            _ = SendInput(1, inputs, Marshal.SizeOf(typeof(INPUT)));
-            // 模拟释放 C 键
-            inputs[0].inputUnion.keyboardInput.dwFlags = KEYEVENTF_KEYUP;
-            _ = SendInput(1, inputs, Marshal.SizeOf(typeof(INPUT)));
-            // 模拟释放 Ctrl 键
-            inputs[0].inputUnion.keyboardInput.wVk = VK_CONTROL;
-            inputs[0].inputUnion.keyboardInput.dwFlags = KEYEVENTF_KEYUP;
-            _ = SendInput(1, inputs, Marshal.SizeOf(typeof(INPUT)));
+            Keyboard.INPUT[] inputs = new Keyboard.INPUT[1];
+            inputs[0].type = Keyboard.INPUT_KEYBOARD;
+
+            inputs[0].inputUnion.keyboardInput.wVk = Keyboard.VK_CONTROL;
+            inputs[0].inputUnion.keyboardInput.dwFlags = Keyboard.KEYEVENTF_KEYDOWN;
+            _ = Keyboard.SendInput(1, inputs, Marshal.SizeOf(typeof(Keyboard.INPUT)));
+
+            inputs[0].inputUnion.keyboardInput.wVk = Keyboard.VK_C;
+            inputs[0].inputUnion.keyboardInput.dwFlags = Keyboard.KEYEVENTF_KEYDOWN;
+            _ = Keyboard.SendInput(1, inputs, Marshal.SizeOf(typeof(Keyboard.INPUT)));
+
+            inputs[0].inputUnion.keyboardInput.dwFlags = Keyboard.KEYEVENTF_KEYUP;
+            _ = Keyboard.SendInput(1, inputs, Marshal.SizeOf(typeof(Keyboard.INPUT)));
+
+            inputs[0].inputUnion.keyboardInput.wVk = Keyboard.VK_CONTROL;
+            inputs[0].inputUnion.keyboardInput.dwFlags = Keyboard.KEYEVENTF_KEYUP;
+            _ = Keyboard.SendInput(1, inputs, Marshal.SizeOf(typeof(Keyboard.INPUT)));
         }
 
         public static (bool Ok, string FilePath) GetCurrentFilePath()
@@ -151,54 +69,112 @@ namespace FileViewer.Hook
                 (IntPtr activeWindowHandle, string className) = GetCurrentProcessInfo();
                 if (activeWindowHandle == IntPtr.Zero) return (false, string.Empty);
 
-                IntPtr shellWindowHandle = GetShellWindow();
-                _ = GetWindowThreadProcessId(shellWindowHandle, out int shellProcessId);
-                Type? t = Type.GetTypeFromProgID("Shell.Application");
-                if (t == null) return (false, string.Empty);
-
-                dynamic? shell = Activator.CreateInstance(t);
-                if (cabinetWClass == className && shell != null)
-                {
-                    for (int i = 0; i < shell!.Windows().Count; i++)
-                    {
-                        var window = shell.Windows().Item(i);
-                        if (window != null && (IntPtr)window!.HWND == activeWindowHandle && window!.Document != null)
-                        {
-                            if (window!.Document.SelectedItems().Count > 0)
-                            {
-                                foreach (var item in window.Document.SelectedItems())
-                                {
-                                    return (true, item.Path);
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    string filePath = string.Empty;
-                    RunAsSTA(() =>
-                    {
-                        var originalData = Clipboard.GetDataObject();
-                        SendCopy();
-                        Thread.Sleep(100);
-                        var files = Clipboard.GetFileDropList();
-                        if (files != null && files.Count > 0)
-                        {
-                            filePath = files[0]!;
-                        }
-                        if (originalData != null) Clipboard.SetDataObject(originalData);
-                    });
-                    if (!string.IsNullOrEmpty(filePath))
-                    {
-                        return (true, filePath);
-                    }
-                }
+                var selectedFils = IsDesktopWindow(className) ?
+                    GetSelectedFilesFromDesktop() :
+                    GetSelectedFilesFromFileExplorer(activeWindowHandle);
+                if (selectedFils.Length > 0) return (true, selectedFils[0]);
             }
-            catch (Exception)
+            catch (Exception e)
             {
             }
             return (false, string.Empty);
+        }
+
+        private static string[] GetSelectedFilesFromFileExplorer(IntPtr foregroundWindowHandle)
+        {
+            //var activeTab = foregroundWindowHandle;
+            //if (Tools.OSVersionHelper.IsWindows11OrGreater)
+            //{
+            //    activeTab = FindChildWindow(foregroundWindowHandle, "ShellTabWindowClass");
+            //    if (activeTab == IntPtr.Zero)
+            //    {
+            //        activeTab = FindChildWindow(foregroundWindowHandle, "TabWindowClass");
+            //    }
+            //}
+            dynamic shellWindows = Activator.CreateInstance(Type.GetTypeFromCLSID(ClsidShellWindows)!)!;
+            foreach (dynamic webBrowserApp in shellWindows)
+            {
+                dynamic shellFolderView = webBrowserApp.Document;
+                var folderTitle = shellFolderView.Folder.Title;
+                if ((IntPtr)webBrowserApp.HWND != foregroundWindowHandle) continue;
+                if (folderTitle != GetWindowText(foregroundWindowHandle)) continue;
+                var selectedItems = shellFolderView.SelectedItems();
+                string[] result = new string[selectedItems.Count];
+                var i = 0;
+                foreach (var item in selectedItems)
+                {
+                    result[i++] = item.Path;
+                }
+                return result;
+                //IUnknown_QueryService(Marshal.GetIDispatchForObject(webBrowserApp), ref SID_STopLevelBrowser,
+                //    ref IID_IShellBrowser, out dynamic shellBrowser);
+                //Type type = shellBrowser.GetType();
+                //MethodInfo[] methods = type.GetMethods();
+                ////var shellBrowser = webBrowserApp.QueryService(SID_STopLevelBrowser, IID_IShellBrowser);
+                //shellBrowser.GetWindow(out IntPtr shellBrowserHandle);
+
+                //if (activeTab == shellBrowserHandle)
+                //{
+                //    return GetSelectedFilesFromShellBrowser(shellBrowser, true);
+                //}
+            }
+            return Array.Empty<string>();
+        }
+
+        private static string[] GetSelectedFilesFromDesktop()
+        {
+            string[] filePaths = Array.Empty<string>();
+            RunAsSTA(() =>
+            {
+                var originalData = Clipboard.GetDataObject();
+                SendCopy();
+                Thread.Sleep(100);
+                var files = Clipboard.GetFileDropList();
+                if (files != null && files.Count > 0)
+                {
+                    filePaths = new string[files.Count];
+                    for (int i = 0; i < filePaths.Length; i++)
+                    {
+                        filePaths[i] = files[i]!;
+                    }
+                }
+                if (originalData != null) Clipboard.SetDataObject(originalData);
+            });
+            return filePaths;
+            //const int SWC_DESKTOP = 8;
+            //const int SWFO_NEEDDISPATCH = 1;
+            //object pvarloc = 0;
+            //object pvarlocRoot = 0;
+            //dynamic shellWindows = Activator.CreateInstance(Type.GetTypeFromCLSID(ClsidShellWindows)!)!;
+            //dynamic serviceProvider = shellWindows.FindWindowSW(ref pvarloc, ref pvarlocRoot, SWC_DESKTOP, out int pHWND, SWFO_NEEDDISPATCH);
+            //long num = shellWindows.Count;
+            //IUnknown_QueryService(Marshal.GetIDispatchForObject(serviceProvider), ref SID_STopLevelBrowser,
+            //    ref IID_IShellBrowser, out dynamic shellBrowser);
+            //return GetSelectedFilesFromShellBrowser(shellBrowser, true);
+        }
+
+        private static string[] GetSelectedFilesFromShellBrowser(dynamic shellBrowser, bool onlySelectedFiles)
+        {
+            var shellView = shellBrowser.QueryActiveShellView();
+            if (shellView != null)
+            {
+                const uint SVGIO_SELECTION = 2;
+                const uint SVGIO_ALLVIEW = 0xFFFFFFFF;
+                var selectionFlag = onlySelectedFiles ? SVGIO_SELECTION : SVGIO_ALLVIEW;
+                shellView.ItemCount(selectionFlag, out int countItems);
+                if (countItems > 0)
+                {
+                    Guid IID_IShellItemArray = new("b63ea76d-1f85-456f-a19c-48159efa858b");
+                    shellView.Items(selectionFlag, IID_IShellItemArray, out dynamic items);
+                    var result = new string[countItems];
+                    for (int i = 0; i < countItems; i++)
+                    {
+                        result[i] = items.GetItemAt(i).ToIFileSystemItem().Path;
+                    }
+                    return result;
+                }
+            }
+            return Array.Empty<string>();
         }
 
         private static void RunAsSTA(Action threadStart)
@@ -218,6 +194,12 @@ namespace FileViewer.Hook
         static readonly string cabinetWClass = "cabinetwclass";
 
         static readonly string[] ExplorerClassNames = new string[] { cabinetWClass, "workerw", "progman" };
+
+        static bool IsDesktopWindow(string className)
+        {
+            return className != cabinetWClass;
+        }
+
         static (IntPtr, string) GetCurrentProcessInfo()
         {
             IntPtr myPtr = GetForegroundWindow();
@@ -228,16 +210,7 @@ namespace FileViewer.Hook
             {
                 return (IntPtr.Zero, string.Empty);
             }
-
             return (myPtr, className);
-        }
-
-        static (bool Ok, GUITHREADINFO GUIInfo) GetGUICursorStatus(int processId)
-        {
-            GUITHREADINFO lpgui = new();
-            lpgui.cbSize = Marshal.SizeOf(lpgui);
-            bool ok = GetGUIThreadInfo(processId, ref lpgui);
-            return (ok, lpgui);
         }
     }
 }

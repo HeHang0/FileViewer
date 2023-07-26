@@ -1,4 +1,5 @@
 ﻿using FileViewer.Base;
+using FileViewer.Tools;
 using Prism.Commands;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -70,7 +71,6 @@ namespace FileViewer
                     Navigating?.Invoke(this, _selectedItem.Page, null);
                     _selectedItem.Opacity = 1;
                 }
-
             }
         }
 

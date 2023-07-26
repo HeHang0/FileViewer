@@ -6,4 +6,14 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FileViewer.Tools\FileViewer.Tools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Interop.Shell32">
+      <HintPath>..\FileViewer.Base\obj\Debug\net6.0-windows\Interop.Shell32.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

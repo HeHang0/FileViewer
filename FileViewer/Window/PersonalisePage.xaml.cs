@@ -1,5 +1,4 @@
-﻿using FileViewer.Base;
-using ModernWpf;
+﻿using ModernWpf;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,7 +21,7 @@ namespace FileViewer
         private void InitTheme()
         {
             var theme = ThemeManager.Current.ApplicationTheme;
-            if (!OSVersionHelper.IsWindows7OrLess)
+            if (!Tools.OSVersionHelper.IsWindows7OrLess)
             {
                 theme = ThemeManager.Current.ActualApplicationTheme;
             }
@@ -44,7 +43,7 @@ namespace FileViewer
 
         private void InitColor()
         {
-            if (!OSVersionHelper.IsWindows7OrLess) return;
+            if (!Tools.OSVersionHelper.IsWindows7OrLess) return;
             ColorChooserPanel.Visibility = Visibility.Visible;
         }
 
@@ -66,7 +65,7 @@ namespace FileViewer
 
         private void OpenSystemTheme(object sender, RoutedEventArgs e)
         {
-            if (OSVersionHelper.IsWindows7OrLess)
+            if (Tools.OSVersionHelper.IsWindows7OrLess)
             {
                 Tools.File.ProcessStart("control.exe", "/name Microsoft.Personalization");
             }

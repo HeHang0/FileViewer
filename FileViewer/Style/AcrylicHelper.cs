@@ -14,9 +14,9 @@ namespace FileViewer.Style
         /// <returns><see langword="true"/> if Aero is supported.</returns>
         public static bool IsSupported()
         {
-            if (!Base.OSVersionHelper.IsWindowsNT) { return false; }
+            if (!Tools.OSVersionHelper.IsWindowsNT) { return false; }
 
-            if (new Version(10, 0) <= Base.OSVersionHelper.OSVersion && Base.OSVersionHelper.OSVersion < new Version(10, 0, 22523)) { return true; }
+            if (new Version(10, 0) <= Tools.OSVersionHelper.OSVersion && Tools.OSVersionHelper.OSVersion < new Version(10, 0, 22523)) { return true; }
 
             return false;
         }
@@ -27,9 +27,9 @@ namespace FileViewer.Style
         /// <returns><see langword="true"/> if Acrylic is supported.</returns>
         public static bool IsAcrylicSupported()
         {
-            if (!Base.OSVersionHelper.IsWindowsNT) { return false; }
+            if (!Tools.OSVersionHelper.IsWindowsNT) { return false; }
 
-            if (new Version(10, 0, 17063) <= Base.OSVersionHelper.OSVersion && Base.OSVersionHelper.OSVersion < new Version(10, 0, 22523)) { return true; }
+            if (new Version(10, 0, 17063) <= Tools.OSVersionHelper.OSVersion && Tools.OSVersionHelper.OSVersion < new Version(10, 0, 22523)) { return true; }
 
             return false;
         }

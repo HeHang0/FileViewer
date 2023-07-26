@@ -149,7 +149,7 @@ namespace FileViewer
 
         private void OpenFontFolder(object sender, RoutedEventArgs e)
         {
-            if (OSVersionHelper.IsWindows10OrGreater)
+            if (Tools.OSVersionHelper.IsWindows10OrGreater)
             {
                 Tools.File.ProcessStart("ms-settings:fonts");
             }
@@ -161,11 +161,11 @@ namespace FileViewer
 
         private void OpenSystemStartup(object sender, RoutedEventArgs e)
         {
-            if (OSVersionHelper.IsWindows11OrGreater)
+            if (Tools.OSVersionHelper.IsWindows11OrGreater)
             {
                 Tools.File.ProcessStart("ms-settings:startupapps");
             }
-            else if (OSVersionHelper.IsWindows8OrGreater)
+            else if (Tools.OSVersionHelper.IsWindows8OrGreater)
             {
                 Tools.File.ProcessStart("taskmgr", "/Startup");
             }

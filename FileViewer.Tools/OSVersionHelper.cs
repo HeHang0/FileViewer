@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace FileViewer.Base
+namespace FileViewer.Tools
 {
     public static class OSVersionHelper
     {
