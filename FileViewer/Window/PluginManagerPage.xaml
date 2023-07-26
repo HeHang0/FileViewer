@@ -15,13 +15,38 @@
             <i:InvokeCommandAction Command="{Binding Path=SaveCommand}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
+    <Page.Resources>
+        <Style TargetType="ui:ListView">
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden" />
+        </Style>
+        <Style x:Key="ListViewItemContainerStyle" TargetType="ui:ListViewItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ui:ListViewItem">
+                        <Border x:Name="Bd" Margin="0 10 0 0" BorderThickness="1" SnapsToDevicePixels="true"
+                                    CornerRadius="{DynamicResource MenuCornerRadius}"
+                                    BorderBrush="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                                    Background="{DynamicResource ListViewItemBackgroundPointerOver}">
+                            <ContentPresenter x:Name="ContentPresenter" Margin="0" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=PreviousData}}" Value="{x:Null}">
+                                <Setter Property="Margin" TargetName="Bd" Value="0" />
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
     <ui:ListView x:Name="PluginList" ItemsSource="{Binding Plugins}" IsSelectionEnabled="False"
                      dd:DragDrop.IsDragSource="True" VirtualizingStackPanel.IsVirtualizing="True"
                      dd:DragDrop.IsDropTarget="True" VirtualizingStackPanel.VirtualizationMode="Recycling"
-                     VirtualizingPanel.ScrollUnit="Pixel">
+                     VirtualizingPanel.ScrollUnit="Pixel" ItemContainerStyle="{StaticResource ListViewItemContainerStyle}">
         <ui:ListView.ItemTemplate>
             <DataTemplate>
-                <Grid x:Name="PluginGrid" Margin="0 5" AllowDrop="True" Background="#01000000"
+                <Grid x:Name="PluginGrid" Margin="0" AllowDrop="True" Background="#01000000"
                           Width="{Binding ElementName=PluginWindow, Path=ActualWidth, Converter={StaticResource DecreaseValue},ConverterParameter=20}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Drop">
@@ -37,12 +62,12 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="68" />
+                        <ColumnDefinition MaxWidth="100" />
                     </Grid.ColumnDefinitions>
-                    <Image Source="{Binding Icon, Mode=OneWay}"
+                    <Image Margin="0 10" Source="{Binding Icon, Mode=OneWay}"
                            MaxHeight="100" Stretch="Uniform" VerticalAlignment="Center"/>
 
-                    <StackPanel Margin="20,10,0,0" Grid.Column="1" VerticalAlignment="Center">
+                    <StackPanel Margin="20" Grid.Column="1" VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal"
                                     HorizontalAlignment="Left"
                                     Margin="0,0,0,6">
@@ -62,26 +87,38 @@
                                 Width="NaN"
                                 TextWrapping="Wrap" />
                         <Expander Margin="0 10 0 0"
-                                Header="Extensions"
                                 ExpandDirection="Down"
                                 IsExpanded="{Binding IsExpanded}">
-                            <ui:GridView ItemsSource="{Binding Extensions, Mode=OneWay}" IsSelectionEnabled="False">
-
+                            <ui:GridView Margin="0 5 0 0" ItemsSource="{Binding Extensions, Mode=OneWay}" IsSelectionEnabled="False">
                                 <ui:GridView.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding ExtensionName}"
+                                        <Border Cursor="Hand" Margin="0 0 10 10" Padding="15 2" Background="#01000000" SnapsToDevicePixels ="True"
+                                                BorderThickness="1" CornerRadius="{DynamicResource MenuCornerRadius}"
+                                                BorderBrush="{DynamicResource SystemControlBackgroundAltHighBrush}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                                    <i:InvokeCommandAction Command="{Binding Path=SwitchEnabled}" PassEventArgsToCommand="True"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                            <TextBlock Text="{Binding ExtensionName}" VerticalAlignment="Center"
                                                        TextDecorations="{Binding IsEnabled, Converter={StaticResource BoolToStrikethrough}}">
-                                                <i:Interaction.Triggers>
-                                                    <i:EventTrigger EventName="MouseLeftButtonUp">
-                                                        <i:InvokeCommandAction Command="{Binding Path=SwitchEnabled}" PassEventArgsToCommand="True"/>
-                                                    </i:EventTrigger>
-                                                </i:Interaction.Triggers>
-                                        </TextBlock>
+                                            </TextBlock>
+                                        </Border>
                                     </DataTemplate>
                                 </ui:GridView.ItemTemplate>
                                 <ui:GridView.ItemContainerStyle>
                                     <Style TargetType="ui:GridViewItem">
                                         <Setter Property="Margin" Value="0" />
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="MinHeight" Value="0" />
+                                        <Setter Property="MinWidth" Value="0" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ui:GridViewItem">
+                                                    <ContentPresenter />
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
                                     </Style>
                                 </ui:GridView.ItemContainerStyle>
 
@@ -93,9 +130,18 @@
                             </ui:GridView>
                         </Expander>
                     </StackPanel>
-                    <ui:AppBarToggleButton VerticalAlignment="Center" Grid.Column="2" Icon="World"
-                                           LabelPosition="Default" IsChecked="{Binding IsEnabled, Mode=TwoWay}"
-                                           Label="{Binding EnabledText}" VerticalContentAlignment="Center"/>
+                    <ToggleButton Grid.Column="2" Margin="0 0 0 1" VerticalAlignment="Center"
+                                  IsChecked="{Binding IsEnabled, Mode=TwoWay}" Width="100" Height="100"
+                                  VerticalContentAlignment="Center">
+                        <StackPanel>
+                            <Viewbox Width="16" Height="16" HorizontalAlignment="Center">
+                                <Label x:Name="MenuIconLabel">
+                                    <ui:SymbolIcon Symbol="World" Foreground="{Binding Foreground, ElementName=MenuIconLabel}"/>
+                                </Label>
+                            </Viewbox>
+                            <Label Content="{Binding EnabledText}" FontSize="13" Margin="0 5 0 0"></Label>
+                        </StackPanel>
+                    </ToggleButton>
                 </Grid>
             </DataTemplate>
         </ui:ListView.ItemTemplate>

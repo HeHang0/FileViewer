@@ -2,6 +2,7 @@
 using Prism.Commands;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Drawing.Printing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -18,12 +19,12 @@ namespace FileViewer
         public class SettingsItem : INotifyPropertyChanged
         {
             public event PropertyChangedEventHandler? PropertyChanged;
-            public SettingsItem(string title, ModernWpf.Controls.Symbol icon, Page page, Thickness? margin=null)
+            public SettingsItem(string title, ModernWpf.Controls.Symbol icon, Page page, Thickness? margin=null, bool backgroundVisible=true)
             {
                 Title = title;
                 Icon = icon;
                 Page = page;
-                if(margin != null)
+                if (margin != null)
                 {
                     TitleMargin = margin!;
                 }
@@ -31,11 +32,13 @@ namespace FileViewer
                 {
                     TitleMargin = new(19, 12, 0, 10);
                 }
+                BackgroundVisible = backgroundVisible;
             }
-            public string Title { get; set; }
+            public string Title { get; set; } = string.Empty;
+            public bool BackgroundVisible { get; private set; } = true;
             public Thickness? TitleMargin { get; set; }
             public double Opacity { get; set; } = 0;
-            public ModernWpf.Controls.Symbol Icon { get; set; }
+            public ModernWpf.Controls.Symbol? Icon { get; set; }
             internal Page Page { get; set; }
         }
 

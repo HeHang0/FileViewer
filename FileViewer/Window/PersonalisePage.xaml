@@ -7,7 +7,7 @@
     xmlns:local="clr-namespace:FileViewer"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel Orientation="Vertical" Margin="20 20 0 0">
+    <StackPanel Orientation="Vertical">
         <Label FontWeight="Bold" FontSize="20">
             主题
         </Label>
@@ -20,7 +20,7 @@
             <RadioButton x:Name="ThemeDarkMode" Content="深色" Tag="Dark"/>
             <RadioButton x:Name="ThemeSystemMode" Content="使用 Windows 设置" />
         </ui:RadioButtons>
-        <Button Margin="0 10 0 0" Padding="0" Background="Transparent" Click="OpenSystemTheme" Cursor="Hand">
+        <Button x:Name="OpenSystemThemeButton" Margin="0 10 0 0" Padding="0" Background="Transparent" Click="OpenSystemTheme" Cursor="Hand">
             <TextBlock Text="在 Windows 设置中更改颜色" 
                        Padding="11,5,11,6" TextDecorations="Underline"
                        Foreground="{DynamicResource SystemAccentColorDark1Brush}">
@@ -35,5 +35,151 @@
                 </TextBlock.Style>
             </TextBlock>
         </Button>
+        <StackPanel x:Name="ColorChooserPanel" Margin="0 -22 0 10" Visibility="Collapsed">
+            <Label FontWeight="Bold" FontSize="20">
+                颜色
+            </Label>
+            <Label Margin="0 10">
+                选择应用的主色调。
+            </Label>
+            <ui:GridView 
+                    x:Name="ColorChooser"
+                    Padding="0" Loaded="OnColorChooserLoaded"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    SelectionMode="Single"
+                    SelectedValuePath="Color"
+                    SelectionChanged="OnAccentColorChanged"
+                    ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                    ui:ThemeManager.HasThemeResources="True">
+                <ui:GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid
+                            Rows="6"
+                            Columns="8" />
+                    </ItemsPanelTemplate>
+                </ui:GridView.ItemsPanel>
+                <ui:GridView.ItemsSource>
+                    <local:AccentColors />
+                </ui:GridView.ItemsSource>
+                <ui:GridView.ItemContainerStyle>
+                    <Style TargetType="ui:GridViewItem">
+                        <Setter Property="Margin" Value="0,0,2,3" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ui:GridViewItem">
+                                    <Border
+                                        x:Name="ContentBorder"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}"
+                                        SnapsToDevicePixels="True">
+                                        <Grid>
+                                            <ContentPresenter
+                                                x:Name="ContentPresenter"
+                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                Margin="{TemplateBinding Padding}"
+                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                            <Rectangle
+                                                x:Name="BorderRectangle"
+                                                IsHitTestVisible="False"
+                                                Stroke="{DynamicResource SystemControlHighlightListAccentLowBrush}"
+                                                StrokeThickness="2"
+                                                Opacity="0" />
+                                            <Border
+                                                x:Name="MultiSelectSquare"
+                                                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                                                Width="20"
+                                                Height="20"
+                                                Margin="0,2,2,0"
+                                                VerticalAlignment="Top"
+                                                HorizontalAlignment="Right"
+                                                Visibility="Collapsed">
+                                                <ui:FontIcon
+                                                    x:Name="MultiSelectCheck"
+                                                    FontFamily="{DynamicResource SymbolThemeFontFamily}"
+                                                    Glyph="&#xE73E;"
+                                                    FontSize="16"
+                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                                    Opacity="0" />
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="BorderRectangle" Property="Opacity" Value="1" />
+                                            <Setter TargetName="BorderRectangle" Property="Stroke" Value="{DynamicResource SystemControlHighlightListLowBrush}" />
+                                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="MultiSelectCheck" Property="Opacity" Value="1" />
+                                            <Setter TargetName="BorderRectangle" Property="Opacity" Value="1" />
+                                            <Setter TargetName="BorderRectangle" Property="Stroke" Value="{DynamicResource SystemControlHighlightAccentBrush}" />
+                                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                            <Setter TargetName="MultiSelectSquare" Property="Visibility" Value="Visible" />
+                                            <Setter TargetName="MultiSelectSquare" Property="Background" Value="{DynamicResource SystemControlHighlightAccentBrush}" />
+                                        </Trigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                                <Condition Property="IsSelected" Value="True" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter TargetName="MultiSelectCheck" Property="Opacity" Value="1" />
+                                            <Setter TargetName="BorderRectangle" Property="Opacity" Value="1" />
+                                            <Setter TargetName="BorderRectangle" Property="Stroke" Value="{DynamicResource SystemControlHighlightListAccentMediumBrush}" />
+                                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                            <Setter TargetName="MultiSelectSquare" Property="Visibility" Value="Visible" />
+                                            <Setter TargetName="MultiSelectSquare" Property="Background" Value="{DynamicResource SystemControlHighlightAccentBrush}" />
+                                        </MultiTrigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter TargetName="ContentBorder" Property="Opacity" Value="{DynamicResource ListViewItemDisabledThemeOpacity}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ui:GridView.ItemContainerStyle>
+                <ui:GridView.ItemTemplate>
+                    <DataTemplate>
+                        <Rectangle
+                            Fill="{Binding Brush, Mode=OneTime}"
+                            ToolTipService.InitialShowDelay="1000"
+                            ToolTipService.BetweenShowDelay="500">
+                            <Rectangle.ToolTip>
+                                <ToolTip Content="{Binding Name, Mode=OneTime}" />
+                            </Rectangle.ToolTip>
+                        </Rectangle>
+                    </DataTemplate>
+                </ui:GridView.ItemTemplate>
+                <ui:GridView.Resources>
+                    <ui:ResourceDictionaryEx>
+                        <ui:ResourceDictionaryEx.ThemeDictionaries>
+                            <ResourceDictionary x:Key="Light" ui:ThemeDictionary.Key="Light">
+                                <SolidColorBrush x:Key="SystemControlHighlightListLowBrush" Color="{StaticResource SystemBaseHighColor}" />
+                                <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="{StaticResource SystemBaseHighColor}" />
+                                <SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush" Color="{StaticResource SystemBaseHighColor}" />
+                                <SolidColorBrush x:Key="SystemControlForegroundBaseMediumHighBrush" Color="{StaticResource SystemAltHighColor}" />
+                            </ResourceDictionary>
+                            <ResourceDictionary x:Key="Dark" ui:ThemeDictionary.Key="Dark">
+                                <SolidColorBrush x:Key="SystemControlHighlightListLowBrush" Color="{StaticResource SystemBaseHighColor}" />
+                                <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="{StaticResource SystemBaseHighColor}" />
+                                <SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush" Color="{StaticResource SystemBaseHighColor}" />
+                                <SolidColorBrush x:Key="SystemControlForegroundBaseMediumHighBrush" Color="{StaticResource SystemAltHighColor}" />
+                            </ResourceDictionary>
+                        </ui:ResourceDictionaryEx.ThemeDictionaries>
+                    </ui:ResourceDictionaryEx>
+                </ui:GridView.Resources>
+            </ui:GridView>
+            <Button
+                    Style="{DynamicResource AccentButtonStyle}"
+                    Content="重置颜色"
+                    Margin="0,12,0,0"
+                    Click="ResetAccentColor" />
+        </StackPanel>
     </StackPanel>
 </Page>

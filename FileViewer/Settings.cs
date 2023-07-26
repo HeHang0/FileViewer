@@ -2,15 +2,15 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Windows.Media;
 
 namespace FileViewer
 {
     public static class Settings
     {
         public static List<SettingItem> PluginSetting { get; set; }
-
-        public static ApplicationTheme? Theme { get; set; }
 
         public class SettingItem
         {
@@ -24,9 +24,12 @@ namespace FileViewer
         static Settings()
         {
             PluginSetting = ReadPlugins();
-            Theme = ReadTheme();
-            if (ThemeManager.Current.ApplicationTheme != Theme)
-                ThemeManager.Current.ApplicationTheme = Theme;
+            ThemeManager.Current.ApplicationTheme = ReadTheme();
+            ThemeManager.Current.AccentColor = ReadAccentColor();
+            DependencyPropertyDescriptor desc = DependencyPropertyDescriptor.FromProperty(ThemeManager.ApplicationThemeProperty, ThemeManager.Current.GetType());
+            desc.AddValueChanged(ThemeManager.Current, SaveTheme);
+            desc = DependencyPropertyDescriptor.FromProperty(ThemeManager.AccentColorProperty, ThemeManager.Current.GetType());
+            desc.AddValueChanged(ThemeManager.Current, SaveAccentColor);
         }
 
         public static bool ExtensionEnabled(string extension, string pluginName, string pluginPath)
@@ -60,11 +63,23 @@ namespace FileViewer
             }
         }
 
-        public static void SaveTheme()
+        static void SaveTheme(object? sender, EventArgs args)
         {
             try
             {
-                File.WriteAllText(AppThemeSettingPath, Theme?.ToString() ?? string.Empty);
+                File.WriteAllText(AppThemeSettingPath, ThemeManager.Current.ApplicationTheme?.ToString() ?? string.Empty);
+            }
+            catch (Exception e)
+            {
+                System.Windows.MessageBox.Show(e.ToString());
+            }
+        }
+
+        static void SaveAccentColor(object? sender, EventArgs args)
+        {
+            try
+            {
+                File.WriteAllText(AppAccentColorSettingPath, ThemeManager.Current.AccentColor?.ToString() ?? string.Empty);
             }
             catch (Exception e)
             {
@@ -110,11 +125,38 @@ namespace FileViewer
             return null;
         }
 
+        static Color? ReadAccentColor()
+        {
+            if (File.Exists(AppAccentColorSettingPath))
+            {
+                try
+                {
+                    string text = File.ReadAllText(AppAccentColorSettingPath);
+                    if (!string.IsNullOrWhiteSpace(text))
+                    {
+                        return (Color)ColorConverter.ConvertFromString(text);
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+            return null;
+        }
+
         static string AppThemeSettingPath
         {
             get
             {
                 return Path.Combine(AppDataPath, "theme.json");
+            }
+        }
+
+        static string AppAccentColorSettingPath
+        {
+            get
+            {
+                return Path.Combine(AppDataPath, "color.json");
             }
         }
 

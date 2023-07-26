@@ -36,25 +36,5 @@ namespace FileViewer
                 NavigationFrame.Navigate(content);
             }
         }
-
-        //public FrameworkElement? FindElementByName(DependencyObject parent, string name)
-        //{
-        //    if (parent == null)
-        //        return null;
-
-        //    int childCount = VisualTreeHelper.GetChildrenCount(parent);
-        //    for (int i = 0; i < childCount; i++)
-        //    {
-        //        DependencyObject child = VisualTreeHelper.GetChild(parent, i);
-        //        if (child is FrameworkElement element && element.Name == name)
-        //            return element;
-
-        //        FrameworkElement? foundElement = FindElementByName(child, name);
-        //        if (foundElement != null)
-        //            return foundElement;
-        //    }
-
-        //    return null;
-        //}
     }
 }

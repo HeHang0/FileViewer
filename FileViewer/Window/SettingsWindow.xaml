@@ -12,21 +12,21 @@
         ui:WindowHelper.UseModernWindowStyle="{Binding UseModernWindowStyle}"
         ui:TitleBar.ExtendViewIntoTitleBar="True"
         ui:ThemeManager.IsThemeAware="True"
-        Height="450" Width="800">
+        Height="450" Width="800" MinHeight="200" MinWidth="400">
     <Window.Resources>
         <CornerRadius x:Key="MenuCornerRadius">5</CornerRadius>
-        <Style TargetType="ListView">
+        <Style TargetType="ui:ListView">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Margin" Value="0" />
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden" />
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden" />
             <Setter Property="HorizontalAlignment" Value="Left" />
         </Style>
-        <Style x:Key="NavItemContainerStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+        <Style x:Key="NavItemContainerStyle" TargetType="ui:ListViewItem">
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="ListViewItem">
+                    <ControlTemplate TargetType="ui:ListViewItem">
                         <Border x:Name="Bd" CornerRadius="{DynamicResource MenuCornerRadius}" SnapsToDevicePixels="true" Margin="4 2"
                                 HorizontalAlignment="Left" Background="{TemplateBinding Background}">
                             <ContentPresenter x:Name="ContentPresenter" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
@@ -55,19 +55,19 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Bd"
-                                Background="{TemplateBinding Background}"
-                                CornerRadius="{DynamicResource MenuCornerRadius}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                Padding="{TemplateBinding Padding}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                            SnapsToDevicePixels="True">
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="{DynamicResource MenuCornerRadius}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    Padding="{TemplateBinding Padding}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                SnapsToDevicePixels="True">
                             <ContentPresenter x:Name="ContentPresenter"
-                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                Focusable="False"
-                                RecognizesAccessKey="True"
-                                TextElement.Foreground="Transparent"
-                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    Focusable="False"
+                                    RecognizesAccessKey="True"
+                                    TextElement.Foreground="Transparent"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
                             </ContentPresenter>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -82,9 +82,7 @@
                                     <Condition Property="IsPressed" Value="True" />
                                     <Condition Property="IsMouseOver" Value="True" />
                                 </MultiTrigger.Conditions>
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ListViewItemBackgroundPointerOver}">
-                                    
-                                </Setter>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ListViewItemBackgroundPointerOver}"/>
                             </MultiTrigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ListViewItemBackgroundPointerOver}" />
@@ -105,7 +103,9 @@
             <Label Content="{Binding Title}" Margin="10 0" VerticalAlignment="Center" FontSize="12"/>
         </StackPanel>
         <Grid Grid.Row="1">
-            <Grid HorizontalAlignment="Right" Width="240" Background="{DynamicResource SystemControlBackgroundAltHighBrush}" />
+            <Grid HorizontalAlignment="Right" Width="240" 
+                  Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                  Visibility="{Binding SelectedItem.BackgroundVisible, Converter={StaticResource BooleanToVisibility}}"/>
             <ui:SplitView x:Name="NavigationView" OpenPaneLength="240" DisplayMode="CompactInline" PaneBackground="Transparent"
                       IsPaneOpen="{Binding IsPaneOpen}">
                 <ui:SplitView.Pane>
@@ -146,55 +146,55 @@
                                 </Viewbox>
                             </Label>
                         </Button>
-                        <ListView x:Name="NavigationMenu" Grid.Row="1" SelectionMode="Single" Width="{Binding Width}"
+                        <ui:ListView x:Name="NavigationMenu" Grid.Row="1" SelectionMode="Single" Width="{Binding Width}"
                               ItemsSource="{Binding SettingsItems}"
                               SelectedItem="{Binding SelectedItem}"
                               ItemContainerStyle="{StaticResource NavItemContainerStyle}">
-                            <ListView.ItemTemplate>
+                            <ui:ListView.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Background="#01000000">
-                                        <Grid.Triggers>
+                                    <StackPanel Background="#01000000" Orientation="Horizontal" ToolTip="{Binding Title}">
+                                        <StackPanel.Triggers>
                                             <EventTrigger RoutedEvent="PreviewMouseLeftButtonDown">
                                                 <BeginStoryboard>
                                                     <Storyboard>
                                                         <DoubleAnimation From="24" To="16" Duration="0:0:0.2"
-                                                                         Storyboard.Target="{Binding ElementName=MenuAnchor}"
-                                                                         Storyboard.TargetProperty="Height"/>
+                                                                        Storyboard.Target="{Binding ElementName=MenuAnchor}"
+                                                                        Storyboard.TargetProperty="Height"/>
                                                     </Storyboard>
                                                 </BeginStoryboard>
                                             </EventTrigger>
-                                        </Grid.Triggers>
-                                        <StackPanel Orientation="Horizontal" ToolTip="{Binding Title}">
-                                            <Border x:Name="MenuAnchor" Opacity="{Binding Opacity}" BorderThickness="2" CornerRadius="2" Height="16"
-                                            BorderBrush="{StaticResource SystemControlBackgroundAccentBrush}"></Border>
-                                            <Viewbox Width="16" Height="16" Margin="6 0 10 0" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                                <Label x:Name="MenuIconLabel">
-                                                    <ui:SymbolIcon Symbol="{Binding Icon}" Foreground="{Binding Foreground, ElementName=MenuIconLabel}"/>
-                                                </Label>
-                                            </Viewbox>
-                                            <Border Width="195" Visibility="{Binding IsPaneOpen, ElementName=NavigationView, Converter={StaticResource BooleanToVisibility}}">
-                                                <Label Content="{Binding Title}" VerticalContentAlignment="Center"/>
-                                            </Border>
-                                        </StackPanel>
-                                    </Grid>
+                                        </StackPanel.Triggers>
+                                        <Border x:Name="MenuAnchor" Opacity="{Binding Opacity}" BorderThickness="2" CornerRadius="2" Height="16"
+                                        BorderBrush="{StaticResource SystemControlBackgroundAccentBrush}"></Border>
+                                        <Viewbox Width="16" Height="16" Margin="8 0 12 0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                            <Label x:Name="MenuIconLabel">
+                                                <ui:SymbolIcon Symbol="{Binding Icon}" Foreground="{Binding Foreground, ElementName=MenuIconLabel}"/>
+                                            </Label>
+                                        </Viewbox>
+                                        <Border Width="193" Visibility="{Binding IsPaneOpen, ElementName=NavigationView, Converter={StaticResource BooleanToVisibility}}">
+                                            <Label Content="{Binding Title}" VerticalContentAlignment="Center"/>
+                                        </Border>
+                                    </StackPanel>
                                 </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
+                            </ui:ListView.ItemTemplate>
+                        </ui:ListView>
                     </Grid>
                 </ui:SplitView.Pane>
-                <Border CornerRadius="10 0 0 0" Background="{DynamicResource SystemControlBackgroundAltHighBrush}" SnapsToDevicePixels="True">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="50" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <Label Content="{Binding SelectedItem.Title}" Margin="19,10,0,0" FontSize="28" FontWeight="SemiBold"/>
-                        <ScrollViewer Grid.Row="1">
-                            <ui:Frame x:Name="NavigationFrame">
-                            </ui:Frame>
-                        </ScrollViewer>
-                    </Grid>
-                </Border>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Border Grid.RowSpan="2" CornerRadius="10 0 0 0" SnapsToDevicePixels="True"
+                            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                            Visibility="{Binding SelectedItem.BackgroundVisible, Converter={StaticResource BooleanToVisibility}}">
+                    </Border>
+                    <Label Content="{Binding SelectedItem.Title}" Margin="20,10,0,0" FontSize="28" FontWeight="SemiBold"/>
+                    <ScrollViewer Grid.Row="1" Margin="20 20 0 0" Padding="0 0 5 0">
+                        <ui:Frame x:Name="NavigationFrame" Margin="0" Padding="0">
+                        </ui:Frame>
+                    </ScrollViewer>
+                </Grid>
             </ui:SplitView>
         </Grid>
     </Grid>
