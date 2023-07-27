@@ -47,7 +47,7 @@
       const darkModeMediaQuery = window.matchMedia(
         '(prefers-color-scheme: dark)'
       );
-      const languageMatch = { '.xsd': 'xml', '.sln': 'vb' };
+      const languageMatch = { '.xsd': 'xml', '.sln': 'vb', '.gitignore': 'ini', '.gitattributes': 'ini' };
       require(['vs/editor/editor.main'], function () {
         editor = monaco.editor.create(document.getElementById('container'), {
           language: 'plaintext',

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -20,12 +22,28 @@ namespace FileViewer.Hook
         [DllImport("shlwapi.dll")]
         static extern int IUnknown_QueryService(IntPtr pUnk, ref Guid guidService, ref Guid riid,
                 [MarshalAs(UnmanagedType.IUnknown)] out object ppv);
+        [DllImport("user32.dll")]
+        public static extern bool GetGUIThreadInfo(uint tId, out GUITHREADINFO threadInfo);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct GUITHREADINFO
+        {
+            public int cbSize;
+            public int flags;
+            public IntPtr hwndActive;
+            public IntPtr hwndFocus;
+            public IntPtr hwndCapture;
+            public IntPtr hwndMenuOwner;
+            public IntPtr hwndMoveSize;
+            public IntPtr hwndCaret;
+            public System.Drawing.Rectangle rcCaret;
+        }
 
         private static readonly Guid ClsidShellWindows = new("9BA05972-F6A8-11CF-A442-00A0C90A8F39");
         private static readonly Guid SID_STopLevelBrowser = new(1284947520u, 37212, 4559, 153, 211, 0, 170, 0, 74, 232, 55);
         private static readonly Guid IID_IShellBrowser = new("000214E2-0000-0000-C000-000000000046");
 
-        public static IntPtr FindChildWindow(IntPtr parentHandle, string className, string? windowTitle = null)
+        private static IntPtr FindChildWindow(IntPtr parentHandle, string className, string? windowTitle = null)
         {
             return FindWindowEx(parentHandle, IntPtr.Zero, className, windowTitle);
         }
@@ -33,10 +51,21 @@ namespace FileViewer.Hook
         static string GetWindowText(IntPtr handle)
         {
             const int nChars = 256;
-            StringBuilder Buff = new(nChars);
-            if (GetWindowText(handle, Buff, nChars) > 0)
+            StringBuilder buffer = new(nChars);
+            if (GetWindowText(handle, buffer, nChars) > 0)
             {
-                return Buff.ToString();
+                return buffer.ToString();
+            }
+            return string.Empty;
+        }
+
+        static string GetClassName(IntPtr handle)
+        {
+            const int nChars = 256;
+            StringBuilder buffer = new(nChars);
+            if (GetClassName(handle, buffer, nChars) > 0)
+            {
+                return buffer.ToString();
             }
             return string.Empty;
         }
@@ -66,10 +95,10 @@ namespace FileViewer.Hook
         {
             try
             {
-                (IntPtr activeWindowHandle, string className) = GetCurrentProcessInfo();
+                (IntPtr activeWindowHandle, bool isDesktopWindow) = GetCurrentProcessInfo();
                 if (activeWindowHandle == IntPtr.Zero) return (false, string.Empty);
 
-                var selectedFils = IsDesktopWindow(className) ?
+                var selectedFils = isDesktopWindow ?
                     GetSelectedFilesFromDesktop() :
                     GetSelectedFilesFromFileExplorer(activeWindowHandle);
                 if (selectedFils.Length > 0) return (true, selectedFils[0]);
@@ -193,24 +222,36 @@ namespace FileViewer.Hook
 
         static readonly string cabinetWClass = "cabinetwclass";
 
-        static readonly string[] ExplorerClassNames = new string[] { cabinetWClass, "workerw", "progman" };
+        static readonly HashSet<string> ExplorerWindowClassNames = new() { cabinetWClass, "workerw", "progman" };
+
+        static readonly HashSet<string> ExplorerFocusClassNames = new() { "directuihwnd", "syslistview32" };
 
         static bool IsDesktopWindow(string className)
         {
             return className != cabinetWClass;
         }
 
-        static (IntPtr, string) GetCurrentProcessInfo()
+        static (IntPtr, bool) GetCurrentProcessInfo()
         {
-            IntPtr myPtr = GetForegroundWindow();
-            StringBuilder classNameSB = new(256);
-            _ = GetClassName(myPtr, classNameSB, classNameSB.Capacity);
-            string className = classNameSB.ToString().ToLower();
-            if (!ExplorerClassNames.Contains(className))
+            IntPtr foregroundWindowHandle = GetForegroundWindow();
+            string windowClassName = GetClassName(foregroundWindowHandle);
+            if (!ExplorerWindowClassNames.Contains(windowClassName.ToLower()))
             {
-                return (IntPtr.Zero, string.Empty);
+                return (IntPtr.Zero, false);
             }
-            return (myPtr, className);
+
+            GUITHREADINFO guiInfo = new();
+            guiInfo.cbSize = Marshal.SizeOf(guiInfo);
+            GetGUIThreadInfo(0, out guiInfo);
+            IntPtr focusedHandle = guiInfo.hwndFocus;
+            string focusClassName = GetClassName(focusedHandle);
+
+            if (!ExplorerFocusClassNames.Contains(focusClassName.ToLower()))
+            {
+                return (IntPtr.Zero, false);
+            }
+
+            return (foregroundWindowHandle, IsDesktopWindow(windowClassName));
         }
     }
 }
