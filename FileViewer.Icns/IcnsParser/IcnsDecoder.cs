@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 #if _FREEIMAGE
 using FreeImageAPI;
@@ -330,15 +331,61 @@ namespace FileViewer.Icns.IcnsParser
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static unsafe void SetPixel(BitmapData data, int x, int y, uint color)
+        internal static void SetPixel(BitmapData bmpData, int x, int y, uint color)
         {
-            *(((uint*)data.Scan0) + y * data.Width + x) = color;
+            // Calculate the position of the pixel in the byte array.
+            int position = (y * bmpData.Stride) + (x * 4);
+
+            // Get the address of the first line.
+            IntPtr ptr = bmpData.Scan0;
+
+            // Declare an array to hold the bytes of the bitmap.
+            int bytes = Math.Abs(bmpData.Stride) * bmpData.Height;
+            byte[] rgbValues = new byte[bytes];
+
+            // Copy the RGB values into the array.
+            Marshal.Copy(ptr, rgbValues, 0, bytes);
+
+            // Set the pixel to the given color.
+            uint blue = color & 0xff;
+            uint green = (color >> 8) & 0xff;
+            uint red = (color >> 16) & 0xff;
+            uint alpha = (color >> 24) & 0xff;
+
+            rgbValues[position] = (byte)blue;
+            rgbValues[position + 1] = (byte)green;
+            rgbValues[position + 2] = (byte)red;
+            rgbValues[position + 3] = (byte)alpha;
+
+            // Copy the RGB values back to the bitmap.
+            Marshal.Copy(rgbValues, 0, ptr, bytes);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static unsafe uint GetPixel(BitmapData data, int x, int y)
+        internal static uint GetPixel(BitmapData bmpData, int x, int y)
         {
-            return *(((uint*)data.Scan0) + y * data.Width + x);
+            // Calculate the position of the pixel in the byte array.
+            int position = (y * bmpData.Stride) + (x * 4);
+
+            // Get the address of the first line.
+            IntPtr ptr = bmpData.Scan0;
+
+            // Declare an array to hold the bytes of the bitmap.
+            int bytes = Math.Abs(bmpData.Stride) * bmpData.Height;
+            byte[] rgbValues = new byte[bytes];
+
+            // Copy the RGB values into the array.
+            Marshal.Copy(ptr, rgbValues, 0, bytes);
+
+            // Get the color of the pixel.
+            byte blue = rgbValues[position];
+            byte green = rgbValues[position + 1];
+            byte red = rgbValues[position + 2];
+            byte alpha = rgbValues[position + 3];
+
+            uint color = (uint)((alpha << 24) | (red << 16) | (green << 8) | blue);
+
+            return color;
         }
 
         private static void Decode1BPPImage(IcnsType imageType, byte[] imageData, BitmapData image)

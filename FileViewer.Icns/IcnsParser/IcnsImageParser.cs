@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 
 namespace FileViewer.Icns.IcnsParser
 {
@@ -110,13 +111,7 @@ namespace FileViewer.Icns.IcnsParser
             List<IcnsImage> result = IcnsDecoder.DecodeAllImages(icnsContents);
             if (result.Count <= 0)
                 throw new NotSupportedException("No icons in ICNS file");
-
-            IcnsImage max = null;
-            foreach (IcnsImage bitmap in result)
-                if (bitmap.Bitmap != null && (max == null || (bitmap.Bitmap.Width > bitmap.Bitmap.Height)))
-                    max = bitmap;
-
-            return max;
+            return result.OrderByDescending(m => m.Bitmap.Height).FirstOrDefault()!;
         }
 
         public static List<IcnsImage> GetImages(string filename)

@@ -27,9 +27,4 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Copy SourceFiles="$(USERPROFILE)\.nuget\packages\microsoft.web.webview2\1.0.1823.32\lib\netcoreapp3.0\Microsoft.Web.WebView2.Core.dll" DestinationFolder="$(OutputPath)" />
-    <Copy SourceFiles="$(USERPROFILE)\.nuget\packages\microsoft.web.webview2\1.0.1823.32\lib\netcoreapp3.0\Microsoft.Web.WebView2.Wpf.dll" DestinationFolder="$(OutputPath)" />
-  </Target>
-
 </Project>

@@ -4,36 +4,18 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <BaseOutputPath>..\FileViewer\bin</BaseOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>True</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1823.32" />
-    <PackageReference Include="System.Management" Version="7.0.2" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1901.177" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FileViewer.Tools\FileViewer.Tools.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="copy &quot;$(USERPROFILE)\.nuget\packages\microsoft.web.webview2\1.0.1823.32\runtimes\win-arm64\native\WebView2Loader.dll&quot; &quot;Resources\WebView2Loader_arm64.dll&quot;" />
-    <Exec Command="copy &quot;$(USERPROFILE)\.nuget\packages\microsoft.web.webview2\1.0.1823.32\runtimes\win-x64\native\WebView2Loader.dll&quot; &quot;Resources\WebView2Loader_x64.dll&quot;" />
-    <Exec Command="copy &quot;$(USERPROFILE)\.nuget\packages\microsoft.web.webview2\1.0.1823.32\runtimes\win-x86\native\WebView2Loader.dll&quot; &quot;Resources\WebView2Loader_x86.dll&quot;" />
-  </Target>
-
 </Project>

@@ -31,8 +31,4 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Copy SourceFiles="$(USERPROFILE)\.nuget\packages\sharpcompress\0.33.0\lib\net6.0\SharpCompress.dll" DestinationFolder="$(OutputPath)" />
-  </Target>
-
 </Project>

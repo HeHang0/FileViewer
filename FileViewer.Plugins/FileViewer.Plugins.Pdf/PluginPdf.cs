@@ -14,7 +14,6 @@ namespace FileViewer.Plugins.Pdf
 
         public PluginPdf()
         {
-            WebView2.WebView2.LoadWebView2();
         }
 
         public UserControl GetUserControl(IManager manager)

@@ -44,7 +44,7 @@ namespace FileViewer.Plugins.Text
         {
             ".txt", ".cs", ".go", ".js", ".json", ".vue", ".sql", ".html", ".plist",
             ".bat", ".css", ".md", ".bash", ".sh", ".gitignore", ".swift", ".xaml",
-            ".gitattribute", ".rc", ".xml", ".log", ".py", ".java", ".c", ".aml",
+            ".gitattributes", ".rc", ".xml", ".log", ".py", ".java", ".c", ".aml",
             ".cpp", ".cc", ".less", ".kt", ".php", ".ts", ".ps", ".ps1", ".yaml"
         };
 

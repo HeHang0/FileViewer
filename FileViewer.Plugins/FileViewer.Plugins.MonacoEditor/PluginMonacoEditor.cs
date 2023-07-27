@@ -20,7 +20,6 @@ namespace FileViewer.Plugins.MonacoEditor
 
         public PluginMonacoEditor()
         {
-            WebView2.WebView2.LoadWebView2();
         }
 
         public UserControl GetUserControl(IManager manager)
@@ -172,8 +171,8 @@ namespace FileViewer.Plugins.MonacoEditor
         {
             ".txt", ".cs", ".go", ".js", ".json", ".vue", ".sql", ".html", ".plist",
             ".bat", ".css", ".md", ".bash", ".sh", ".gitignore", ".swift", ".xaml",
-            ".gitattribute", ".rc", ".xml", ".log", ".py", ".java", ".c", ".aml",
-            ".cpp", ".cc", ".less", ".kt", ".php", ".ts", ".ps", ".ps1", ".yaml", ".gitattributes"
+            ".gitattributes", ".rc", ".xml", ".log", ".py", ".java", ".c", ".aml",
+            ".cpp", ".cc", ".less", ".kt", ".php", ".ts", ".ps", ".ps1", ".yaml"
         };
 
         public string Description => "Preview text with monaco editor";

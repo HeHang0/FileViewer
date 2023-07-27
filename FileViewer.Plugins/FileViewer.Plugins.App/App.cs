@@ -3,7 +3,6 @@ using ApkReader.Arsc;
 using FileViewer.Base;
 using FileViewer.Icns.IcnsParser;
 using FileViewer.Tools;
-using PListNet;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -162,50 +161,47 @@ namespace FileViewer.Plugins.App
             byte[]? appIcon = null;
             var fileSize = GetDirectorySize(appPath);
             ApkInfo appInfo = new();
-            using (FileStream stream = File.OpenRead(infoPath))
+            Dictionary<string, object> node = (Dictionary<string, object>)PList.ReadPlist(infoPath);
+            node.TryGetValue("CFBundleName", out object? nameNode);
+            appInfo.Label = PList.ParsePNodeString(nameNode);
+            node.TryGetValue("CFBundleIdentifier", out object? packageNode);
+            appInfo.PackageName = PList.ParsePNodeString(packageNode);
+            node.TryGetValue("CFBundleShortVersionString", out object? versionNode);
+            appInfo.VersionName = PList.ParsePNodeString(versionNode);
+            node.TryGetValue("LSMinimumSystemVersion", out object? minOSNode);
+            appInfo.MinSdkVersion = "MacOS " + PList.ParsePNodeString(minOSNode);
+            node.TryGetValue("DTSDKName", out object? targetOSNode);
+            appInfo.TargetSdkVersion = "MacOS " + Regex.Replace(PList.ParsePNodeString(targetOSNode), "[a-zA-Z]", "");
+            node.TryGetValue("CFBundleSupportedPlatforms", out object? familyNode);
+            if (familyNode != null && familyNode.GetType().IsAssignableTo(typeof(IList<object>)))
             {
-                PListNet.Nodes.DictionaryNode node = (PListNet.Nodes.DictionaryNode)PList.Load(stream);
-                node.TryGetValue("CFBundleName", out PNode nameNode);
-                appInfo.Label = ParsePNodeString(nameNode);
-                node.TryGetValue("CFBundleIdentifier", out PNode packageNode);
-                appInfo.PackageName = ParsePNodeString(packageNode);
-                node.TryGetValue("CFBundleShortVersionString", out PNode versionNode);
-                appInfo.VersionName = ParsePNodeString(versionNode);
-                node.TryGetValue("LSMinimumSystemVersion", out PNode minOSNode);
-                appInfo.MinSdkVersion = "MacOS " + ParsePNodeString(minOSNode);
-                node.TryGetValue("DTSDKName", out PNode targetOSNode);
-                appInfo.TargetSdkVersion = "MacOS " + Regex.Replace(ParsePNodeString(targetOSNode), "[a-zA-Z]", "");
-                node.TryGetValue("CFBundleSupportedPlatforms", out PNode familyNode);
-                if (familyNode != null && familyNode.GetType() == typeof(PListNet.Nodes.ArrayNode))
+                foreach (var item in (IList<object>)familyNode)
                 {
-                    foreach (var item in ((PListNet.Nodes.ArrayNode)familyNode))
-                    {
-                        appInfo.Densities.Add(ParsePNodeString(item));
-                    }
+                    appInfo.Densities.Add(PList.ParsePNodeString(item));
                 }
+            }
 
-                node.TryGetValue("CFBundleIconFile", out PNode iconsNode);
-                string appIconName = ParsePNodeString(iconsNode);
-                string resourcePath = Path.Combine(appPath, "Contents", "Resources");
-                if (Directory.Exists(resourcePath))
+            node.TryGetValue("CFBundleIconFile", out object? iconsNode);
+            string appIconName = PList.ParsePNodeString(iconsNode);
+            string resourcePath = Path.Combine(appPath, "Contents", "Resources");
+            if (Directory.Exists(resourcePath))
+            {
+
+                foreach (var resourceInfo in Directory.EnumerateFiles(resourcePath, appIconName + "*"))
                 {
-
-                    foreach (var resourceInfo in Directory.EnumerateFiles(resourcePath, appIconName + "*"))
+                    try
                     {
-                        try
+                        var iconBitmap = GetIcnsMax(resourceInfo);
+                        if (iconBitmap != null)
                         {
-                            var iconBitmap = GetIcnsMax(resourceInfo);
-                            if (iconBitmap != null)
-                            {
-                                using MemoryStream ms = new();
-                                iconBitmap.Save(ms, ImageFormat.Png);
-                                appIcon = ms.ToArray();
-                                break;
-                            }
+                            using MemoryStream ms = new();
+                            iconBitmap.Save(ms, ImageFormat.Png);
+                            appIcon = ms.ToArray();
+                            break;
                         }
-                        catch (Exception)
-                        {
-                        }
+                    }
+                    catch (Exception)
+                    {
                     }
                 }
             }
@@ -234,23 +230,23 @@ namespace FileViewer.Plugins.App
                         }
                         using (MemoryStream stream = new(plistBytes))
                         {
-                            PListNet.Nodes.DictionaryNode node = (PListNet.Nodes.DictionaryNode)PList.Load(stream);
-                            node.TryGetValue("CFBundleDisplayName", out PNode nameNode);
-                            ipaInfo.Label = ParsePNodeString(nameNode);
-                            node.TryGetValue("CFBundleIdentifier", out PNode packageNode);
-                            ipaInfo.PackageName = ParsePNodeString(packageNode);
-                            node.TryGetValue("CFBundleShortVersionString", out PNode versionNode);
-                            ipaInfo.VersionName = ParsePNodeString(versionNode);
-                            node.TryGetValue("MinimumOSVersion", out PNode minOSNode);
-                            ipaInfo.MinSdkVersion = "iOS " + ParsePNodeString(minOSNode);
-                            node.TryGetValue("DTPlatformVersion", out PNode targetOSNode);
-                            ipaInfo.TargetSdkVersion = "iOS " + ParsePNodeString(targetOSNode);
-                            node.TryGetValue("UIDeviceFamily", out PNode familyNode);
-                            if (familyNode != null && familyNode.GetType() == typeof(PListNet.Nodes.ArrayNode))
+                            Dictionary<string, object> node = (Dictionary<string, object>)PList.ReadPlist(stream, PlistType.Auto);
+                            node.TryGetValue("CFBundleDisplayName", out object? nameNode);
+                            ipaInfo.Label = PList.ParsePNodeString(nameNode);
+                            node.TryGetValue("CFBundleIdentifier", out object? packageNode);
+                            ipaInfo.PackageName = PList.ParsePNodeString(packageNode);
+                            node.TryGetValue("CFBundleShortVersionString", out object? versionNode);
+                            ipaInfo.VersionName = PList.ParsePNodeString(versionNode);
+                            node.TryGetValue("MinimumOSVersion", out object? minOSNode);
+                            ipaInfo.MinSdkVersion = "iOS " + PList.ParsePNodeString(minOSNode);
+                            node.TryGetValue("DTPlatformVersion", out object? targetOSNode);
+                            ipaInfo.TargetSdkVersion = "iOS " + PList.ParsePNodeString(targetOSNode);
+                            node.TryGetValue("UIDeviceFamily", out object? familyNode);
+                            if (familyNode != null && familyNode.GetType() == typeof(List<object>))
                             {
-                                foreach (var item in ((PListNet.Nodes.ArrayNode)familyNode))
+                                foreach (var item in ((List<object>)familyNode))
                                 {
-                                    var deviceFamily = ParsePNodeString(item);
+                                    var deviceFamily = PList.ParsePNodeString(item);
                                     iosDeviceFamily.TryGetValue(deviceFamily, out string? deviceFamilyDesc);
                                     if (!string.IsNullOrWhiteSpace(deviceFamilyDesc))
                                     {
@@ -259,16 +255,16 @@ namespace FileViewer.Plugins.App
                                 }
                             }
 
-                            node.TryGetValue("CFBundleIcons", out PNode iconsNode);
-                            if (iconsNode != null && iconsNode.GetType() == typeof(PListNet.Nodes.DictionaryNode))
+                            node.TryGetValue("CFBundleIcons", out object? iconsNode);
+                            if (iconsNode != null && iconsNode.GetType() == typeof(Dictionary<string, object>))
                             {
-                                ((PListNet.Nodes.DictionaryNode)iconsNode).TryGetValue("CFBundlePrimaryIcon", out PNode primaryIconNode);
-                                if (primaryIconNode != null && primaryIconNode.GetType() == typeof(PListNet.Nodes.DictionaryNode))
+                                ((Dictionary<string, object>)iconsNode).TryGetValue("CFBundlePrimaryIcon", out object? primaryIconNode);
+                                if (primaryIconNode != null && primaryIconNode.GetType() == typeof(Dictionary<string, object>))
                                 {
-                                    ((PListNet.Nodes.DictionaryNode)primaryIconNode).TryGetValue("CFBundleIconFiles", out PNode iconFilesNode);
+                                    ((Dictionary<string, object>)primaryIconNode).TryGetValue("CFBundleIconFiles", out object? iconFilesNode);
                                     if (iconFilesNode != null)
                                     {
-                                        iconName = ParsePNodeString(iconFilesNode, arrayLast: true);
+                                        iconName = PList.ParsePNodeString(iconFilesNode, arrayLast: true);
                                     }
                                 }
                             }
@@ -347,75 +343,7 @@ namespace FileViewer.Plugins.App
 
         public static Bitmap? GetIcnsMax(string icnsPath)
         {
-            return IcnsImageParser.GetImages(icnsPath).OrderByDescending(m => m.Bitmap.Height).FirstOrDefault()?.Bitmap;
-        }
-
-        private static string ParsePNodeString(PNode node, bool arrayFirst = false, bool arrayLast = false)
-        {
-            if (node == null) return string.Empty;
-            var nodeType = node.GetType();
-            if (nodeType == typeof(PListNet.Nodes.DictionaryNode))
-            {
-                PListNet.Nodes.DictionaryNode value = (PListNet.Nodes.DictionaryNode)node;
-                return string.Join(", ", value.Values.Select(m => ParsePNodeString(m)));
-            }
-            else if (nodeType == typeof(PListNet.Nodes.BooleanNode))
-            {
-                PListNet.Nodes.BooleanNode value = (PListNet.Nodes.BooleanNode)node;
-                return value.Value.ToString();
-            }
-            else if (nodeType == typeof(PListNet.Nodes.ArrayNode))
-            {
-                PListNet.Nodes.ArrayNode value = (PListNet.Nodes.ArrayNode)node;
-                if (arrayFirst && value.Count > 0)
-                {
-                    return ParsePNodeString(value[0]);
-                }
-                else if (arrayLast && value.Count > 0)
-                {
-                    return ParsePNodeString(value[^1]);
-                }
-                return string.Join(", ", value.Select(m => ParsePNodeString(m)));
-            }
-            else if (nodeType == typeof(PListNet.Nodes.DataNode))
-            {
-                PListNet.Nodes.DataNode value = (PListNet.Nodes.DataNode)node;
-                return Convert.ToBase64String(value.Value);
-            }
-            else if (nodeType == typeof(PListNet.Nodes.DateNode))
-            {
-                PListNet.Nodes.DateNode value = (PListNet.Nodes.DateNode)node;
-                return value.Value.ToString();
-            }
-            else if (nodeType == typeof(PListNet.Nodes.FillNode))
-            {
-                PListNet.Nodes.FillNode value = (PListNet.Nodes.FillNode)node;
-                return value?.ToString() ?? string.Empty;
-            }
-            else if (nodeType == typeof(PListNet.Nodes.IntegerNode))
-            {
-                PListNet.Nodes.IntegerNode value = (PListNet.Nodes.IntegerNode)node;
-                return value.Value.ToString();
-            }
-            else if (nodeType == typeof(PListNet.Nodes.RealNode))
-            {
-                PListNet.Nodes.RealNode value = (PListNet.Nodes.RealNode)node;
-                return value.Value.ToString();
-            }
-            else if (nodeType == typeof(PListNet.Nodes.StringNode))
-            {
-                PListNet.Nodes.StringNode value = (PListNet.Nodes.StringNode)node;
-                return value.Value.ToString();
-            }
-            else if (nodeType == typeof(PListNet.Nodes.UidNode))
-            {
-                PListNet.Nodes.UidNode value = (PListNet.Nodes.UidNode)node;
-                return value.Value.ToString();
-            }
-            else
-            {
-                return node?.ToString() ?? string.Empty;
-            }
+            return IcnsImageParser.GetImage(icnsPath).Bitmap;
         }
 
         class MyApkInfoHandler : IApkInfoHandler<ApkInfo>

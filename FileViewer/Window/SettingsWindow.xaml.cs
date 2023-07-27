@@ -14,6 +14,10 @@ namespace FileViewer
             {
                 ModernWpf.Controls.Primitives.WindowHelper.SetUseModernWindowStyle(this, true);
             }
+            else
+            {
+                CornerContainer.CornerRadius = new CornerRadius(0);
+            }
             SettingsModel _model = new();
             DataContext = _model;
             _model.Navigating += Navigate;

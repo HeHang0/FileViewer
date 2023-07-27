@@ -16,8 +16,11 @@ using System.Windows.Media;
 
 namespace FileViewer
 {
-    public class PluginManager
+    public class PluginManager:INotifyPropertyChanged
     {
+#pragma warning disable CS0067
+        public event PropertyChangedEventHandler? PropertyChanged;
+#pragma warning restore CS0067
         readonly IPlugin universalPlugin;
 
         public ObservableCollection<Plugin> Plugins { get; } = new();

@@ -35,6 +35,10 @@ namespace FileViewer.Plugins.Text
             {
                 TextEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(".js");
             }
+            if (extension.StartsWith(".git"))
+            {
+                TextEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(".ini");
+            }
             else
             {
                 TextEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(extension);

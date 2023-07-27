@@ -185,7 +185,7 @@
                         <RowDefinition Height="50" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <Border Grid.RowSpan="2" CornerRadius="10 0 0 0" SnapsToDevicePixels="True"
+                    <Border x:Name="CornerContainer" Grid.RowSpan="2" CornerRadius="10 0 0 0" SnapsToDevicePixels="True"
                             Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
                             Visibility="{Binding SelectedItem.BackgroundVisible, Converter={StaticResource BooleanToVisibility}}">
                     </Border>

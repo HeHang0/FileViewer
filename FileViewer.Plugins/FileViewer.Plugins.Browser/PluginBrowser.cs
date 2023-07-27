@@ -15,7 +15,6 @@ namespace FileViewer.Plugins.Browser
 
         public PluginBrowser()
         {
-            WebView2.WebView2.LoadWebView2();
         }
 
         public UserControl GetUserControl(IManager manager)

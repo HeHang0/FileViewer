@@ -1,7 +1,6 @@
 using Microsoft.Web.WebView2.Core;
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows.Controls;
 
 namespace FileViewer.WebView2
@@ -11,10 +10,9 @@ namespace FileViewer.WebView2
     /// </summary>
     public partial class WebView2 : UserControl
     {
-        private static bool webView2LoaderLoaded = false;
-        private static bool _available = false;
         private Microsoft.Web.WebView2.Wpf.WebView2? _webview2;
         private readonly object lockObject = new();
+        private static CoreWebView2Environment? _coreEnvironment;
         readonly Tools.Timeout timeout = new();
         public event EventHandler<CoreWebView2WebMessageReceivedEventArgs>? WebMessageReceived;
 
@@ -22,6 +20,10 @@ namespace FileViewer.WebView2
         {
             InitializeComponent();
             Unloaded += WebView2_Unloaded;
+        }
+        static WebView2()
+        {
+            InitWebView2();
         }
 
         private void WebView2_Unloaded(object sender, System.Windows.RoutedEventArgs e)
@@ -33,9 +35,12 @@ namespace FileViewer.WebView2
         {
             Dispatcher.Invoke(() =>
             {
-                Content = null;
-                _webview2?.Dispose();
-                _webview2 = null;
+                _webview2?.CoreWebView2.Profile.ClearBrowsingDataAsync().ContinueWith(x =>
+                {
+                    Content = null;
+                    _webview2?.Dispose();
+                    _webview2 = null;
+                });
             });
         }
 
@@ -51,7 +56,7 @@ namespace FileViewer.WebView2
                         if (_webview2 == null)
                         {
                             _webview2 = new Microsoft.Web.WebView2.Wpf.WebView2();
-                            InitWebView2(Path.Combine(Path.GetTempPath(), "WebView2"));
+                            _webview2.EnsureCoreWebView2Async(_coreEnvironment);
                             Content = _webview2;
                             _webview2.WebMessageReceived += OnWebMessageReceived;
                         }
@@ -61,79 +66,23 @@ namespace FileViewer.WebView2
             }
         }
 
+        private static async void InitWebView2(Microsoft.Web.WebView2.Wpf.WebView2? _webview2 = null)
+        {
+            try
+            {
+                string userDataFolder = Path.Combine(Path.GetTempPath(), "WebView2");
+                _coreEnvironment = await CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
             WebMessageReceived?.Invoke(this, e);
         }
 
-        public static bool Available => _available;
-
-        private async void InitWebView2(string userDataFolder)
-        {
-            try
-            {
-                var environment = await CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
-                _webview2?.EnsureCoreWebView2Async(environment);
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        public static async void LoadWebView2()
-        {
-            if (webView2LoaderLoaded) return;
-            webView2LoaderLoaded = true;
-            string webView2Path = Path.Combine(Path.GetTempPath(), "WebView2");
-            CoreWebView2Environment.SetLoaderDllFolderPath(webView2Path);
-            var loaderPath = Path.Combine(webView2Path, "WebView2Loader.dll");
-            if (!Directory.Exists(webView2Path))
-            {
-                Directory.CreateDirectory(webView2Path);
-            }
-            var architecture = RuntimeInformation.ProcessArchitecture;
-            var architectureName = architecture.ToString().ToLower();
-            var architecturePath = loaderPath + ".architecture";
-            string architectureText = string.Empty;
-            try
-            {
-                architectureText = File.ReadAllText(architecturePath);
-            }
-            catch (Exception)
-            {
-            }
-            if (!File.Exists(loaderPath) ||
-                !File.Exists(architecturePath) ||
-                architectureText != architectureName)
-            {
-                try
-                {
-                    File.WriteAllText(architecturePath, architectureName);
-                    switch (architecture)
-                    {
-                        case Architecture.X86:
-                            File.WriteAllBytes(loaderPath, Properties.Resources.WebView2Loader_x86);
-                            break;
-                        case Architecture.X64:
-                            File.WriteAllBytes(loaderPath, Properties.Resources.WebView2Loader_x64);
-                            break;
-                        case Architecture.Arm64:
-                            File.WriteAllBytes(loaderPath, Properties.Resources.WebView2Loader_arm64);
-                            break;
-                    }
-                }
-                catch (Exception)
-                {
-                }
-            }
-            try
-            {
-                var environment = await CoreWebView2Environment.CreateAsync(userDataFolder: webView2Path);
-                _available = environment != null;
-            }
-            catch (Exception)
-            {
-            }
-        }
+        public static bool Available => _coreEnvironment != null;
     }
 }

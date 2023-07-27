@@ -12,13 +12,17 @@ namespace FileViewer
 {
     public class SettingsModel : INotifyPropertyChanged
     {
-        public delegate void NavigatingEventHandler(object? sender, object content, object? extraData);
+#pragma warning disable CS0067
         public event PropertyChangedEventHandler? PropertyChanged;
+#pragma warning restore CS0067
+        public delegate void NavigatingEventHandler(object? sender, object content, object? extraData);
         public event NavigatingEventHandler? Navigating;
 
         public class SettingsItem : INotifyPropertyChanged
         {
+#pragma warning disable CS0067
             public event PropertyChangedEventHandler? PropertyChanged;
+#pragma warning restore CS0067
             public SettingsItem(string title, ModernWpf.Controls.Symbol icon, Page page, Thickness? margin = null, bool backgroundVisible = true)
             {
                 Title = title;
