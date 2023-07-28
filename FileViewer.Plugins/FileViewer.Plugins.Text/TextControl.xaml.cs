@@ -1,4 +1,5 @@
 using FileViewer.Base;
+using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using System;
@@ -8,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml;
+using Ude;
 
 namespace FileViewer.Plugins.Text
 {
@@ -60,7 +62,26 @@ namespace FileViewer.Plugins.Text
         {
             try
             {
-                using StreamReader st = new(filePath, true);
+                Encoding encoding = Encoding.UTF8;
+
+                using (var fs = File.OpenRead(filePath))
+                {
+                    var detector = new CharsetDetector();
+                    detector.Feed(fs);
+                    detector.DataEnd();
+
+                    if (detector.Charset != null)
+                    {
+                        try
+                        {
+                            encoding = Encoding.GetEncoding(detector.Charset);
+                        }
+                        catch (ArgumentException)
+                        {
+                        }
+                    }
+                }
+                using StreamReader st = new(filePath, encoding);
                 StringBuilder sb = new();
                 string? str;
                 int i = 0;

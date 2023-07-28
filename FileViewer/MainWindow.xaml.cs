@@ -88,15 +88,23 @@ namespace FileViewer
         string lastFilePath = string.Empty;
         private void ShowFile(string filePath)
         {
-            if (filePath == lastFilePath) return;
+            if (filePath == lastFilePath)
+            {
+                ShowWindow();
+                return;
+            }
             lastFilePath = filePath;
             _model.SetFile(filePath);
             _model.SetLoading(true);
             if (!_model.TopMostShow) _model.TopMostShow = true;
             currentPlugin = pluginManager.GetPlugin(filePath);
             MainContent.Content = currentPlugin.GetUserControl(_model);
-
             currentPlugin.ChangeFile(filePath);
+            ShowWindow();
+        }
+
+        private void ShowWindow()
+        {
             Show();
             if (_model.WindowState == WindowState.Minimized)
             {

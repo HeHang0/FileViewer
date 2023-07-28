@@ -1,9 +1,9 @@
 ﻿using ModernWpf;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Text.Json;
 using System.Windows.Media;
 
 namespace FileViewer
@@ -55,7 +55,7 @@ namespace FileViewer
         {
             try
             {
-                File.WriteAllText(AppPluginSettingPath, JsonConvert.SerializeObject(PluginSetting));
+                File.WriteAllText(AppPluginSettingPath, JsonSerializer.Serialize(PluginSetting));
             }
             catch (Exception e)
             {
@@ -94,7 +94,7 @@ namespace FileViewer
                 try
                 {
                     string text = File.ReadAllText(AppPluginSettingPath);
-                    List<SettingItem>? result = JsonConvert.DeserializeObject<List<SettingItem>>(text);
+                    List<SettingItem>? result = JsonSerializer.Deserialize<List<SettingItem>>(text);
                     if (result != null) return result;
                 }
                 catch (Exception)

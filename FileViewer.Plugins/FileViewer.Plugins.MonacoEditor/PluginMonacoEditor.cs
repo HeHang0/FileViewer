@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -13,7 +14,7 @@ namespace FileViewer.Plugins.MonacoEditor
 {
     public class PluginMonacoEditor : BackgroundWorkBase, IPlugin
     {
-        public const string VirtualHostName = "FileViewerLocalMonaco";
+        public const string LocalMonacoVirtualHostName = "FileViewerLocalMonaco";
         IManager? _manager;
         private WebView2.WebView2? _instance;
         private readonly object lockObject = new();
@@ -32,11 +33,31 @@ namespace FileViewer.Plugins.MonacoEditor
                     {
                         _manager = manager;
                         _instance = new WebView2.WebView2();
-                        _instance.WebMessageReceived += WebMessageReceived;
+                        _instance.CoreWebView2InitializationCompleted += OnCoreWebView2InitializationCompleted;
+                        _instance.WebMessageReceived += OnWebMessageReceived;
                     }
                 }
             }
             return _instance;
+        }
+
+        private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
+        {
+            var message = e.TryGetWebMessageAsString();
+            switch (message)
+            {
+                case "failed":
+                    _instance?.Dispatcher.Invoke(() =>
+                    {
+                        _manager?.LoadFileFailed(_filePath!);
+                    });
+                    break;
+            }
+        }
+
+        private void OnCoreWebView2InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
+        {
+            InitCoreWebView2();
         }
 
         private string? _filePath;
@@ -51,27 +72,22 @@ namespace FileViewer.Plugins.MonacoEditor
 
         private void CoreWebView2InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
         {
-            if (sender is Microsoft.Web.WebView2.Wpf.WebView2 webview2)
-            {
-                webview2.CoreWebView2InitializationCompleted -= CoreWebView2InitializationCompleted;
-            }
             InitCoreWebView2();
+            _manager?.SetLoading(false);
         }
 
         private void InitCoreWebView2()
         {
-            _instance?.WebView2Instance?.EnsureCoreWebView2Async().ContinueWith(task =>
+            if (_instance == null || _instance?.WebView2Instance.CoreWebView2 == null) return;
+            _instance.WebView2Instance.CoreWebView2.SetVirtualHostNameToFolderMapping(
+                LocalMonacoVirtualHostName, MonacoAssetsDirectory,
+                CoreWebView2HostResourceAccessKind.Allow);
+            var data = new Dictionary<string, string>()
             {
-                _instance.Dispatcher.Invoke(() =>
-                {
-                    _instance?.WebView2Instance.CoreWebView2.SetVirtualHostNameToFolderMapping(
-                        VirtualHostName, MonacoAssetsDirectory,
-                        CoreWebView2HostResourceAccessKind.Allow);
-                    _instance?.WebView2Instance.CoreWebView2.PostWebMessageAsJson(
-                        $"{{\"message\": \"load-file\"}}");
-                    _manager?.SetLoading(false);
-                });
-            });
+                {"message", "load-file" },
+                {"value", _filePath ?? string.Empty },
+            };
+            _instance.WebView2Instance.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(data));
         }
 
         private static void ExtractJS()
@@ -90,72 +106,34 @@ namespace FileViewer.Plugins.MonacoEditor
                 $"{{\"message\": \"theme\",\"value\": \"{(dark ? "dark" : "light")}\"}}");
         }
 
-        private static readonly long MAX_TEXT_LENGTH = 10485760;
-        private void ShowTextWithWebView2(string filePath)
-        {
-            if (_instance == null) return;
-            _instance.WebView2Instance.CoreWebView2.PostWebMessageAsJson(
-                $"{{\"message\": \"extension\",\"value\": \"{Path.GetExtension(filePath)}\"}}");
-            string content;
-            var fileInfo = new FileInfo(filePath);
-            var buffer = new char[Math.Min(MAX_TEXT_LENGTH, fileInfo.Length)];
-
-            using (StreamReader st = new(filePath, true))
-            {
-                int length = st.ReadBlock(buffer, 0, buffer.Length);
-                content = new string(buffer.Take(length).ToArray());
-            }
-            Dictionary<string, string> data = new()
-            {
-                { "message", "text" },
-                { "value", content }
-            };
-            _instance.WebView2Instance.CoreWebView2.PostWebMessageAsJson(Encoding.UTF8.GetString(System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(data)));
-        }
-
-        private void WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
-        {
-            var message = e.TryGetWebMessageAsString();
-            switch (message)
-            {
-                case "loaded":
-                    ShowTextWithWebView2(_filePath ?? string.Empty);
-                    break;
-            }
-        }
-
         protected override void BgWorker_DoWork(object? sender, DoWorkEventArgs e)
         {
-            if (_instance != null)
+            if (_instance == null) return;
+            var htmlPath = Path.Combine(Path.GetTempPath(), "WebView2", "monaco_editor.html");
+            if (!File.Exists(htmlPath))
             {
-                var htmlPath = Path.Combine(Path.GetTempPath(), "WebView2", "monaco_editor.html");
-                //if (!File.Exists(htmlPath))
-                //{
-                //    File.WriteAllText(htmlPath, Properties.Resources.monaco_editor);
-                //}
-                File.WriteAllText(htmlPath, Properties.Resources.monaco_editor);
-                ExtractJS();
-                e.Result = htmlPath;
             }
+                File.WriteAllText(htmlPath, Properties.Resources.monaco_editor);
+            ExtractJS();
+            e.Result = htmlPath;
         }
 
         protected override void BgWorker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e)
         {
             if (_instance == null) return;
             string targetUrl = (string)e.Result!;
-            UriBuilder uriBuilder = new(targetUrl);
+            UriBuilder uriBuilder = new(targetUrl)
+            {
+                Query = "file=" + System.Net.WebUtility.UrlEncode(_filePath)
+            };
             if (_manager?.IsDarkMode() ?? false)
             {
-                uriBuilder.Query = "dark=1";
+                uriBuilder.Query += "&dark=1";
             }
             _instance.WebView2Instance.Source = uriBuilder.Uri;
             if (_instance.WebView2Instance.CoreWebView2 != null)
             {
                 InitCoreWebView2();
-            }
-            else
-            {
-                _instance.WebView2Instance.CoreWebView2InitializationCompleted += CoreWebView2InitializationCompleted;
             }
         }
 

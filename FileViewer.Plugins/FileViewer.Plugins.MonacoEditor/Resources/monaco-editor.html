@@ -25,8 +25,9 @@
   </head>
   <body>
     <script>
-      const queryParams = window.location.search;
-      const isDarkMode = queryParams.includes('dark=1');
+      const queryParams = new URLSearchParams(window.location.search);
+      var filePath = queryParams.get('file');
+      const isDarkMode = queryParams.get('dark') == '1';
       var backgroundColor = isDarkMode ? '#1E1E1E' : '#FFFFFE';
       var styleElement = document.createElement('style');
       var styleContent = `:root { --background-color: ${backgroundColor}; }`;
@@ -47,7 +48,46 @@
       const darkModeMediaQuery = window.matchMedia(
         '(prefers-color-scheme: dark)'
       );
-      const languageMatch = { '.xsd': 'xml', '.sln': 'vb', '.gitignore': 'ini', '.gitattributes': 'ini' };
+      let _fileLoaded = false;
+
+      async function loadFile() {
+        if (_fileLoaded) return;
+        _fileLoaded = true;
+        let extension = '.' + filePath.split('.').pop();
+        editor &&
+          monaco.editor.setModelLanguage(
+            editor.getModel(),
+            languageMatch[extension] || 'plaintext'
+          );
+        try {
+          let fileSize =
+            await window.chrome.webview.hostObjects.fileAccessor.ReadFileSize(
+              filePath
+            );
+          if (fileSize > 100 * 1024 * 1024) {
+            _fileLoaded = false;
+            window.chrome.webview?.postMessage('failed');
+            return;
+          }
+          editor &&
+            editor
+              .getModel()
+              .setValue(
+                await window.chrome.webview.hostObjects.fileAccessor.ReadFile(
+                  filePath
+                )
+              );
+        } catch {
+          _fileLoaded = false;
+          window.chrome.webview?.postMessage('failed');
+        }
+      }
+      const languageMatch = {
+        '.xsd': 'xml',
+        '.sln': 'vb',
+        '.gitignore': 'ini',
+        '.gitattributes': 'ini'
+      };
       require(['vs/editor/editor.main'], function () {
         editor = monaco.editor.create(document.getElementById('container'), {
           language: 'plaintext',
@@ -55,7 +95,10 @@
           automaticLayout: true,
           wordWrap: 'on',
           theme: isDarkMode ? 'vs-dark' : 'vs',
-          scrollBeyondLastLine: false
+          scrollBeyondLastLine: false,
+          minimap: {
+            enabled: false
+          }
         });
         const languages = monaco.languages.getLanguages();
         languages.map(m => {
@@ -64,7 +107,7 @@
               languageMatch[ext.toLowerCase()] = m.id;
             });
         });
-        window.chrome.webview?.postMessage('loaded');
+        loadFile();
       });
       window.chrome.webview?.addEventListener('message', event => {
         let data = event.data;
@@ -80,7 +123,8 @@
             editor && editor.getModel().setValue(data.value);
             break;
           case 'load-file':
-            window.chrome.webview?.postMessage('loaded');
+            filePath = data.value;
+            loadFile();
             break;
           case 'theme':
             monaco &&
