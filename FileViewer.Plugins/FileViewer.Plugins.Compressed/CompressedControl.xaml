@@ -15,28 +15,24 @@
         <TreeView Background="Transparent" BorderThickness="0" ItemsSource="{Binding FileList}" PreviewKeyDown="TreeView_PreviewKeyDown">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="TreeViewItem" BasedOn="{StaticResource DefaultTreeViewItemStyle}">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
                     <Setter Property="IsSelected" Value="False" />
                     <Setter Property="BorderThickness" Value="0" />
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Setter Property="Background" Value="GreenYellow" />
-                        </Trigger>
-                    </Style.Triggers>
                 </Style>
             </TreeView.ItemContainerStyle>
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                    <Grid HorizontalAlignment="Stretch" Margin="0 2">
+                    <Grid Margin="0 2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="22"></ColumnDefinition>
-                            <ColumnDefinition Width="300"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
                             <ColumnDefinition Width="100"></ColumnDefinition>
                             <ColumnDefinition Width="150"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Image Grid.Column="0" Source="{Binding Icon}"  Width="20" Height="18" Margin="0 0 5 0" Stretch="Uniform"/>
-                        <Label x:Name="TreeName" Grid.Column="1" ToolTip="{Binding FileName}" HorizontalAlignment="Left" VerticalAlignment="Center">
+                        <Label x:Name="TreeName" Grid.Column="1" ToolTip="{Binding FilePath}" HorizontalAlignment="Left" VerticalAlignment="Center">
                             <TextBlock Text="{Binding FileName}" TextTrimming="CharacterEllipsis" Foreground="{Binding ElementName=TreeName, Path=Foreground}"/>
                         </Label>
                         <Label Grid.Column="2" Content="{Binding FileSize}" VerticalAlignment="Center"/>

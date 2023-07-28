@@ -22,6 +22,9 @@ namespace FileViewer.Plugins.Compressed
             this.manager = manager;
         }
 
+        private readonly ObservableCollection<FileItem> _fileList = new ObservableCollection<FileItem>();
+        public ObservableCollection<FileItem> FileList => _fileList;
+
         private string currentFilePath = string.Empty;
         public void ChangeFile(string filePath)
         {
@@ -117,11 +120,12 @@ namespace FileViewer.Plugins.Compressed
                 manager.LoadFileFailed(currentFilePath);
                 return;
             }
-            FileList.Clear();
+            _fileList.Clear();
             foreach (var item in (List<FileItem>)e.Result)
             {
-                FileList.Add(item);
+                _fileList.Add(item);
             }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileList)));
             manager.SetLoading(false);
         }
 
@@ -129,8 +133,6 @@ namespace FileViewer.Plugins.Compressed
         {
 
         }
-
-        public ObservableCollection<FileItem> FileList { get; set; } = new ObservableCollection<FileItem>();
 
         public class FileItem
         {
@@ -153,6 +155,14 @@ namespace FileViewer.Plugins.Compressed
                 get
                 {
                     return Path.GetFileName(fullName);
+                }
+            }
+
+            public string FilePath
+            {
+                get
+                {
+                    return fullName;
                 }
             }
             public string FileSize { get; set; }
