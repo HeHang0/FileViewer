@@ -312,11 +312,11 @@ namespace FileViewer
 
             public ICommand DropFile => new DelegateCommand<DragEventArgs>(e =>
             {
-                e.Handled = true;
                 if (!(e?.Data.GetDataPresent(DataFormats.FileDrop) ?? false))
                 {
                     return;
                 }
+                e.Handled = true;
 
                 if (e.Data.GetData(DataFormats.FileDrop) is not string[] files) return;
                 foreach (string item in files)
@@ -341,6 +341,10 @@ namespace FileViewer
 
             public static ICommand DragOver => new DelegateCommand<DragEventArgs>(e =>
             {
+                if (!(e?.Data.GetDataPresent(DataFormats.FileDrop) ?? false))
+                {
+                    return;
+                }
                 e.Handled = true;
             });
 
