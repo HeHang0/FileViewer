@@ -1,8 +1,6 @@
 using Microsoft.Web.WebView2.Core;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -34,7 +32,7 @@ namespace FileViewer.WebView2
 
         private void WebView2_Unloaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            timeout.SetTimeout(DisposeWebView, TimeSpan.FromSeconds(10));
+            timeout.SetTimeout(DisposeWebView, TimeSpan.FromMinutes(1));
         }
 
         private void DisposeWebView()
@@ -78,76 +76,97 @@ namespace FileViewer.WebView2
 
         public class FileAccessor
         {
+#pragma warning disable CA1822 // 将成员标记为 static
             static FileAccessor()
             {
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             }
-            public async Task<string> ReadFile(string filePath)
+
+            public async Task<object> ReadFile(string filePath)
             {
-                Encoding encoding = Encoding.UTF8;
-
-                using (var fs = File.OpenRead(filePath))
+                try
                 {
-                    var detector = new CharsetDetector();
-                    detector.Feed(fs);
-                    detector.DataEnd();
+                    Encoding encoding = Encoding.UTF8;
 
-                    if (detector.Charset != null)
+                    using (var fs = File.OpenRead(filePath))
                     {
-                        try
+                        var detector = new CharsetDetector();
+                        detector.Feed(fs);
+                        detector.DataEnd();
+
+                        if (detector.Charset != null)
                         {
-                            encoding = Encoding.GetEncoding(detector.Charset);
-                        }
-                        catch (ArgumentException)
-                        {
+                            try
+                            {
+                                encoding = Encoding.GetEncoding(detector.Charset);
+                            }
+                            catch (ArgumentException)
+                            {
+                            }
                         }
                     }
+                    return await File.ReadAllTextAsync(filePath, encoding);
                 }
-                string result = await File.ReadAllTextAsync(filePath, encoding);
-                return result;
+                catch (Exception)
+                {
+                    return -1;
+                }
             }
 
-            public async Task<string> ReadFileLines(string filePath, int startLine = 1, int length = 0)
+            public async Task<object> ReadFileLines(string filePath, int startLine = 1, int length = 0)
             {
-                var lines = new StringBuilder();
-                int lineCount = 0;
-                var a = "";
-                using (var reader = new StreamReader(filePath))
+                try
                 {
-                    string? line;
-                    while ((line = await reader.ReadLineAsync()) != null)
+                    var lines = new StringBuilder();
+                    int lineCount = 0;
+                    using (var reader = new StreamReader(filePath))
                     {
-                        lineCount++;
-                        if (lineCount >= startLine && (length <=0 || lineCount < length))
+                        string? line;
+                        while ((line = await reader.ReadLineAsync()) != null)
                         {
-                            lines.AppendLine(line);
-                            a += line + "\n";
-                        }
-                        if (length > 0 && lineCount > length)
-                        {
-                            break;
+                            lineCount++;
+                            if (lineCount >= startLine && (length <= 0 || lineCount < length))
+                            {
+                                lines.AppendLine(line);
+                            }
+                            if (length > 0 && lineCount > length)
+                            {
+                                break;
+                            }
                         }
                     }
+
+                    string result = lines.ToString();
+
+                    return lines.ToString();
                 }
-
-                string result = lines.ToString();
-
-                return result;
+                catch (Exception)
+                {
+                    return -1;
+                }
             }
 
-            public async Task<int> ReadFileLineCount(string filePath)
+            public async Task<object> ReadFileLineCount(string filePath)
             {
-                int lineCount = 0;
-
-                using (var reader = new StreamReader(filePath))
+                try
                 {
-                    while (await reader.ReadLineAsync() != null)
-                    {
-                        lineCount++;
-                    }
-                }
 
-                return lineCount;
+                    int lineCount = 0;
+
+                    using (var reader = new StreamReader(filePath))
+                    {
+                        while (await reader.ReadLineAsync() != null)
+                        {
+                            lineCount++;
+                        }
+                    }
+
+                    return lineCount;
+                }
+                catch (Exception)
+                {
+                    return -1;
+                }
             }
 
             public long ReadFileSize(string filePath)
@@ -162,11 +181,12 @@ namespace FileViewer.WebView2
                     return -1;
                 }
             }
+#pragma warning restore CA1822 // 将成员标记为 static
         }
 
         private void OnCoreWebView2InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
         {
-            if(_webview2 != null)
+            if (_webview2 != null)
             {
                 _webview2.CoreWebView2.AddHostObjectToScript("fileAccessor", new FileAccessor());
             }

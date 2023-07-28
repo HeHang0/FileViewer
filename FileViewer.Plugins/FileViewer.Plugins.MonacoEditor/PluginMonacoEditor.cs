@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -14,13 +12,22 @@ namespace FileViewer.Plugins.MonacoEditor
 {
     public class PluginMonacoEditor : BackgroundWorkBase, IPlugin
     {
-        public const string LocalMonacoVirtualHostName = "FileViewerLocalMonaco";
+        private const string LocalMonacoVirtualHostName = "FileViewerLocalMonaco";
+        private static string MonacoAssetsDirectory => Path.Combine(Path.GetTempPath(), "WebView2", "monacojs");
+        private static string MonacoIndexPath => Path.Combine(Path.GetTempPath(), "WebView2", "monaco_editor.html");
         IManager? _manager;
         private WebView2.WebView2? _instance;
         private readonly object lockObject = new();
 
         public PluginMonacoEditor()
         {
+            try
+            {
+                File.Delete(MonacoIndexPath);
+            }
+            catch (Exception)
+            {
+            }
         }
 
         public UserControl GetUserControl(IManager manager)
@@ -73,7 +80,6 @@ namespace FileViewer.Plugins.MonacoEditor
         private void CoreWebView2InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
         {
             InitCoreWebView2();
-            _manager?.SetLoading(false);
         }
 
         private void InitCoreWebView2()
@@ -97,8 +103,6 @@ namespace FileViewer.Plugins.MonacoEditor
             Tools.File.UnZip(stream, MonacoAssetsDirectory);
         }
 
-        private static string MonacoAssetsDirectory => Path.Combine(Path.GetTempPath(), "WebView2", "monacojs");
-
         public void ChangeTheme(bool dark)
         {
             _manager?.SetColor(dark ? Color.FromRgb(0x1E, 0x1E, 0x1E) : Color.FromRgb(0xFF, 0xFF, 0xFE));
@@ -109,20 +113,18 @@ namespace FileViewer.Plugins.MonacoEditor
         protected override void BgWorker_DoWork(object? sender, DoWorkEventArgs e)
         {
             if (_instance == null) return;
-            var htmlPath = Path.Combine(Path.GetTempPath(), "WebView2", "monaco_editor.html");
-            if (!File.Exists(htmlPath))
+            if (!File.Exists(MonacoIndexPath))
             {
+                File.WriteAllText(MonacoIndexPath, Properties.Resources.monaco_editor);
             }
-                File.WriteAllText(htmlPath, Properties.Resources.monaco_editor);
             ExtractJS();
-            e.Result = htmlPath;
         }
 
         protected override void BgWorker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e)
         {
+            _manager?.SetLoading(false);
             if (_instance == null) return;
-            string targetUrl = (string)e.Result!;
-            UriBuilder uriBuilder = new(targetUrl)
+            UriBuilder uriBuilder = new(MonacoIndexPath)
             {
                 Query = "file=" + System.Net.WebUtility.UrlEncode(_filePath)
             };

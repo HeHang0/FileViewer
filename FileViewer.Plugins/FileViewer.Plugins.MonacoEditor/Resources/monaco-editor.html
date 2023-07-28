@@ -64,19 +64,20 @@
             await window.chrome.webview.hostObjects.fileAccessor.ReadFileSize(
               filePath
             );
-          if (fileSize > 100 * 1024 * 1024) {
-            _fileLoaded = false;
-            window.chrome.webview?.postMessage('failed');
+          if (fileSize == -1 || fileSize > 100 * 1024 * 1024) {
+            throw 'size read error';
             return;
           }
-          editor &&
-            editor
-              .getModel()
-              .setValue(
-                await window.chrome.webview.hostObjects.fileAccessor.ReadFile(
-                  filePath
-                )
-              );
+          let value =
+            await window.chrome.webview.hostObjects.fileAccessor.ReadFile(
+              filePath
+            );
+          if (value === -1) {
+            throw 'text read error';
+            return;
+          }
+
+          editor && editor.getModel().setValue(value);
         } catch {
           _fileLoaded = false;
           window.chrome.webview?.postMessage('failed');
