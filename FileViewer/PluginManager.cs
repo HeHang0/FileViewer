@@ -16,7 +16,7 @@ using System.Windows.Media;
 
 namespace FileViewer
 {
-    public class PluginManager:INotifyPropertyChanged
+    public class PluginManager : INotifyPropertyChanged
     {
 #pragma warning disable CS0067
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -50,6 +50,7 @@ namespace FileViewer
             LoadPluginFormType(typeof(Plugins.Pdf.PluginPdf));
             LoadPluginFormType(typeof(Plugins.Text.PluginText));
             LoadPluginFormType(typeof(Plugins.Browser.PluginBrowser));
+            LoadPluginFormType(typeof(Plugins.Fonts.FontsControl));
         }
 
         public IPlugin GetPlugin(string filePath)

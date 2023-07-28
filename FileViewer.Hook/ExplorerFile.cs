@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -103,7 +101,7 @@ namespace FileViewer.Hook
                     GetSelectedFilesFromFileExplorer(activeWindowHandle);
                 if (selectedFils.Length > 0) return (true, selectedFils[0]);
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
             return (false, string.Empty);

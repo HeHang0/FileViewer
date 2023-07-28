@@ -1,0 +1,76 @@
+<UserControl x:Class="FileViewer.Plugins.Fonts.FontsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="http://schemas.modernwpf.com/2019"
+             xmlns:local="clr-namespace:FileViewer.Plugins.Fonts"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <ui:GridView x:Name="FontsView" Margin="0 5 0 0" IsSelectionEnabled="False"
+                     VirtualizingStackPanel.IsVirtualizing="True"
+                     VirtualizingPanel.IsContainerVirtualizable="True"
+                     VirtualizingStackPanel.VirtualizationMode="Recycling">
+            <ui:GridView.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="10 0 10 10" Padding="5 2" SnapsToDevicePixels ="True"
+                        BorderThickness="1" CornerRadius="5"
+                        BorderBrush="{DynamicResource SystemControlBackgroundAltHighBrush}">
+                        <Grid Width="100" Height="90">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="18"/>
+                                <RowDefinition Height="18"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="20"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.RowSpan="2" Text="{Binding FontFamilyName}" ToolTip="{Binding FontFamilyName}" TextWrapping="WrapWithOverflow"  TextTrimming="CharacterEllipsis" FontSize="11" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <!--<TextBlock Grid.Row="1" Text="{Binding TypeName, Mode=OneWay}" ToolTip="{Binding TypeName}" TextTrimming="CharacterEllipsis" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"/>-->
+                            <TextBox Grid.Row="2" Text="{Binding Text, Mode=OneWay}" FontSize="25" FontFamily="{Binding FontFamily}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <Grid Grid.Row="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="55"/>
+                                    <ColumnDefinition Width="45"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding CharHexH, Mode=OneWay}" FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Text="{Binding CharHexU, Mode=OneWay}" FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ui:GridView.ItemTemplate>
+            <ui:GridView.ItemContainerStyle>
+                <Style TargetType="ui:GridViewItem">
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="MinHeight" Value="0" />
+                    <Setter Property="MinWidth" Value="0" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ui:GridViewItem">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ui:GridView.ItemContainerStyle>
+            <ui:GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ui:GridView.ItemsPanel>
+        </ui:GridView>
+    </Grid>
+</UserControl>

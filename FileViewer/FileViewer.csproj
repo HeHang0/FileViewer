@@ -45,6 +45,7 @@
     <ProjectReference Include="..\FileViewer.Plugins\FileViewer.Plugins.App\FileViewer.Plugins.App.csproj" />
     <ProjectReference Include="..\FileViewer.Plugins\FileViewer.Plugins.Browser\FileViewer.Plugins.Browser.csproj" />
     <ProjectReference Include="..\FileViewer.Plugins\FileViewer.Plugins.Compressed\FileViewer.Plugins.Compressed.csproj" />
+    <ProjectReference Include="..\FileViewer.Plugins\FileViewer.Plugins.Fonts\FileViewer.Plugins.Fonts.csproj" />
     <ProjectReference Include="..\FileViewer.Plugins\FileViewer.Plugins.Image\FileViewer.Plugins.Image.csproj" />
     <ProjectReference Include="..\FileViewer.Plugins\FileViewer.Plugins.Media\FileViewer.Plugins.Media.csproj" />
     <ProjectReference Include="..\FileViewer.Plugins\FileViewer.Plugins.MobileProvision\FileViewer.Plugins.MobileProvision.csproj" />

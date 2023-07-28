@@ -37,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileViewer.Plugins.Text", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileViewer.Plugins.Browser", "FileViewer.Plugins\FileViewer.Plugins.Browser\FileViewer.Plugins.Browser.csproj", "{EEB834E3-363A-4AE7-A634-7DDB1BA67765}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileViewer.Plugins.Fonts", "FileViewer.Plugins\FileViewer.Plugins.Fonts\FileViewer.Plugins.Fonts.csproj", "{0421FE94-17C2-4AD5-B6A1-F2147F89B62C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,6 +109,10 @@ Global
 		{EEB834E3-363A-4AE7-A634-7DDB1BA67765}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEB834E3-363A-4AE7-A634-7DDB1BA67765}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEB834E3-363A-4AE7-A634-7DDB1BA67765}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0421FE94-17C2-4AD5-B6A1-F2147F89B62C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0421FE94-17C2-4AD5-B6A1-F2147F89B62C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0421FE94-17C2-4AD5-B6A1-F2147F89B62C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0421FE94-17C2-4AD5-B6A1-F2147F89B62C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -122,6 +128,7 @@ Global
 		{68D043E2-0465-4587-9539-82CC73B95DDB} = {2FD158EC-F6F6-4783-9CD1-F6A7A4D8D45A}
 		{232A00F4-A907-4F03-9B6A-2D4B23067F38} = {2FD158EC-F6F6-4783-9CD1-F6A7A4D8D45A}
 		{EEB834E3-363A-4AE7-A634-7DDB1BA67765} = {2FD158EC-F6F6-4783-9CD1-F6A7A4D8D45A}
+		{0421FE94-17C2-4AD5-B6A1-F2147F89B62C} = {2FD158EC-F6F6-4783-9CD1-F6A7A4D8D45A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6378909B-B818-4366-A42B-65BD186F6CA2}

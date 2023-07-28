@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Text;
 using System.Xml;
 
@@ -753,7 +752,7 @@ namespace FileViewer.Tools
             for (int i = 0; i < refCount; i++)
             {
                 var binary = ParseBinary(refs[i]);
-                if(binary != null) buffer.Add(binary);
+                if (binary != null) buffer.Add(binary);
             }
 
             return buffer;
