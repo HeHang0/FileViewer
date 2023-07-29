@@ -15,7 +15,6 @@ namespace FileViewer
     {
         private static readonly AssemblyName assemblyName = Application.ResourceAssembly.GetName();
 
-        private AutoUpdate.Core.AutoUpdate? autoUpdate;
         public AboutPage()
         {
             InitializeComponent();
@@ -23,12 +22,12 @@ namespace FileViewer
             AppVersion.Content = $" {assemblyName.Version?.ToString().TrimEnd('0').TrimEnd('.') ?? string.Empty}";
             CurrentYear.Content = $"{DateTime.Now.Year}";
             PageIcon.Source = Utils.GetBitmapSource(Properties.Resources.logo);
+            VersionUpdate.Visibility = Update.GithubChecker.CanUpdate() ? Visibility.Visible : Visibility.Collapsed;
             Update.NewPackageChecked += NewPackageChecked;
         }
 
         private void NewPackageChecked(AutoUpdate.Core.AutoUpdate sender, PackageCheckedEventArgs e)
         {
-            autoUpdate = sender;
             VersionUpdate.Visibility = Visibility.Visible;
         }
 
@@ -38,7 +37,7 @@ namespace FileViewer
             UpdateProgress.Visibility = Visibility.Visible;
             Height -= 10;
             CancellationTokenSource cts = new();
-            autoUpdate?.Update(new SingleInstaller(), cts.Token, new Progress<int>(p =>
+            Update.AutoUpdate?.Update(new SingleInstaller(), cts.Token, new Progress<int>(p =>
             {
                 UpdateProgress.Value = p;
                 if (p == 100)

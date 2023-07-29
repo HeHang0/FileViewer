@@ -9,14 +9,20 @@ namespace FileViewer
     {
         public static event NewPackageCheckedEventHandler? NewPackageChecked;
 
-        private static readonly AutoUpdate.Core.AutoUpdate autoUpdate;
+        public static readonly AutoUpdate.Core.AutoUpdate AutoUpdate;
+        public static readonly GithubChecker GithubChecker;
         private static readonly AssemblyName assemblyName = Application.ResourceAssembly.GetName();
         static Update()
         {
-            var githubChecker = new GithubChecker("hehang0", assemblyName.Name, assemblyName.Name + ".exe", assemblyName.Version?.ToString());
-            autoUpdate = new AutoUpdate.Core.AutoUpdate(new Options(githubChecker, TimeSpan.FromMinutes(60)));
-            autoUpdate.NewPackageChecked += NewPackageChecked;
-            autoUpdate.Start();
+            GithubChecker = new GithubChecker("hehang0", assemblyName.Name, assemblyName.Name + ".exe", assemblyName.Version?.ToString());
+            AutoUpdate = new AutoUpdate.Core.AutoUpdate(new Options(GithubChecker, TimeSpan.FromHours(1)));
+            AutoUpdate.NewPackageChecked += OnNewPackageChecked;
+            AutoUpdate.Start();
+        }
+
+        private static void OnNewPackageChecked(AutoUpdate.Core.AutoUpdate sender, PackageCheckedEventArgs e)
+        {
+            NewPackageChecked?.Invoke(sender, e);
         }
     }
 }
