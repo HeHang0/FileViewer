@@ -50,10 +50,10 @@
                           Width="{Binding ElementName=PluginWindow, Path=ActualWidth, Converter={StaticResource DecreaseValue},ConverterParameter=20}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Drop">
-                            <i:InvokeCommandAction Command="{Binding Path=DropFile}" PassEventArgsToCommand="true"/>
+                            <i:InvokeCommandAction Command="{Binding Path=DropFile}" PassEventArgsToCommand="True"/>
                         </i:EventTrigger>
                         <i:EventTrigger EventName="PreviewDragOver">
-                            <i:InvokeCommandAction Command="{Binding Path=DragOver}" PassEventArgsToCommand="true"/>
+                            <i:InvokeCommandAction Command="{Binding Path=DragOver}" PassEventArgsToCommand="True"/>
                         </i:EventTrigger>
                         <i:EventTrigger EventName="MouseLeftButtonUp">
                             <i:InvokeCommandAction Command="{Binding Path=SwitchExpand}"/>

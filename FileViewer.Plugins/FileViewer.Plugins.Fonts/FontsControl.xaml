@@ -1,12 +1,14 @@
 <UserControl x:Class="FileViewer.Plugins.Fonts.FontsControl"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:ui="http://schemas.modernwpf.com/2019"
-             xmlns:local="clr-namespace:FileViewer.Plugins.Fonts"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:local="clr-namespace:FileViewer.Plugins.Fonts"
+        d:DataContext="{d:DesignInstance Type=local:Fonts}"
+        mc:Ignorable="d" 
+        d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <Style TargetType="TextBox">
             <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
@@ -18,15 +20,60 @@
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
+        <DrawingImage x:Key="downDrawingImage">
+            <DrawingImage.Drawing>
+                <DrawingGroup ClipGeometry="M0,0 V26 H26 V0 H0 Z">
+                    <DrawingGroup Opacity="1">
+                        <GeometryDrawing Brush="#FFFFFFFF" Geometry="F1 M26,26z M0,0z M7.269,9.29A1.393,1.393,0,0,0,7.269,11.26L12.325,16.316A1.393,1.393,0,0,0,14.295,16.316L14.306,16.305 19.351,11.26A1.393,1.393,0,1,0,17.381,9.29L13.31,13.362 9.239,9.29A1.393,1.393,0,0,0,7.269,9.29z" />
+                    </DrawingGroup>
+                </DrawingGroup>
+            </DrawingImage.Drawing>
+        </DrawingImage>
+        <DrawingImage x:Key="upDrawingImage">
+            <DrawingImage.Drawing>
+                <DrawingGroup ClipGeometry="M0,0 V26 H26 V0 H0 Z">
+                    <DrawingGroup Opacity="1">
+                        <GeometryDrawing Brush="#FFFFFFFF" Geometry="F1 M26,26z M0,0z M7.269,16.316A1.393,1.393,0,0,1,7.269,14.346L12.325,9.291A1.393,1.393,0,0,1,14.295,9.291L14.306,9.302 19.351,14.347A1.393,1.393,0,1,1,17.381,16.317L13.31,12.245 9.239,16.316A1.393,1.393,0,0,1,7.269,16.316z" />
+                    </DrawingGroup>
+                </DrawingGroup>
+            </DrawingImage.Drawing>
+        </DrawingImage>
     </UserControl.Resources>
     <Grid>
-        <ui:GridView x:Name="FontsView" Margin="0 5 0 0" IsSelectionEnabled="False"
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="30" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Button Padding="0" Command="{Binding LastPage}" IsEnabled="{Binding LastPageEnabled}"
+                ui:ControlHelper.CornerRadius="10 10 0 0"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center">
+                <Image Source="{StaticResource upDrawingImage}" Width="20"  HorizontalAlignment="Left" Margin="0 5 0 2"/>
+            </Button>
+            <Button Padding="0" Command="{Binding NextPage}" IsEnabled="{Binding NextPageEnabled}"
+                ui:ControlHelper.CornerRadius="0 0 10 10"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center">
+                <Image Source="{StaticResource downDrawingImage}" Width="20"  HorizontalAlignment="Left" Margin="0 2 0 5"/>
+            </Button>
+        </StackPanel>
+        <ui:GridView x:Name="FontsView" Margin="10 5 0 0" Padding="0" IsSelectionEnabled="False"
+                     ItemsSource="{Binding FontItems}"
+                     ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                     Width="{Binding FontsWidth, Mode=OneWayToSource}"
+                     Height="{Binding FontsHeight, Mode=OneWayToSource}"
                      VirtualizingStackPanel.IsVirtualizing="True"
                      VirtualizingPanel.IsContainerVirtualizable="True"
                      VirtualizingStackPanel.VirtualizationMode="Recycling">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SizeChanged">
+                    <i:InvokeCommandAction Command="{Binding Path=SizeChanged}" PassEventArgsToCommand="True"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             <ui:GridView.ItemTemplate>
                 <DataTemplate>
-                    <Border Margin="10 0 10 10" Padding="5 2" SnapsToDevicePixels ="True"
+                    <Border Margin="0 0 10 10" Padding="5 2" SnapsToDevicePixels ="True"
                         BorderThickness="1" CornerRadius="5"
                         BorderBrush="{DynamicResource SystemControlBackgroundAltHighBrush}">
                         <Grid Width="100" Height="90">

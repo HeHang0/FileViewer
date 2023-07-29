@@ -8,6 +8,7 @@ namespace FileViewer.Plugins.Fonts
     public class FontsPlugin : IPlugin
     {
         FontsControl? _instance;
+        Fonts? _model;
         readonly object lockObject = new();
 
         public UserControl GetUserControl(IManager manager)
@@ -16,7 +17,8 @@ namespace FileViewer.Plugins.Fonts
             {
                 lock (lockObject)
                 {
-                    _instance ??= new FontsControl(manager);
+                    _model = new Fonts(manager);
+                    _instance ??= new FontsControl(_model);
                 }
             }
             return _instance;
@@ -40,12 +42,12 @@ namespace FileViewer.Plugins.Fonts
 
         public void ChangeFile(string filePath)
         {
-            _instance?.ChangeFile(filePath);
+            _model?.ChangeFile(filePath);
         }
 
         public void ChangeTheme(bool dark)
         {
-            _instance?.ChangeTheme(dark);
+            _model?.ChangeTheme(dark);
         }
     }
 }
