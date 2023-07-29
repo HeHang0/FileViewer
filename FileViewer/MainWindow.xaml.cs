@@ -110,6 +110,7 @@ namespace FileViewer
             {
                 _model.WindowState = WindowState.Normal;
             }
+            if (Topmost) return;
             Activate();
         }
 
