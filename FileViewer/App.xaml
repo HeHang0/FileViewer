@@ -13,6 +13,7 @@
                 <ResourceDictionary Source="Style/ScrollBar.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibility"/>
+            <converter:BooleanToVisibilityReverseConverter x:Key="BooleanToVisibilityReverse" />
             <converter:PixelsToGridLengthConverter x:Key="PixelsToGridLength" />
             <converter:HalfLengthConverter x:Key="HalfLength" />
             <converter:DecreaseValueConverter x:Key="DecreaseValue" />

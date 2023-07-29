@@ -7,11 +7,11 @@ using System.Windows.Media;
 namespace FileViewer
 {
     /// <summary>
-    /// PersonalisePage.xaml 的交互逻辑
+    /// PersonalizePage.xaml 的交互逻辑
     /// </summary>
-    public partial class PersonalisePage : Page
+    public partial class PersonalizePage : BadgePage
     {
-        public PersonalisePage()
+        public PersonalizePage()
         {
             InitializeComponent();
             InitTheme();

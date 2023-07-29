@@ -13,7 +13,7 @@ using System.Windows.Threading;
 
 namespace FileViewer.Plugins.Fonts
 {
-    public class Fonts: INotifyPropertyChanged
+    public class Fonts : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -53,7 +53,7 @@ namespace FileViewer.Plugins.Fonts
         readonly Dispatcher CurrentDispatcher = Dispatcher.CurrentDispatcher;
         public void ResetPageSize(SizeChangedEventArgs? e = null)
         {
-            if(e != null && e.NewSize.Width > 0 && e.NewSize.Height > 0)
+            if (e != null && e.NewSize.Width > 0 && e.NewSize.Height > 0)
             {
                 viewWidth = e.NewSize.Width;
                 viewHeight = e.NewSize.Height;
@@ -83,7 +83,7 @@ namespace FileViewer.Plugins.Fonts
             _currentList.Clear();
             _total = (int)Math.Ceiling((double)_allList.Count / _pageSize);
             var requestList = _allList.Skip(_page * _pageSize).Take(_pageSize);
-            if(!requestList.Any())
+            if (!requestList.Any())
             {
                 requestList = _allList.TakeLast(_pageSize);
             }

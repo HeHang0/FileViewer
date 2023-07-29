@@ -4,7 +4,6 @@ using Prism.Commands;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -23,7 +22,7 @@ namespace FileViewer
 #pragma warning disable CS0067
             public event PropertyChangedEventHandler? PropertyChanged;
 #pragma warning restore CS0067
-            public SettingsItem(string title, ModernWpf.Controls.Symbol icon, Page page, Thickness? margin = null, bool backgroundVisible = true)
+            public SettingsItem(string title, ModernWpf.Controls.Symbol icon, BadgePage page, Thickness? margin = null, bool backgroundVisible = true)
             {
                 Title = title;
                 Icon = icon;
@@ -37,13 +36,22 @@ namespace FileViewer
                     TitleMargin = new(19, 12, 0, 10);
                 }
                 BackgroundVisible = backgroundVisible;
+                IsBadgeShow = page.IsBadgeShow;
+                page.BadgeShowChanged += OnBadgeShowChanged;
             }
+
+            private void OnBadgeShowChanged(object? sender, bool isBadgeShow)
+            {
+                IsBadgeShow = isBadgeShow;
+            }
+
             public string Title { get; set; } = string.Empty;
             public bool BackgroundVisible { get; private set; } = true;
             public Thickness? TitleMargin { get; set; }
             public double Opacity { get; set; } = 0;
+            public bool IsBadgeShow { get; set; }
             public ModernWpf.Controls.Symbol? Icon { get; set; }
-            internal Page Page { get; set; }
+            internal BadgePage Page { get; set; }
         }
 
         public static string Title => "设置";
@@ -86,7 +94,7 @@ namespace FileViewer
             {
                 new SettingsItem("常规", ModernWpf.Controls.Symbol.Setting, new SettingsPage()),
                 new SettingsItem("插件管理", ModernWpf.Controls.Symbol.ViewAll, new PluginManagerPage(model), new(19, 12, 0, 0)),
-                new SettingsItem("个性化", ModernWpf.Controls.Symbol.Edit, new PersonalisePage()),
+                new SettingsItem("个性化", ModernWpf.Controls.Symbol.Edit, new PersonalizePage()),
                 new SettingsItem("关于", ModernWpf.Controls.Symbol.ReportHacked, new AboutPage())
             };
             SelectedItem = SettingsItems[0];

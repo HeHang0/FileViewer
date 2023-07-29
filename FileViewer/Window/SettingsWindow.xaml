@@ -165,15 +165,30 @@
                                             </EventTrigger>
                                         </StackPanel.Triggers>
                                         <Border x:Name="MenuAnchor" Opacity="{Binding Opacity}" BorderThickness="2" CornerRadius="2" Height="16"
-                                        BorderBrush="{StaticResource SystemControlBackgroundAccentBrush}"></Border>
-                                        <Viewbox Width="16" Height="16" Margin="8 0 12 0" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                            <Label x:Name="MenuIconLabel">
-                                                <ui:SymbolIcon Symbol="{Binding Icon}" Foreground="{Binding Foreground, ElementName=MenuIconLabel}"/>
-                                            </Label>
-                                        </Viewbox>
-                                        <Border Width="193" Visibility="{Binding IsPaneOpen, ElementName=NavigationView, Converter={StaticResource BooleanToVisibility}}">
+                                            BorderBrush="{StaticResource SystemControlBackgroundAccentBrush}"></Border>
+                                        <Grid>
+                                            <Viewbox Width="16" Height="16" Margin="8 0 12 0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                <Label x:Name="MenuIconLabel">
+                                                    <ui:SymbolIcon Symbol="{Binding Icon}" Foreground="{Binding Foreground, ElementName=MenuIconLabel}"/>
+                                                </Label>
+                                            </Viewbox>
+                                            <Border Visibility="{Binding IsPaneOpen, ElementName=NavigationView, Converter={StaticResource BooleanToVisibilityReverse}}">
+                                                <Border CornerRadius="15" Width="15" Height="15" Margin="0 0 5 0"
+                                                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                    Visibility="{Binding IsBadgeShow, Converter={StaticResource BooleanToVisibility}}"
+                                                    Background="{StaticResource SystemControlBackgroundAccentBrush}">
+                                                    <Label Foreground="White" Content="1" FontSize="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                                </Border>
+                                            </Border>
+                                        </Grid>
+                                        <Grid Width="193" Visibility="{Binding IsPaneOpen, ElementName=NavigationView, Converter={StaticResource BooleanToVisibility}}">
                                             <Label Content="{Binding Title}" VerticalContentAlignment="Center"/>
-                                        </Border>
+                                            <Border CornerRadius="15" Width="15" Height="15" Margin="0 0 10 0" HorizontalAlignment="Right"
+                                                    Visibility="{Binding IsBadgeShow, Converter={StaticResource BooleanToVisibility}}"
+                                                    Background="{StaticResource SystemControlBackgroundAccentBrush}">
+                                                <Label Foreground="White" Content="1" FontSize="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                            </Border>
+                                        </Grid>
                                     </StackPanel>
                                 </DataTemplate>
                             </ui:ListView.ItemTemplate>

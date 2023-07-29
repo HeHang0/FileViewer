@@ -6,14 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace FileViewer
 {
     /// <summary>
     /// SettingsPage.xaml 的交互逻辑
     /// </summary>
-    public partial class SettingsPage : Page
+    public partial class SettingsPage : BadgePage
     {
         private const string SegoeMDL2Assets = "Segoe MDL2 Assets";
         private const string SegoeUIEmoji = "Segoe UI Emoji";
@@ -40,6 +39,7 @@ namespace FileViewer
             }
             NeedInstalledFonts.Content = string.Join(", ", needInstalls);
             FontInstallControl.Visibility = needInstalls.Count <= 0 ? Visibility.Collapsed : Visibility.Visible;
+            SetBadgeShow(needInstalls.Count > 0);
         }
 
         private static bool IsFontInstalled(string fontName)
