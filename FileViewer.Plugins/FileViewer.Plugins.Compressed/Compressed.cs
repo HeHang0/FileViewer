@@ -83,10 +83,43 @@ namespace FileViewer.Plugins.Compressed
             e.Result = result.Count > 0 ? result : null;
         }
 
+        static void ConfirmFolderPath(List<FileItem> result, Dictionary<string, FileItem> fileItemMap, string folderPath, string lastWriteTime)
+        {
+            if (fileItemMap.ContainsKey(folderPath))
+            {
+                return;
+            }
+            if(string.IsNullOrWhiteSpace(folderPath) || folderPath == "/")
+            {
+                return;
+            }
+            string parentPath = Path.GetDirectoryName(folderPath)?.Replace("\\", "/") ?? string.Empty;
+            if (!fileItemMap.ContainsKey(parentPath))
+            {
+                ConfirmFolderPath(result, fileItemMap, parentPath, lastWriteTime);
+            }
+            if (!string.IsNullOrWhiteSpace(parentPath) && !fileItemMap.ContainsKey(parentPath))
+            {
+                return;
+            }
+            FileItem folderItem = new(folderPath, true);
+            fileItemMap[folderPath] = folderItem;
+            if(string.IsNullOrWhiteSpace(parentPath) || parentPath == "/")
+            {
+                folderItem.IsExpanded = true;
+                result.Add(folderItem);
+            }
+            else
+            {
+                fileItemMap[parentPath].Children.Add(folderItem);
+            }
+        }
+
         static void ParseEntry(List<FileItem> result, Dictionary<string, FileItem> fileItemMap, bool isFolder, string fullName, long length, string lastWriteTime)
         {
             var folderPath = Path.GetDirectoryName(fullName)?.Replace("\\", "/") ?? string.Empty;
-            FileItem fileItem = new(fullName, isFolder, length, lastWriteTime); ;
+            ConfirmFolderPath(result, fileItemMap, folderPath, lastWriteTime);
+            FileItem fileItem = new(fullName, isFolder, length, lastWriteTime);
             if (isFolder)
             {
                 if (fileItemMap.ContainsKey(folderPath))
@@ -146,6 +179,14 @@ namespace FileViewer.Plugins.Compressed
             {
                 FileSize = isFolder ? string.Empty : length.ToSizeString();
                 LastModified = lastWriteTime;
+                this.isFolder = isFolder;
+                this.fullName = fullName;
+            }
+
+            public FileItem(string fullName, bool isFolder)
+            {
+                FileSize = string.Empty;
+                LastModified = string.Empty;
                 this.isFolder = isFolder;
                 this.fullName = fullName;
             }

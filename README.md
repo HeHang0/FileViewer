@@ -36,18 +36,6 @@
 ![Common Directory](Demo/common_dir.png)
 ![Common Directory](Demo/common_file.png)
 
-### Image
-
-![Image](Demo/image.png)
-
-#### Music
-
-![Music](Demo/music.png)
-
-#### Movie
-
-![Movie](Demo/movie.png)
-
 ### Word
 
 ![Word](Demo/word.png)
@@ -69,6 +57,8 @@
 ![Text](Demo/text.png)
 
 ### Media
+
+![Image](Demo/image.png)
 
 ![Music](Demo/music.png)
 
