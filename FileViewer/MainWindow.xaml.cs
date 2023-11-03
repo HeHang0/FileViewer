@@ -6,11 +6,13 @@ using ModernWpf;
 using PicaPico;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Ude.Core;
 using ToolStripMenuItem = System.Windows.Forms.ToolStripMenuItem;
 
 namespace FileViewer
@@ -31,6 +33,8 @@ namespace FileViewer
         public MainWindow()
         {
             InitializeComponent();
+            WindowState = WindowState.Minimized;
+            _model.WindowState = WindowState.Minimized;
             DataContext = _model;
             AppDomain.CurrentDomain.UnhandledException += UnhandledException;
 
@@ -40,6 +44,7 @@ namespace FileViewer
             _model.LoadFailed += FileLoadFailed;
             IsVisibleChanged += OnVisibleChanged;
             Closing += OnClosing;
+            Loaded += MainWindow_Loaded;
             InitNotify();
             InitHello();
             DependencyPropertyDescriptor desc = DependencyPropertyDescriptor.FromProperty(ThemeManager.ActualApplicationThemeProperty, ThemeManager.Current.GetType());
@@ -65,10 +70,13 @@ namespace FileViewer
             MainContent.Content = control;
         }
 
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            Hide();
+        }
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
-            Visibility = Visibility.Collapsed;
             if (MicaHelper.IsSupported)
             {
                 MicaHelper.Apply(this, ThemeManager.Current.ActualApplicationTheme == ApplicationTheme.Dark);
@@ -106,12 +114,13 @@ namespace FileViewer
         private void ShowWindow()
         {
             Show();
+            WindowState = WindowState.Normal;
             if (_model.WindowState == WindowState.Minimized)
             {
                 _model.WindowState = WindowState.Normal;
             }
-            if (Topmost) return;
             Activate();
+            if (Topmost) return;
         }
 
         private void FileLoadFailed(object? sender, string filePath)
